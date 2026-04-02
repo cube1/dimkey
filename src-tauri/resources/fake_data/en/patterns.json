@@ -1,0 +1,10 @@
+{
+  "us_phone_area_codes": ["212", "310", "312", "415", "512", "617", "713", "818", "202", "305", "404", "503"],
+  "ssn_area_prefixes": ["001", "100", "200", "300", "400", "500", "600", "700"],
+  "zip_prefixes": ["100", "900", "606", "770", "850", "191", "782", "941", "752", "802"],
+  "credit_card_prefixes": ["4111", "4012", "5100", "5200", "5300", "3714", "6011"],
+  "uk_phone_prefixes": ["020", "0121", "0131", "0141", "0151", "0161", "07911", "07700"],
+  "iban_country_codes": ["GB", "DE", "FR", "ES", "IT", "NL", "BE", "AT", "CH"],
+  "email_names": ["john", "jane", "mike", "sarah", "david", "emma", "alex", "lisa", "chris", "anna"],
+  "email_domains": ["gmail.com", "yahoo.com", "outlook.com", "company.com", "example.org"]
+}

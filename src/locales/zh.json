@@ -1,0 +1,381 @@
+{
+  "app": {
+    "name": "Dimkey",
+    "tagline": "本地运行，零网络通信，保护您的数据隐私"
+  },
+  "sensitiveType": {
+    "Phone": "手机号",
+    "IdCard": "身份证",
+    "BankCard": "银行卡",
+    "Email": "邮箱",
+    "IpAddress": "IP地址",
+    "LandlinePhone": "固定电话",
+    "LicensePlate": "车牌号",
+    "CreditCode": "信用代码",
+    "PersonName": "人名",
+    "OrgName": "机构/公司名",
+    "Address": "地址",
+    "Title": "职位",
+    "Custom": "自定义",
+    "Ssn": "SSN",
+    "CreditCard": "信用卡",
+    "UsPhone": "美国电话",
+    "UkPhone": "英国电话",
+    "Passport": "护照号",
+    "Iban": "IBAN",
+    "ZipCode": "邮编(US)",
+    "UkPostcode": "邮编(UK)",
+    "DriversLicense": "驾照号"
+  },
+  "strategy": {
+    "Mask": "掩码",
+    "Replace": "替换",
+    "Generalize": "泛化"
+  },
+  "replaceStyle": {
+    "Fake": "假数据",
+    "Mou": "某式",
+    "Ordinal": "序号式"
+  },
+  "common": {
+    "confirm": "确认",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "add": "添加",
+    "back": "返回",
+    "close": "关闭",
+    "export": "导出",
+    "loading": "加载中...",
+    "copyFailed": "复制到剪贴板失败",
+    "copied": "已复制",
+    "exact": "精确",
+    "fuzzy": "模糊"
+  },
+  "steps": {
+    "parsing": "解析文件中…",
+    "detecting": "扫描识别中…",
+    "desensitizing": "执行脱敏中…",
+    "saving": "保存记录中…",
+    "done": "处理完成"
+  },
+  "home": {
+    "dropHint": "拖拽文件到此处，自动脱敏",
+    "dropRelease": "松开导入文件",
+    "selectFile": "点击选择文件",
+    "supportedFormats": "支持 Excel / CSV / Word / TXT / PDF",
+    "supportedFormatsLong": "目前支持 Excel(.xlsx/.xls)、CSV(.csv/.tsv)、Word(.docx)、TXT(.txt)、PDF(.pdf)",
+    "pasteText": "粘贴文本脱敏",
+    "recentTasks": "最近脱敏任务",
+    "viewAll": "查看全部",
+    "items": "{{count}} 处",
+    "restore": "还原",
+    "restoring": "还原中...",
+    "fileReadError": "文件无法读取，请检查文件是否完好",
+    "parsingFile": "正在解析文件...",
+    "maxFileSize": "支持 Excel / CSV / Word / TXT / PDF，单个文件，最大 50MB"
+  },
+  "preview": {
+    "detectError": "识别过程出错",
+    "noContent": "未加载文件内容",
+    "noSensitive": "未识别到敏感信息，无需脱敏",
+    "desensitizeFailed": "脱敏处理失败",
+    "detecting": "正在识别敏感信息...",
+    "processing": "脱敏处理中...",
+    "startDesensitize": "开始脱敏",
+    "nerDetecting": "NER识别中..."
+  },
+  "result": {
+    "exportSuccess": "文件导出成功",
+    "restoreExportSuccess": "还原文件导出成功",
+    "openDir": "打开目录",
+    "copyFile": "复制文件",
+    "totalItems": "共 {{count}} 处",
+    "exportFailed": "导出失败"
+  },
+  "history": {
+    "loadFailed": "加载历史任务失败",
+    "deleted": "任务已删除",
+    "deleteFailed": "删除失败",
+    "empty": "暂无脱敏历史",
+    "emptyHint": "完成一次脱敏导出后，任务会自动保存在这里",
+    "sensitiveCount": "{{count}} 处敏感信息",
+    "restored": "已还原",
+    "viewComparison": "查看对比",
+    "deleteRecord": "删除记录"
+  },
+  "restorePage": {
+    "restoreSuccess": "还原文件导出成功",
+    "exportFailed": "导出失败",
+    "totalRestored": "共还原 {{count}} 处",
+    "noResult": "暂无还原结果",
+    "pasteAiReply": "粘贴 AI 回复",
+    "importRestore": "导入文件还原",
+    "noMatch": "AI回复中没有匹配到脱敏占位符",
+    "restoreFailed": "还原失败",
+    "restored": "已还原 {{count}} 处",
+    "desensitizedContent": "脱敏后内容（待还原）",
+    "restoredContent": "还原后内容"
+  },
+  "strategyPanel": {
+    "title": "策略配置",
+    "selectWorkspace": "选择工作区查看配置",
+    "desensitizeMode": "脱敏模式",
+    "templateMode": "模版替换",
+    "rules": "识别规则",
+    "replaceStyleLabel": "替换风格",
+    "keepPrefix": "前",
+    "keepSuffix": "后",
+    "dict": "自定义词典",
+    "dictMapping": "词典映射 ({{set}}/{{total}} 已设替换值)",
+    "inputSensitiveText": "输入敏感词文本",
+    "inputOriginalText": "原文",
+    "replaceTo": "替换为",
+    "replaceToRequired": "替换为（必填）",
+    "whitelist": "排除词",
+    "whitelistHint": "白名单中的文本不会被任何引擎识别为敏感信息",
+    "removeFromWhitelist": "从白名单移除",
+    "aliasGroup": "别名关联",
+    "noAliasGroup": "暂无别名组，在预览中点击敏感项可创建",
+    "members": "{{count}}个",
+    "deleteGroup": "删除别名组",
+    "primary": "主名",
+    "addAlias": "添加别名...",
+    "memberAdded": "成员已添加",
+    "addFailed": "添加失败: {{error}}",
+    "removeFailed": "移除失败: {{error}}",
+    "groupDeleted": "别名组已删除",
+    "output": "输出设置",
+    "defaultOutputDir": "默认输出目录",
+    "clearDir": "清除",
+    "selectDir": "点击选择目录",
+    "noDictReplacements": "没有可替换的项，请先设置词典替换值"
+  },
+  "aliasLink": {
+    "mode": "关联模式",
+    "clickToAdd": "点击敏感项继续添加...",
+    "confirmLink": "确认关联（{{count}}）",
+    "minMembers": "至少需要选择 2 个成员",
+    "createSuccess": "别名组创建成功",
+    "createFailed": "创建失败: {{error}}"
+  },
+  "password": {
+    "title": "文件已加密",
+    "hint": "Word / Excel 文件需要密码才能打开",
+    "placeholder": "请输入文件密码",
+    "decrypting": "解密中...",
+    "decrypt": "解密导入",
+    "safetyHint": "密码仅用于本次解密，不会保存"
+  },
+  "about": {
+    "name": "Dimkey",
+    "description": "本地文档脱敏工具，纯本地运行，零网络通信。",
+    "feedback": "反馈建议",
+    "copyEmail": "复制邮箱"
+  },
+  "analytics": {
+    "title": "匿名使用统计",
+    "description": "我们会收集匿名使用统计以改进产品，例如功能使用频率和文件类型分布。不包含任何文件内容或个人信息。你可以随时在左侧栏底部关闭此功能。",
+    "decline": "不参与",
+    "accept": "好的"
+  },
+  "update": {
+    "title": "软件更新",
+    "newVersion": "新版本 v{{version}} 可用",
+    "updateNow": "立即更新",
+    "downloading": "正在下载更新...",
+    "downloaded": "更新已下载完成，重启后生效",
+    "restart": "立即重启",
+    "failed": "更新失败: {{message}}"
+  },
+  "fileQueue": {
+    "exported": "该文件已导出",
+    "failed": "处理失败",
+    "waitOrder": "请按顺序处理文件",
+    "allDone": "所有文件已处理完成"
+  },
+  "dropzone": {
+    "formatNotSupported": "{{count}} 个文件格式不支持，已跳过",
+    "maxQueue": "最多同时处理 {{max}} 个文件，已取前 {{max}} 个",
+    "clipboardFailed": "读取剪贴板失败，请检查浏览器权限",
+    "waitQueue": "请先完成当前队列中的文件处理",
+    "restoreTitle": "还原操作",
+    "historyTitle": "处理历史"
+  },
+  "fileSuffix": {
+    "desensitized": "_脱敏",
+    "restored": "_还原",
+    "template": "_替换"
+  },
+  "topBar": {
+    "dictManager": "词典管理",
+    "strategyConfig": "策略配置",
+    "historyTasks": "历史任务",
+    "desensitizeTool": "脱敏工具"
+  },
+  "summaryBar": {
+    "totalDetected": "共识别 {{count}} 处",
+    "showAll": "全部显示",
+    "hideAll": "全部隐藏"
+  },
+  "typeSelector": {
+    "label": "脱敏项"
+  },
+  "textToolbar": {
+    "selectType": "选择类型",
+    "moreTypes": "更多类型",
+    "custom": "自定义"
+  },
+  "comparison": {
+    "originalContent": "原始内容",
+    "desensitizedContent": "脱敏后内容",
+    "replacePreview": "替换预览",
+    "redactPreview": "涂黑预览",
+    "noData": "暂无对比数据",
+    "noSensitiveManualHint": "未检测到敏感数据，您可以选中文本手动标记",
+    "fontSize": "字号",
+    "zoom": "缩放",
+    "rectSelect": "框选涂黑",
+    "recordTitle": "处理记录：{{name}}",
+    "processedAt": "处理时间：",
+    "sensitiveItems": "敏感项：{{count}} 处",
+    "mappingTable": "脱敏映射表",
+    "originalText": "原文",
+    "desensitizedText": "脱敏后",
+    "type": "类型",
+    "strategy": "策略",
+    "occurrences": "次数",
+    "reprocess": "重新处理",
+    "reprocessing": "处理中…",
+    "skipColumn": "不脱敏此列",
+    "reversible": "可还原（生成码本）",
+    "maskNotReversible": "掩码策略不可还原",
+    "sensitiveType": "敏感类型",
+    "desensitizeStrategy": "脱敏策略",
+    "keepPrefix": "保留前缀",
+    "keepSuffix": "保留后缀",
+    "columnHeader": "列 {{col}}: {{header}}",
+    "inferenceConfidence": "推断置信度 {{confidence}}%"
+  },
+  "processing": {
+    "parseFile": "解析文件",
+    "scanDetect": "扫描识别",
+    "desensitize": "执行脱敏",
+    "saveRecord": "保存记录"
+  },
+  "popover": {
+    "desensitizeStrategy": "脱敏策略",
+    "preview": "预览",
+    "replaceWith": "将以{{style}}替换",
+    "generalize": "将泛化处理",
+    "keepBefore": "保留前",
+    "keepAfter": "保留后",
+    "linked": "已关联",
+    "linkEntity": "关联实体",
+    "addToWhitelist": "加入白名单",
+    "ignoreItem": "忽略此项",
+    "addedToWhitelist": "\"{{text}}\" 已加入白名单",
+    "joinLink": "加入关联",
+    "inDict": "已在词典中",
+    "inputReplacement": "输入替换值..."
+  },
+  "hook": {
+    "processing": "正在处理文件，请稍候",
+    "selectWorkspace": "请先选择工作区",
+    "nerFound": "NER 引擎额外发现 {{count}} 处敏感信息",
+    "noSensitiveManual": "未检测到敏感数据，可手动选中文本标记",
+    "encrypted": "{{name}} 已加密，已跳过",
+    "encryptedSkipped": "文件已加密，批量模式下已跳过",
+    "passwordWrong": "密码错误，还剩 {{left}} 次机会",
+    "passwordTooMany": "密码错误次数过多，请检查密码后重新导入",
+    "processFailed": "处理失败",
+    "batchFileFailed": "{{name}} 处理失败：{{message}}",
+    "mappingSaveFailed": "映射记录保存失败，还原功能可能受影响",
+    "columnDesensitized": "已重新脱敏列 \"{{header}}\"",
+    "columnDesensitizeFailed": "列级脱敏失败",
+    "noDesensitizeItems": "无可脱敏项",
+    "desensitizedCount": "已脱敏 {{count}} 处敏感信息",
+    "desensitizeFailed": "脱敏失败",
+    "originalFileMissing": "原始文件已移动或删除，请重新选择",
+    "columnUndone": "已撤销列 \"{{header}}\" 的脱敏",
+    "clipboardText": "粘贴板文本",
+    "strategyUpdated": "脱敏策略已更新",
+    "reDesensitizeFailed": "重新脱敏失败"
+  },
+  "dict": {
+    "title": "自定义词典",
+    "empty": "暂无自定义词条，点击下方添加",
+    "alreadyExists": "该词条已存在",
+    "addFailed": "添加词条失败",
+    "deleteFailed": "删除词条失败",
+    "editFailed": "编辑词条失败",
+    "edit": "编辑",
+    "builtin": "内置词条（只读）",
+    "singleFileOnly": "一次只能导入一个文件",
+    "createWorkspaceFailed": "创建工作区失败",
+    "clipboardEmpty": "剪贴板中没有文本内容",
+    "clipboardFailed": "读取剪贴板失败"
+  },
+  "sidebar": {
+    "toggleLeft": "切换左侧栏",
+    "toggleRight": "切换右侧栏"
+  },
+  "workspace": {
+    "title": "工作区",
+    "newWorkspace": "新建工作区",
+    "newWorkspaceShortcut": "新建工作区 (Cmd+N)",
+    "empty": "暂无工作区",
+    "createFirst": "创建第一个工作区",
+    "createFailed": "创建工作区失败",
+    "renameFailed": "重命名失败",
+    "confirmDeleteQueue": "当前有 {{count}} 个文件未处理，删除工作区将放弃队列，是否继续？",
+    "confirmSwitchQueue": "当前有 {{count}} 个文件未处理，切换工作区将放弃队列，是否继续？",
+    "deleted": "工作区已删除",
+    "deleteFailed": "删除失败",
+    "loadFailed": "加载工作区失败",
+    "records": "{{count}} 条记录",
+    "latestVersion": "已是最新版本",
+    "updateCheckFailed": "检查更新失败",
+    "checkUpdate": "点击检查更新",
+    "aboutApp": "关于Dimkey",
+    "analyticsEnabled": "匿名统计已开启",
+    "analyticsDisabled": "匿名统计已关闭",
+    "analytics": "统计",
+    "confirmDeleteAgain": "再次点击确认删除",
+    "deleteWorkspace": "删除工作区"
+  },
+  "strategyConfig": {
+    "title": "脱敏策略配置",
+    "replaceStyle": "替换风格",
+    "keepPrefix": "保留前",
+    "keepSuffix": "保留后",
+    "chars": "位",
+    "restoreDefault": "恢复默认",
+    "save": "保存"
+  },
+  "resultPage": {
+    "noResult": "暂无脱敏结果",
+    "originalContent": "原始内容",
+    "desensitizedContent": "脱敏后内容",
+    "totalDesensitized": "共脱敏 {{count}} 处",
+    "goBack": "返回修改",
+    "exporting": "导出中...",
+    "exportFile": "导出文件",
+    "exportSuccess": "文件导出成功",
+    "openDir": "打开目录",
+    "exportFailed": "导出失败",
+    "desensitizedSuffix": "_脱敏",
+    "desensitizedFile": "脱敏文件"
+  },
+  "previewPage": {
+    "file": "文件"
+  },
+  "restore": {
+    "supportedFiles": "支持的文件",
+    "restoreFailed": "还原失败"
+  },
+  "textToolbar": {
+    "selectType": "选择涂黑类型",
+    "cancel": "取消"
+  }
+}

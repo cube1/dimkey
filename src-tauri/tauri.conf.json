@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Dimkey",
+  "version": "0.5.0",
+  "identifier": "com.dimkey",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "macOSPrivateApi": true,
+    "windows": [
+      {
+        "title": "Dimkey",
+        "width": 1200,
+        "height": 800,
+        "dragDropEnabled": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://gitee.com/qiubye/dimkey/raw/main/latest.json",
+        "https://github.com/cube1/desensitize-tool/releases/latest/download/latest.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDVDMkE4QTE2ODA5RUIzNDAKUldSQXM1NkFGb29xWE5Gc1Fvb1NPaHJLZ1NhUVQxakhMblZ2ZXRnZmFzZ0czdjBJMDZ0V0l1aEMK"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "createUpdaterArtifacts": "v1Compatible",
+    "targets": ["app", "dmg", "nsis"],
+    "resources": {
+      "resources/ner/*": "ner/",
+      "resources/pdfium/*": "pdfium/"
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}

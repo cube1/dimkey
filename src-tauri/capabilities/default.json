@@ -1,0 +1,14 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Dimkey主窗口权限",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "opener:default",
+    "dialog:default",
+    "updater:default",
+    "process:allow-restart",
+    "aptabase:allow-track-event"
+  ]
+}

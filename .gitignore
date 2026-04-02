@@ -1,0 +1,50 @@
+# Rust
+target/
+
+# Node
+node_modules/
+dist/
+
+# Tauri 自动生成
+src-tauri/gen/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Claude Code 本地配置
+.claude/settings.local.json
+
+# TypeScript / Vite 构建产物
+tsconfig.tsbuildinfo
+tsconfig.node.tsbuildinfo
+vite.config.d.ts
+vite.config.js
+
+# 环境变量
+.env
+.env.local
+
+# NER 模型文件（体积大，不提交）
+src-tauri/resources/ner/*.onnx
+src-tauri/resources/ner/vocab.txt
+src-tauri/resources/ner/tokenizer.json
+src-tauri/resources/ner/id2label.json
+
+# PDFium 动态库（体积大，不提交）
+src-tauri/resources/pdfium/*
+!src-tauri/resources/pdfium/.gitkeep
+
+# Python 虚拟环境
+.venv/
+
+# 模型导出临时文件
+scripts/_ner_export_tmp/
+onnx_export/
+onnx_export_int8/

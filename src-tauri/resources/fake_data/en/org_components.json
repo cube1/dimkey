@@ -1,0 +1,18 @@
+{
+  "prefixes": [
+    "Global", "Pacific", "Atlantic", "Summit", "Pioneer", "Apex", "Vertex", "Horizon",
+    "Sterling", "Meridian", "Pinnacle", "Nexus", "Vanguard", "Crest", "Beacon",
+    "Alliance", "Catalyst", "Quantum", "Zenith", "Ascent", "Nova", "Radiant",
+    "Prime", "Elite", "Core", "Bridge", "Emerald", "Titan", "Arc", "Pulse"
+  ],
+  "industries": [
+    "Technologies", "Solutions", "Systems", "Dynamics", "Analytics", "Consulting",
+    "Industries", "Ventures", "Capital", "Financial", "Healthcare", "Energy",
+    "Logistics", "Communications", "Media", "Engineering", "Digital", "Bio",
+    "Pharma", "Defense", "Research", "Trading", "Properties", "Insurance"
+  ],
+  "suffixes": [
+    "Inc.", "Corp.", "LLC", "Ltd.", "Group", "Holdings", "Partners", "Associates",
+    "International", "Co."
+  ]
+}

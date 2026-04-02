@@ -1,0 +1,16 @@
+{
+  "cities": [
+    "New York, NY", "Los Angeles, CA", "Chicago, IL", "Houston, TX", "Phoenix, AZ",
+    "Philadelphia, PA", "San Antonio, TX", "San Diego, CA", "Dallas, TX", "San Jose, CA",
+    "Austin, TX", "Jacksonville, FL", "Fort Worth, TX", "Columbus, OH", "Charlotte, NC",
+    "Seattle, WA", "Denver, CO", "Boston, MA", "Nashville, TN", "Portland, OR",
+    "London", "Manchester", "Birmingham", "Edinburgh", "Bristol"
+  ],
+  "streets": [
+    "Main St", "Oak Ave", "Maple Dr", "Cedar Ln", "Pine St", "Elm Rd",
+    "Washington Blvd", "Park Ave", "Lake St", "Hill Rd", "River Dr", "Spring St",
+    "Church St", "High St", "Mill Rd", "School Ln", "Forest Ave", "Meadow Dr",
+    "Sunset Blvd", "Broadway", "Market St", "Union St", "Liberty Ave", "Valley Rd"
+  ],
+  "numbers": [1, 5, 12, 23, 47, 88, 100, 155, 200, 312, 456, 789, 1024, 1500, 2200]
+}

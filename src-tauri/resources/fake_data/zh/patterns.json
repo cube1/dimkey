@@ -1,0 +1,12 @@
+{
+  "phone_prefixes": ["138", "139", "150", "151", "186", "187", "135", "136", "158", "159", "188", "189", "130", "131", "132", "155", "156", "166", "176", "177"],
+  "id_area_codes": ["110101", "110105", "310101", "310115", "440305", "440306", "330106", "330108", "510107", "510104", "320505", "320106", "420106", "500103"],
+  "bank_card_prefixes": ["6222", "6217", "6228", "6225", "6214", "6216", "6212", "6210"],
+  "landline_area_codes": ["010", "021", "020", "0755", "0571", "028", "025", "027", "023", "022", "0512", "029"],
+  "plate_provinces": ["京", "沪", "粤", "浙", "川", "苏", "鄂", "湘", "豫", "鲁", "闽", "赣", "皖", "渝", "津", "冀"],
+  "plate_letters": "ABCDEFGHJKLMNPQRSTUVWXYZ",
+  "credit_code_areas": ["110000", "310000", "440300", "330100", "510100", "320500", "420100", "500100"],
+  "credit_code_charset": "0123456789ABCDEFGHJKLMNPQRTUWXY",
+  "email_names": ["zhangsan", "lisi", "wangwu", "zhaoliu", "sunqi", "qianba", "chenming", "liuyang", "zhoujie", "wuhua", "xuwei", "malin"],
+  "email_domains": ["example.com", "test.org", "sample.net", "demo.cn", "mail.example.com", "corp.test.cn"]
+}

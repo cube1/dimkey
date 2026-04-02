@@ -1,0 +1,381 @@
+{
+  "app": {
+    "name": "Dimkey",
+    "tagline": "Runs locally, zero network traffic, protecting your data privacy"
+  },
+  "sensitiveType": {
+    "Phone": "Phone (CN)",
+    "IdCard": "ID Card (CN)",
+    "BankCard": "Bank Card (CN)",
+    "Email": "Email",
+    "IpAddress": "IP Address",
+    "LandlinePhone": "Landline (CN)",
+    "LicensePlate": "License Plate (CN)",
+    "CreditCode": "Credit Code (CN)",
+    "PersonName": "Person Name",
+    "OrgName": "Organization",
+    "Address": "Address",
+    "Title": "Job Title",
+    "Custom": "Custom",
+    "Ssn": "SSN",
+    "CreditCard": "Credit Card",
+    "UsPhone": "US Phone",
+    "UkPhone": "UK Phone",
+    "Passport": "Passport",
+    "Iban": "IBAN",
+    "ZipCode": "ZIP Code",
+    "UkPostcode": "UK Postcode",
+    "DriversLicense": "Driver's License"
+  },
+  "strategy": {
+    "Mask": "Mask",
+    "Replace": "Replace",
+    "Generalize": "Generalize"
+  },
+  "replaceStyle": {
+    "Fake": "Fake Data",
+    "Mou": "Redacted",
+    "Ordinal": "Ordinal"
+  },
+  "common": {
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "add": "Add",
+    "back": "Back",
+    "close": "Close",
+    "export": "Export",
+    "loading": "Loading...",
+    "copyFailed": "Failed to copy to clipboard",
+    "copied": "Copied",
+    "exact": "Exact",
+    "fuzzy": "Fuzzy"
+  },
+  "steps": {
+    "parsing": "Parsing file...",
+    "detecting": "Detecting sensitive data...",
+    "desensitizing": "Desensitizing...",
+    "saving": "Saving record...",
+    "done": "Complete"
+  },
+  "home": {
+    "dropHint": "Drop files here to desensitize",
+    "dropRelease": "Release to import file",
+    "selectFile": "Click to select file",
+    "supportedFormats": "Supports Excel / CSV / Word / TXT / PDF",
+    "supportedFormatsLong": "Supports Excel(.xlsx/.xls), CSV(.csv/.tsv), Word(.docx), TXT(.txt), PDF(.pdf)",
+    "pasteText": "Paste text to desensitize",
+    "recentTasks": "Recent tasks",
+    "viewAll": "View all",
+    "items": "{{count}} items",
+    "restore": "Restore",
+    "restoring": "Restoring...",
+    "fileReadError": "Unable to read file, please check if the file is intact",
+    "parsingFile": "Parsing file...",
+    "maxFileSize": "Excel / CSV / Word / TXT / PDF, single file, max 50MB"
+  },
+  "preview": {
+    "detectError": "Detection error",
+    "noContent": "No file content loaded",
+    "noSensitive": "No sensitive data detected",
+    "desensitizeFailed": "Desensitization failed",
+    "detecting": "Detecting sensitive data...",
+    "processing": "Processing...",
+    "startDesensitize": "Start",
+    "nerDetecting": "NER detecting..."
+  },
+  "result": {
+    "exportSuccess": "File exported successfully",
+    "restoreExportSuccess": "Restored file exported successfully",
+    "openDir": "Open folder",
+    "copyFile": "Copy file",
+    "totalItems": "{{count}} total",
+    "exportFailed": "Export failed"
+  },
+  "history": {
+    "loadFailed": "Failed to load history",
+    "deleted": "Task deleted",
+    "deleteFailed": "Delete failed",
+    "empty": "No history yet",
+    "emptyHint": "Tasks will be saved here after export",
+    "sensitiveCount": "{{count}} sensitive items",
+    "restored": "Restored",
+    "viewComparison": "View comparison",
+    "deleteRecord": "Delete record"
+  },
+  "restorePage": {
+    "restoreSuccess": "Restored file exported successfully",
+    "exportFailed": "Export failed",
+    "totalRestored": "{{count}} items restored",
+    "noResult": "No restore results",
+    "pasteAiReply": "Paste AI reply",
+    "importRestore": "Import file to restore",
+    "noMatch": "No desensitized placeholders found in AI reply",
+    "restoreFailed": "Restore failed",
+    "restored": "{{count}} items restored",
+    "desensitizedContent": "Desensitized content (to restore)",
+    "restoredContent": "Restored content"
+  },
+  "strategyPanel": {
+    "title": "Settings",
+    "selectWorkspace": "Select workspace to view settings",
+    "desensitizeMode": "Desensitize",
+    "templateMode": "Template Replace",
+    "rules": "Detection Rules",
+    "replaceStyleLabel": "Replace Style",
+    "keepPrefix": "Keep",
+    "keepSuffix": "Last",
+    "dict": "Custom Dictionary",
+    "dictMapping": "Dictionary ({{set}}/{{total}} with replacements)",
+    "inputSensitiveText": "Enter sensitive text",
+    "inputOriginalText": "Original text",
+    "replaceTo": "Replace with",
+    "replaceToRequired": "Replace with (required)",
+    "whitelist": "Exclusions",
+    "whitelistHint": "Whitelisted text will not be detected as sensitive",
+    "removeFromWhitelist": "Remove from whitelist",
+    "aliasGroup": "Alias Groups",
+    "noAliasGroup": "No alias groups. Click a sensitive item in preview to create one.",
+    "members": "{{count}} members",
+    "deleteGroup": "Delete group",
+    "primary": "Primary",
+    "addAlias": "Add alias...",
+    "memberAdded": "Member added",
+    "addFailed": "Add failed: {{error}}",
+    "removeFailed": "Remove failed: {{error}}",
+    "groupDeleted": "Alias group deleted",
+    "output": "Output Settings",
+    "defaultOutputDir": "Default output directory",
+    "clearDir": "Clear",
+    "selectDir": "Select directory",
+    "noDictReplacements": "No replacement values set. Please configure dictionary replacements first."
+  },
+  "aliasLink": {
+    "mode": "Link Mode",
+    "clickToAdd": "Click sensitive items to add...",
+    "confirmLink": "Confirm ({{count}})",
+    "minMembers": "At least 2 members required",
+    "createSuccess": "Alias group created",
+    "createFailed": "Create failed: {{error}}"
+  },
+  "password": {
+    "title": "File is encrypted",
+    "hint": "This file requires a password to open",
+    "placeholder": "Enter file password",
+    "decrypting": "Decrypting...",
+    "decrypt": "Decrypt & Import",
+    "safetyHint": "Password is used only for this session and will not be saved"
+  },
+  "about": {
+    "name": "Dimkey",
+    "description": "Local document desensitization tool. Runs entirely offline.",
+    "feedback": "Feedback",
+    "copyEmail": "Copy email"
+  },
+  "analytics": {
+    "title": "Anonymous Usage Statistics",
+    "description": "We collect anonymous usage statistics to improve the product, such as feature usage frequency and file type distribution. No file content or personal information is included. You can disable this anytime in the sidebar.",
+    "decline": "Decline",
+    "accept": "OK"
+  },
+  "update": {
+    "title": "Software Update",
+    "newVersion": "New version v{{version}} available",
+    "updateNow": "Update Now",
+    "downloading": "Downloading update...",
+    "downloaded": "Update downloaded. Restart to apply.",
+    "restart": "Restart Now",
+    "failed": "Update failed: {{message}}"
+  },
+  "fileQueue": {
+    "exported": "File already exported",
+    "failed": "Processing failed",
+    "waitOrder": "Please process files in order",
+    "allDone": "All files processed"
+  },
+  "dropzone": {
+    "formatNotSupported": "{{count}} unsupported files skipped",
+    "maxQueue": "Maximum {{max}} files at once",
+    "clipboardFailed": "Failed to read clipboard",
+    "waitQueue": "Please finish current queue first",
+    "restoreTitle": "Restore",
+    "historyTitle": "History"
+  },
+  "fileSuffix": {
+    "desensitized": "_desensitized",
+    "restored": "_restored",
+    "template": "_replaced"
+  },
+  "topBar": {
+    "dictManager": "Dictionary",
+    "strategyConfig": "Settings",
+    "historyTasks": "History",
+    "desensitizeTool": "Desensitize"
+  },
+  "summaryBar": {
+    "totalDetected": "{{count}} detected",
+    "showAll": "Show all",
+    "hideAll": "Hide all"
+  },
+  "typeSelector": {
+    "label": "Types"
+  },
+  "textToolbar": {
+    "selectType": "Select type",
+    "moreTypes": "More types",
+    "custom": "Custom"
+  },
+  "comparison": {
+    "originalContent": "Original content",
+    "desensitizedContent": "Desensitized content",
+    "replacePreview": "Replace preview",
+    "redactPreview": "Redact preview",
+    "noData": "No comparison data",
+    "noSensitiveManualHint": "No sensitive data detected. Select text to manually mark.",
+    "fontSize": "Font size",
+    "zoom": "Zoom",
+    "rectSelect": "Rect select redact",
+    "recordTitle": "Record: {{name}}",
+    "processedAt": "Processed at: ",
+    "sensitiveItems": "Sensitive items: {{count}}",
+    "mappingTable": "Desensitization mapping table",
+    "originalText": "Original",
+    "desensitizedText": "Desensitized",
+    "type": "Type",
+    "strategy": "Strategy",
+    "occurrences": "Count",
+    "reprocess": "Reprocess",
+    "reprocessing": "Processing...",
+    "skipColumn": "Skip this column",
+    "reversible": "Reversible (codebook)",
+    "maskNotReversible": "Mask strategy is not reversible",
+    "sensitiveType": "Sensitive type",
+    "desensitizeStrategy": "Desensitize strategy",
+    "keepPrefix": "Keep prefix",
+    "keepSuffix": "Keep suffix",
+    "columnHeader": "Col {{col}}: {{header}}",
+    "inferenceConfidence": "Confidence {{confidence}}%"
+  },
+  "processing": {
+    "parseFile": "Parse file",
+    "scanDetect": "Scan & detect",
+    "desensitize": "Desensitize",
+    "saveRecord": "Save record"
+  },
+  "popover": {
+    "desensitizeStrategy": "Desensitize strategy",
+    "preview": "Preview",
+    "replaceWith": "Will be replaced with {{style}}",
+    "generalize": "Will be generalized",
+    "keepBefore": "Keep first",
+    "keepAfter": "Keep last",
+    "linked": "Linked",
+    "linkEntity": "Link entity",
+    "addToWhitelist": "Add to whitelist",
+    "ignoreItem": "Ignore this item",
+    "addedToWhitelist": "\"{{text}}\" added to whitelist",
+    "joinLink": "Add to link",
+    "inDict": "In dictionary",
+    "inputReplacement": "Enter replacement value..."
+  },
+  "hook": {
+    "processing": "Processing file, please wait",
+    "selectWorkspace": "Please select a workspace first",
+    "nerFound": "NER engine found {{count}} additional sensitive items",
+    "noSensitiveManual": "No sensitive data detected, you can manually mark text",
+    "encrypted": "{{name}} is encrypted, skipped",
+    "encryptedSkipped": "File is encrypted, skipped in batch mode",
+    "passwordWrong": "Wrong password, {{left}} attempts remaining",
+    "passwordTooMany": "Too many wrong attempts, please check the password",
+    "processFailed": "Processing failed",
+    "batchFileFailed": "{{name}} failed: {{message}}",
+    "mappingSaveFailed": "Failed to save mapping record, restore may be affected",
+    "columnDesensitized": "Re-desensitized column \"{{header}}\"",
+    "columnDesensitizeFailed": "Column desensitization failed",
+    "noDesensitizeItems": "No items to desensitize",
+    "desensitizedCount": "Desensitized {{count}} sensitive items",
+    "desensitizeFailed": "Desensitization failed",
+    "originalFileMissing": "Original file has been moved or deleted",
+    "columnUndone": "Undid desensitization for column \"{{header}}\"",
+    "clipboardText": "Clipboard text",
+    "strategyUpdated": "Desensitization strategy updated",
+    "reDesensitizeFailed": "Re-desensitization failed"
+  },
+  "dict": {
+    "title": "Custom Dictionary",
+    "empty": "No custom entries. Click below to add.",
+    "alreadyExists": "Entry already exists",
+    "addFailed": "Failed to add entry",
+    "deleteFailed": "Failed to delete entry",
+    "editFailed": "Failed to edit entry",
+    "edit": "Edit",
+    "builtin": "Built-in (read-only)",
+    "singleFileOnly": "Only one file at a time",
+    "createWorkspaceFailed": "Failed to create workspace",
+    "clipboardEmpty": "No text in clipboard",
+    "clipboardFailed": "Failed to read clipboard"
+  },
+  "sidebar": {
+    "toggleLeft": "Toggle left sidebar",
+    "toggleRight": "Toggle right sidebar"
+  },
+  "workspace": {
+    "title": "Workspaces",
+    "newWorkspace": "New Workspace",
+    "newWorkspaceShortcut": "New Workspace (Cmd+N)",
+    "empty": "No workspaces",
+    "createFirst": "Create your first workspace",
+    "createFailed": "Failed to create workspace",
+    "renameFailed": "Rename failed",
+    "confirmDeleteQueue": "{{count}} files unprocessed. Deleting workspace will discard the queue. Continue?",
+    "confirmSwitchQueue": "{{count}} files unprocessed. Switching workspace will discard the queue. Continue?",
+    "deleted": "Workspace deleted",
+    "deleteFailed": "Delete failed",
+    "loadFailed": "Failed to load workspace",
+    "records": "{{count}} records",
+    "latestVersion": "Already up to date",
+    "updateCheckFailed": "Update check failed",
+    "checkUpdate": "Click to check for updates",
+    "aboutApp": "About Dimkey",
+    "analyticsEnabled": "Anonymous analytics enabled",
+    "analyticsDisabled": "Anonymous analytics disabled",
+    "analytics": "Analytics",
+    "confirmDeleteAgain": "Click again to confirm delete",
+    "deleteWorkspace": "Delete workspace"
+  },
+  "strategyConfig": {
+    "title": "Desensitization Strategy",
+    "replaceStyle": "Replace Style",
+    "keepPrefix": "Keep first",
+    "keepSuffix": "Keep last",
+    "chars": "chars",
+    "restoreDefault": "Restore Defaults",
+    "save": "Save"
+  },
+  "resultPage": {
+    "noResult": "No desensitization result",
+    "originalContent": "Original content",
+    "desensitizedContent": "Desensitized content",
+    "totalDesensitized": "{{count}} items desensitized",
+    "goBack": "Go back",
+    "exporting": "Exporting...",
+    "exportFile": "Export file",
+    "exportSuccess": "File exported successfully",
+    "openDir": "Open folder",
+    "exportFailed": "Export failed",
+    "desensitizedSuffix": "_desensitized",
+    "desensitizedFile": "Desensitized file"
+  },
+  "previewPage": {
+    "file": "File"
+  },
+  "restore": {
+    "supportedFiles": "Supported files",
+    "restoreFailed": "Restore failed"
+  },
+  "textToolbar": {
+    "selectType": "Select redact type",
+    "cancel": "Cancel"
+  }
+}
