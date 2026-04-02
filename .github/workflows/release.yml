@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Tag 名称（如 v0.3.2），用于重新生成 latest.json"
+        description: "Tag 名称（如 v0.1.0），用于重新生成 latest.json"
         required: true
 
 # 同一时间只允许一个 release 流程（不取消进行中的构建，排队等待）
@@ -100,8 +100,8 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: v__VERSION__
-          releaseName: "Dimkey Dimkey v__VERSION__"
-          releaseBody: "请查看 [更新日志](https://github.com/cube1/desensitize-tool/blob/main/CHANGELOG.md) 了解详细变更。"
+          releaseName: "Dimkey v__VERSION__"
+          releaseBody: "请查看 [更新日志](https://github.com/cube1/dimkey/blob/main/CHANGELOG.md) 了解详细变更。"
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
@@ -210,158 +210,3 @@ jobs:
           gh release upload "${TAG_NAME}" latest.json \
             --clobber --repo "${{ github.repository }}"
 
-  # ── 3. 创建 Gitee Release + 推送 latest.json ──
-  sync-gitee:
-    needs: generate-updater-json
-    # 只在 workflow_dispatch 时运行（此时 macOS + Windows 产物均已就绪）
-    # push 时不同步 Gitee，避免生成不完整的 Gitee latest.json
-    if: >-
-      always() &&
-      needs.generate-updater-json.result == 'success' &&
-      github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    env:
-      TAG_NAME: ${{ github.event.inputs.tag || github.ref_name }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: 下载签名文件
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          mkdir -p release-assets
-          gh release download "${TAG_NAME}" \
-            --dir release-assets \
-            --repo "${{ github.repository }}" \
-            --pattern "*.tar.gz.sig" \
-            --pattern "*.nsis.zip.sig" \
-            || true
-
-      - name: 提取 Changelog 并替换下载链接为 Gitee 地址
-        env:
-          GITEE_OWNER: ${{ vars.GITEE_OWNER }}
-          GITEE_REPO: ${{ vars.GITEE_REPO }}
-        run: |
-          # 从 CHANGELOG.md 提取当前版本的日志段落
-          RELEASE_NOTES=$(awk "
-            /^## \[${TAG_NAME}\]/ { found=1 }
-            /^## \[v/ && found && !/\[${TAG_NAME}\]/ { exit }
-            found { print }
-          " CHANGELOG.md)
-
-          if [ -n "$RELEASE_NOTES" ]; then
-            # 替换 GitHub 下载链接为 Gitee 下载链接
-            RELEASE_NOTES=$(echo "$RELEASE_NOTES" | sed \
-              "s|https://github.com/cube1/desensitize-tool/releases/download/|https://gitee.com/${GITEE_OWNER}/${GITEE_REPO}/releases/download/|g")
-            echo "$RELEASE_NOTES" > /tmp/gitee_release_notes.md
-            echo "=== Gitee Release Notes ==="
-            cat /tmp/gitee_release_notes.md
-          else
-            echo "未在 CHANGELOG.md 中找到 ${TAG_NAME} 的条目，使用默认描述"
-            echo "Dimkey Dimkey ${TAG_NAME}" > /tmp/gitee_release_notes.md
-          fi
-
-      - name: 创建 Gitee Release
-        env:
-          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
-          GITEE_OWNER: ${{ vars.GITEE_OWNER }}
-          GITEE_REPO: ${{ vars.GITEE_REPO }}
-        run: |
-          # 先尝试删除同名 release（重跑时避免冲突）
-          OLD_ID=$(curl -sf \
-            "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/releases/tags/${TAG_NAME}?access_token=${GITEE_TOKEN}" \
-            | jq -r '.id // empty' 2>/dev/null || true)
-          if [ -n "$OLD_ID" ]; then
-            echo "删除已有 Release (ID: $OLD_ID)..."
-            curl -sf -X DELETE \
-              "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/releases/${OLD_ID}" \
-              -d "access_token=${GITEE_TOKEN}" || true
-          fi
-
-          # 读取 changelog 内容，转义为 JSON 安全字符串
-          BODY=$(jq -Rs '.' < /tmp/gitee_release_notes.md)
-
-          echo "创建 Gitee Release..."
-          HTTP_CODE=$(curl -s -w "%{http_code}" -o /tmp/gitee_resp.json \
-            -X POST \
-            "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/releases" \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"access_token\": \"${GITEE_TOKEN}\",
-              \"tag_name\": \"${TAG_NAME}\",
-              \"name\": \"Dimkey Dimkey ${TAG_NAME}\",
-              \"body\": ${BODY},
-              \"target_commitish\": \"main\"
-            }")
-          if [ "$HTTP_CODE" = "201" ] || [ "$HTTP_CODE" = "200" ]; then
-            echo "Gitee Release 创建成功"
-          else
-            echo "::warning::Gitee Release 创建失败 (HTTP $HTTP_CODE)"
-            cat /tmp/gitee_resp.json 2>/dev/null || true
-          fi
-
-      - name: 生成 Gitee 版 latest.json 并推送
-        env:
-          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
-          GITEE_OWNER: ${{ vars.GITEE_OWNER }}
-          GITEE_REPO: ${{ vars.GITEE_REPO }}
-        run: |
-          VERSION="${TAG_NAME#v}"
-          PUB_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          GITEE_BASE="https://gitee.com/${GITEE_OWNER}/${GITEE_REPO}/releases/download/${TAG_NAME}"
-          PLATFORMS="{}"
-
-          # macOS aarch64
-          SIG_FILE=$(ls release-assets/*.app.tar.gz.sig 2>/dev/null | head -1)
-          if [ -n "$SIG_FILE" ]; then
-            SIG=$(cat "$SIG_FILE")
-            BUNDLE=$(basename "${SIG_FILE%.sig}")
-            PLATFORMS=$(echo "$PLATFORMS" | jq \
-              --arg sig "$SIG" --arg url "${GITEE_BASE}/${BUNDLE}" \
-              '. + {"darwin-aarch64": {signature: $sig, url: $url}}')
-          fi
-
-          # Windows x86_64
-          SIG_FILE=$(ls release-assets/*-setup.nsis.zip.sig 2>/dev/null | head -1)
-          if [ -n "$SIG_FILE" ]; then
-            SIG=$(cat "$SIG_FILE")
-            BUNDLE=$(basename "${SIG_FILE%.sig}")
-            PLATFORMS=$(echo "$PLATFORMS" | jq \
-              --arg sig "$SIG" --arg url "${GITEE_BASE}/${BUNDLE}" \
-              '. + {"windows-x86_64": {signature: $sig, url: $url}}')
-          fi
-
-          if [ "$PLATFORMS" = "{}" ]; then
-            echo "::warning::无签名文件，跳过 Gitee latest.json"
-            exit 0
-          fi
-
-          jq -n \
-            --arg version "$VERSION" \
-            --arg pub_date "$PUB_DATE" \
-            --arg notes "请查看更新日志了解详细变更。" \
-            --argjson platforms "$PLATFORMS" \
-            '{version: $version, notes: $notes, pub_date: $pub_date, platforms: $platforms}' > latest-gitee.json
-
-          echo "=== Gitee latest.json ==="
-          cat latest-gitee.json
-
-          # 推送到 Gitee 仓库（显式指定 main 分支，与 tauri.conf.json 端点一致）
-          CONTENT=$(base64 -w 0 latest-gitee.json)
-          SHA=$(curl -sf \
-            "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/contents/latest.json?access_token=${GITEE_TOKEN}&ref=main" \
-            | jq -r '.sha // empty' 2>/dev/null || true)
-
-          if [ -n "$SHA" ]; then
-            curl -sf -X PUT \
-              "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/contents/latest.json" \
-              -H "Content-Type: application/json" \
-              -d "{\"access_token\":\"${GITEE_TOKEN}\",\"content\":\"${CONTENT}\",\"sha\":\"${SHA}\",\"message\":\"chore: 更新 latest.json (${TAG_NAME})\",\"branch\":\"main\"}"
-          else
-            curl -sf -X POST \
-              "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/contents/latest.json" \
-              -H "Content-Type: application/json" \
-              -d "{\"access_token\":\"${GITEE_TOKEN}\",\"content\":\"${CONTENT}\",\"message\":\"chore: 添加 latest.json (${TAG_NAME})\",\"branch\":\"main\"}"
-          fi
-          echo "latest.json 已推送到 Gitee 仓库"

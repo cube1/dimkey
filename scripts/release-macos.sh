@@ -4,7 +4,7 @@
 # 示例: ./scripts/release-macos.sh v0.3.2
 #
 # 前置要求:
-#   1. ~/.tauri/desensitize-tool.key 存在（Tauri updater 签名私钥）
+#   1. ~/.tauri/dimkey.key 存在（Tauri updater 签名私钥）
 #   2. TAURI_SIGNING_PRIVATE_KEY_PASSWORD 环境变量已设置（私钥密码）
 #   3. gh CLI 已登录
 #   4. cargo tauri 已安装
@@ -25,7 +25,7 @@ echo "  Dimkey macOS 本地发布: $TAG"
 echo "========================================="
 
 # ── 检查前置条件 ──
-KEY_FILE="$HOME/.tauri/desensitize-tool.key"
+KEY_FILE="$HOME/.tauri/dimkey.key"
 if [ ! -f "$KEY_FILE" ]; then
   echo "错误: 未找到签名私钥: $KEY_FILE"
   exit 1
@@ -107,7 +107,7 @@ echo "上传到 GitHub Release ($TAG)..."
 if ! gh release view "$TAG" &>/dev/null; then
   echo "  Release 不存在，先创建..."
   gh release create "$TAG" \
-    --title "Dimkey Dimkey $TAG" \
+    --title "Dimkey $TAG" \
     --notes "Release 准备中..."
 fi
 
@@ -178,7 +178,7 @@ else
   echo "  latest.json 将只包含 macOS 平台"
 fi
 
-# ── 触发 workflow_dispatch 重新生成 latest.json + 同步 Gitee ──
+# ── 触发 workflow_dispatch 重新生成 latest.json ──
 echo ""
 echo "触发 workflow_dispatch 重新生成 latest.json..."
 if gh workflow run release.yml -f tag="$TAG"; then
@@ -200,9 +200,5 @@ echo "========================================="
 echo "  macOS 发布完成: $TAG"
 echo "========================================="
 echo ""
-echo "后续手动步骤（Gitee 同步）:"
-echo "  1. 从 GitHub Release 下载全部产物（含 Windows）"
-echo "  2. 上传到 Gitee Release"
-echo "  3. 验证更新配置:"
-echo "     Gitee: curl -s https://gitee.com/qiubye/dimkey/raw/main/latest.json | jq .version"
-echo "     GitHub: gh release download ${TAG} --pattern latest.json --dir /tmp && cat /tmp/latest.json | jq .version"
+echo "验证更新配置:"
+echo "  gh release download ${TAG} --pattern latest.json --dir /tmp && cat /tmp/latest.json | jq .version"
