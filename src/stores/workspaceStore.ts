@@ -575,6 +575,11 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   },
 }));
 
+// 在开发模式或 E2E 测试模式下，将 store 暴露到 window，供测试用
+if ((window as any).__DIMKEY_E2E__ || import.meta.env.DEV) {
+  (window as any).__DIMKEY_STORE__ = useWorkspaceStore;
+}
+
 /** 通用工作区字段更新（invoke 后重新读取最新 store，避免竞态覆盖） */
 async function updateWorkspaceField(
   get: () => WorkspaceState,
