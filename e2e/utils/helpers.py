@@ -106,4 +106,4 @@ def import_text_via_clipboard(page: Page, text: str):
 def get_detected_items(page: Page) -> list[str]:
     """提取页面上所有敏感高亮项的原始文本"""
     elements = page.locator('[data-testid="sensitive-highlight"]').all()
-    return [el.text_content().strip() for el in elements if el.text_content()]
+    return [el.text_content().strip().replace('\xa0', ' ') for el in elements if el.text_content()]

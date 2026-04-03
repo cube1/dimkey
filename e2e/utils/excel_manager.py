@@ -84,6 +84,9 @@ def read_testcases() -> list[dict]:
             "test_file": ws.cell(row, COL_TEST_FILE).value,
             "note": ws.cell(row, COL_NOTE).value,
             "exec_result": ws.cell(row, COL_EXEC_RESULT).value,
+            "fail_reason": ws.cell(row, COL_FAIL_REASON).value,
+            "exec_time": ws.cell(row, COL_EXEC_TIME).value,
+            "screenshot": ws.cell(row, COL_SCREENSHOT).value,
             "row": row,
         })
     wb.close()
@@ -172,7 +175,7 @@ def read_baseline(fixture_file: str) -> list[dict]:
             else:
                 mode = "hard"
             items.append({
-                "value": str(value),
+                "value": str(value).strip().replace('\xa0', ' '),
                 "type": ws.cell(row, BL_COL_TYPE).value or "",
                 "assert_mode": mode,
             })
