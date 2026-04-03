@@ -35,7 +35,7 @@ export function WhitelistSection() {
   };
 
   return (
-    <div className="border-b border-slate-100">
+    <div className="border-b border-slate-100" data-testid="panel-whitelist">
       <button
         onClick={() => setCollapsed(!collapsed)}
         className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors"

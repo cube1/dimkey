@@ -125,6 +125,7 @@ export function HighlightedText({
           <span
             key={i}
             className={highlightClass || undefined}
+            data-testid="sensitive-highlight"
             title={titleText}
             onClick={(e) => {
               e.stopPropagation();

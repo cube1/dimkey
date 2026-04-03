@@ -153,7 +153,7 @@ export function WorkspaceList() {
       </div>
 
       {/* 工作区列表 */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto" data-testid="workspace-list">
         {workspaces.length === 0 ? (
           <div className="px-4 py-8 text-center">
             <p className="text-sm text-slate-400 mb-3">{t("workspace.empty")}</p>

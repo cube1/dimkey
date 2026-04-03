@@ -98,7 +98,7 @@ export function RestoreView() {
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0">
+    <div className="flex-1 flex flex-col min-h-0" data-testid="view-restore">
       {/* DiffPanel */}
       <div className="flex-1 flex min-h-0">
         {/* 左：脱敏后文件 */}

@@ -151,7 +151,7 @@ export function EmptyDropzoneView() {
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center animate-fade-in p-6">
+    <div className="flex-1 flex items-center justify-center animate-fade-in p-6" data-testid="view-empty">
       <div
         onClick={handleClickSelect}
         className={`

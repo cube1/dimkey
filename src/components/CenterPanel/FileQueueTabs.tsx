@@ -71,7 +71,7 @@ export function FileQueueTabs() {
   const doneCount = fileQueue.filter((f) => f.status === "confirmed" || f.status === "failed").length;
 
   return (
-    <div className="bg-white border-b border-slate-200 px-3 py-1.5 shrink-0">
+    <div className="bg-white border-b border-slate-200 px-3 py-1.5 shrink-0" data-testid="file-queue">
       <div className="flex items-center gap-2">
         <span className="text-xs text-slate-400 shrink-0">
           {doneCount}/{fileQueue.length}

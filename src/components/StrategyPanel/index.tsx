@@ -35,7 +35,7 @@ export function StrategyPanel() {
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0">
+    <div className="flex-1 flex flex-col min-h-0" data-testid="panel-strategy">
       {/* 标题 */}
       <div className="px-4 py-3 border-b border-slate-200 shrink-0">
         <div className="flex items-center gap-2">

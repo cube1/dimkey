@@ -21,7 +21,7 @@ export function ProcessingView() {
   const currentIdx = getStepIndex(step);
 
   return (
-    <div className="flex-1 flex items-center justify-center animate-fade-in">
+    <div className="flex-1 flex items-center justify-center animate-fade-in" data-testid="view-processing">
       <div className="text-center max-w-md w-full px-6">
         {/* 品牌色脉冲动画环 + Spinner */}
         <div className="mx-auto w-16 h-16 relative mb-8">

@@ -228,7 +228,7 @@ export function DropzoneView() {
   const history = wsData?.history || [];
 
   return (
-    <div className="flex-1 flex flex-col min-h-0">
+    <div className="flex-1 flex flex-col min-h-0" data-testid="view-dropzone">
       {/* 拖放区域 */}
       <div className="p-6 shrink-0">
         <div
@@ -288,6 +288,7 @@ export function DropzoneView() {
           <button
             onClick={handleAiRestore}
             disabled={aiRestoring}
+            data-testid="btn-restore-ai"
             className="flex-1 py-2 px-3 bg-emerald-50 hover:bg-emerald-100
                        border border-emerald-300 rounded-lg
                        text-xs text-emerald-700 transition-colors disabled:opacity-50
@@ -300,6 +301,7 @@ export function DropzoneView() {
           <button
             onClick={handleWorkspaceRestore}
             disabled={workspaceRestoring}
+            data-testid="btn-restore-workspace"
             className="flex-1 py-2 px-3 bg-emerald-50 hover:bg-emerald-100
                        border border-emerald-300 rounded-lg
                        text-xs text-emerald-700 transition-colors disabled:opacity-50

@@ -331,6 +331,7 @@ export function WorkspaceLayout() {
             <div className="flex items-center gap-2 min-w-0">
               <button
                 onClick={handleGoBack}
+                data-testid="btn-back"
                 className="p-1.5 rounded-md text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors"
                 title={t("common.back")}
               >
@@ -353,6 +354,7 @@ export function WorkspaceLayout() {
             <div className="flex items-center gap-2 min-w-0">
               <button
                 onClick={handleGoBack}
+                data-testid="btn-back"
                 className="p-1.5 rounded-md text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors"
                 title={t("common.back")}
               >
@@ -385,6 +387,7 @@ export function WorkspaceLayout() {
             <button
               onClick={handleExportOnly}
               disabled={exporting}
+              data-testid="btn-export-only"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-slate-600 text-xs font-medium rounded-md border border-slate-300 hover:bg-slate-50 shadow-sm transition-colors disabled:opacity-50"
             >
               <Download className="w-3.5 h-3.5" />
@@ -393,6 +396,7 @@ export function WorkspaceLayout() {
             <button
               onClick={handleExportAndNext}
               disabled={exporting}
+              data-testid="btn-export-next"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-600 text-white text-xs font-medium rounded-md hover:bg-primary-700 shadow-sm transition-colors disabled:opacity-50"
             >
               <SkipForward className="w-3.5 h-3.5" />
@@ -406,6 +410,7 @@ export function WorkspaceLayout() {
         <button
           onClick={batchMode ? handleExportOnly : handleComparisonExport}
           disabled={exporting}
+          data-testid="btn-export"
           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-600 text-white text-xs font-medium rounded-md hover:bg-primary-700 shadow-sm transition-colors disabled:opacity-50"
         >
           <Download className="w-3.5 h-3.5" />
@@ -418,6 +423,7 @@ export function WorkspaceLayout() {
         <button
           onClick={handleRestoreExport}
           disabled={exporting}
+          data-testid="btn-export-restore"
           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-white text-xs font-medium rounded-md hover:bg-emerald-700 shadow-sm transition-colors disabled:opacity-50"
         >
           <Download className="w-3.5 h-3.5" />
