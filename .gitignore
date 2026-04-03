@@ -48,3 +48,10 @@ src-tauri/resources/pdfium/*
 scripts/_ner_export_tmp/
 onnx_export/
 onnx_export_int8/
+
+# E2E 测试输出
+e2e/output/
+e2e/__pycache__/
+e2e/.pytest_cache/
+e2e/tests/__pycache__/
+e2e/utils/__pycache__/
