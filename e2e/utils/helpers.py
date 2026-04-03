@@ -69,14 +69,35 @@ def get_fixture_path(filename: str) -> str:
     return str(path)
 
 
-def import_file_via_store(page: Page, file_path: str):
-    """通过暴露的 store 导入文件（绕过原生文件对话框）"""
+def import_file_via_ipc(page: Page, file_path: str):
+    """通过暴露的 processFileStandalone 导入文件并触发完整处理流程
+
+    调用 DEV 模式下暴露的 window.__DIMKEY_PROCESS_FILE__，
+    触发：解析 → 识别（regex/dict/NER）→ 脱敏 → UI 更新
+    """
     abs_path = str(Path(file_path).resolve())
     page.evaluate(f"""
         async () => {{
-            const store = window.__DIMKEY_STORE__;
-            if (store) {{
-                await store.getState().handleFileDrop(['{abs_path}']);
+            const processFile = window.__DIMKEY_PROCESS_FILE__;
+            if (!processFile) {{
+                throw new Error('processFile 未暴露到 window，请确认 DEV 模式');
             }}
+            await processFile('{abs_path}');
+        }}
+    """)
+
+
+def import_text_via_clipboard(page: Page, text: str):
+    """通过剪贴板粘贴文本导入（不需要文件对话框）
+
+    调用 DEV 模式下暴露的 window.__DIMKEY_PROCESS_TEXT__。
+    """
+    page.evaluate(f"""
+        async () => {{
+            const processText = window.__DIMKEY_PROCESS_TEXT__;
+            if (!processText) {{
+                throw new Error('processClipboardText 未暴露到 window，请确认 DEV 模式');
+            }}
+            await processText(`{text}`);
         }}
     """)

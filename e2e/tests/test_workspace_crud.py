@@ -1,10 +1,6 @@
 """P1: 工作区管理 — 创建/重命名/删除"""
 
 import pytest
-from pathlib import Path
-
-import sys
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from utils.helpers import (
     wait_for_view,

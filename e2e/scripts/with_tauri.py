@@ -1,64 +1,47 @@
 #!/usr/bin/env python3
-"""Tauri 应用进程管理器：启动 debug build → 等待就绪 → 执行测试命令 → 关闭"""
+"""Tauri E2E 测试运行器：启动 cargo tauri dev → 等待 :1420 就绪 → 执行测试 → 关闭"""
 
 import argparse
 import os
-import platform
 import signal
+import socket
 import subprocess
 import sys
 import time
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-APP_NAME = "Dimkey"
+DEV_PORT = 1420
 
 
-def find_debug_binary() -> Path:
-    """查找 Tauri debug build 产物"""
-    system = platform.system()
-    if system == "Darwin":
-        binary = PROJECT_ROOT / "src-tauri" / "target" / "debug" / APP_NAME
-        if not binary.exists():
-            bundle = PROJECT_ROOT / "src-tauri" / "target" / "debug" / "bundle" / "macos" / f"{APP_NAME}.app" / "Contents" / "MacOS" / APP_NAME
-            if bundle.exists():
-                return bundle
-        return binary
-    elif system == "Windows":
-        return PROJECT_ROOT / "src-tauri" / "target" / "debug" / f"{APP_NAME}.exe"
-    else:
-        return PROJECT_ROOT / "src-tauri" / "target" / "debug" / APP_NAME.lower()
+def is_port_open(port: int) -> bool:
+    """检查端口是否可连接"""
+    try:
+        with socket.create_connection(("127.0.0.1", port), timeout=1):
+            return True
+    except (ConnectionRefusedError, TimeoutError, OSError):
+        return False
 
 
-def build_debug():
-    """构建 debug 版本"""
-    print("[with_tauri] 构建 debug 版本...")
-    subprocess.run(["npm", "run", "build"], cwd=PROJECT_ROOT, check=True)
-    subprocess.run(
-        ["cargo", "build"],
-        cwd=PROJECT_ROOT / "src-tauri",
-        check=True,
-    )
-    print("[with_tauri] 构建完成")
-
-
-def wait_for_ready(proc: subprocess.Popen, timeout: int = 60):
-    """等待应用启动就绪"""
+def wait_for_port(port: int, proc: subprocess.Popen, timeout: int = 120):
+    """轮询端口直到可用"""
+    print(f"[with_tauri] 等待端口 {port} 就绪...")
     start = time.time()
     while time.time() - start < timeout:
         if proc.poll() is not None:
-            raise RuntimeError(f"应用启动失败，退出码: {proc.returncode}")
-        time.sleep(2)
-        print("[with_tauri] 应用已启动")
-        return
-    raise TimeoutError(f"应用在 {timeout} 秒内未启动")
+            raise RuntimeError(f"进程意外退出，退出码: {proc.returncode}")
+        if is_port_open(port):
+            print(f"[with_tauri] 端口 {port} 已就绪 ({time.time() - start:.1f}s)")
+            return
+        time.sleep(1)
+    raise TimeoutError(f"端口 {port} 在 {timeout} 秒内未就绪")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Tauri E2E 测试运行器")
-    parser.add_argument("--no-build", action="store_true", help="跳过构建步骤")
     parser.add_argument("--keep-alive", action="store_true", help="测试后不关闭应用")
-    parser.add_argument("--timeout", type=int, default=60, help="启动超时秒数")
+    parser.add_argument("--timeout", type=int, default=120, help="启动超时秒数")
+    parser.add_argument("--port", type=int, default=DEV_PORT, help="Vite dev server 端口")
     parser.add_argument("command", nargs=argparse.REMAINDER, help="测试命令（-- 之后）")
     args = parser.parse_args()
 
@@ -70,26 +53,33 @@ def main():
         print("示例: python with_tauri.py -- pytest e2e/tests/ -v")
         sys.exit(1)
 
-    binary = find_debug_binary()
-
-    if not args.no_build and not binary.exists():
-        build_debug()
-
-    if not binary.exists():
-        print(f"[with_tauri] 未找到 debug binary: {binary}")
-        print("[with_tauri] 请先运行: cargo build (在 src-tauri 目录)")
-        sys.exit(1)
-
     env = os.environ.copy()
     env["DIMKEY_E2E"] = "1"
-    env["DIMKEY_TEST_BINARY"] = str(binary)
 
-    print(f"[with_tauri] 启动应用: {binary}")
-    proc = subprocess.Popen([str(binary)], env=env)
+    # 检查端口是否已被占用（可能已有 dev server 在运行）
+    if is_port_open(args.port):
+        print(f"[with_tauri] 端口 {args.port} 已在使用，跳过启动")
+        env["DIMKEY_TEST_URL"] = f"http://localhost:{args.port}"
+        result = subprocess.run(cmd, cwd=PROJECT_ROOT, env=env)
+        sys.exit(result.returncode)
+
+    # 启动 cargo tauri dev
+    print("[with_tauri] 启动 cargo tauri dev...")
+    proc = subprocess.Popen(
+        ["cargo", "tauri", "dev"],
+        cwd=PROJECT_ROOT,
+        env=env,
+        # 使用进程组以便一次性关闭所有子进程
+        preexec_fn=os.setsid if hasattr(os, "setsid") else None,
+    )
 
     try:
-        wait_for_ready(proc, args.timeout)
+        wait_for_port(args.port, proc, args.timeout)
 
+        # 额外等待 WebView 初始化
+        time.sleep(3)
+
+        env["DIMKEY_TEST_URL"] = f"http://localhost:{args.port}"
         print(f"[with_tauri] 执行测试: {' '.join(cmd)}")
         result = subprocess.run(cmd, cwd=PROJECT_ROOT, env=env)
 
@@ -104,11 +94,24 @@ def main():
     finally:
         if proc.poll() is None:
             print("[with_tauri] 关闭应用...")
-            proc.send_signal(signal.SIGTERM)
+            # 关闭整个进程组（cargo tauri dev 会启动子进程）
+            if hasattr(os, "killpg"):
+                try:
+                    os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+                except ProcessLookupError:
+                    pass
+            else:
+                proc.send_signal(signal.SIGTERM)
             try:
                 proc.wait(timeout=10)
             except subprocess.TimeoutExpired:
-                proc.kill()
+                if hasattr(os, "killpg"):
+                    try:
+                        os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
+                else:
+                    proc.kill()
         print("[with_tauri] 完成")
 
 

@@ -1,10 +1,6 @@
 """P1: 列级规则 — 导入 xlsx 后验证列推断"""
 
 import pytest
-from pathlib import Path
-
-import sys
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from utils.helpers import (
     wait_for_view,
@@ -12,7 +8,7 @@ from utils.helpers import (
     count_highlights,
     take_diagnostic,
     get_fixture_path,
-    import_file_via_store,
+    import_file_via_ipc,
 )
 
 pytestmark = pytest.mark.p1
@@ -25,7 +21,7 @@ class TestColumnRules:
         """导入 xlsx → 应出现敏感高亮"""
         fixture_path = get_fixture_path("sample.xlsx")
         wait_for_view(page, "dropzone", timeout=10_000)
-        import_file_via_store(page, fixture_path)
+        import_file_via_ipc(page, fixture_path)
         wait_for_processing_done(page)
 
         highlights = count_highlights(page)

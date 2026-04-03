@@ -1020,3 +1020,225 @@ function generateRecordId(): string {
   const rand = Math.random().toString(36).slice(2, 10);
   return `rec_${date}_${time}_${rand}`;
 }
+
+/**
+ * 独立版 processFile — 不依赖 React hook，可在模块级直接调用。
+ * 内部逻辑与 useAutoDesensitize 中的 processFile useCallback 完全一致。
+ * 供 E2E 测试通过 window.__DIMKEY_PROCESS_FILE__ 调用。
+ */
+export async function processFileStandalone(filePath: string, password?: string): Promise<void> {
+  const store = useWorkspaceStore.getState();
+  const wsData = store.activeWorkspaceData;
+  if (!wsData) {
+    toast.error(i18n.t("hook.selectWorkspace"));
+    return;
+  }
+
+  const ws = wsData.workspace;
+  const enabledTypes = ws.enabled_types;
+  const name = filePath.split(/[/\\]/).pop() || filePath;
+
+  try {
+    // 1. 解析文件
+    store.setProcessingStep("parsing", name);
+    store.setCenterView("processing");
+    const content = password
+      ? await invoke<FileContent>("import_file_with_password", { filePath, password })
+      : await invoke<FileContent>("import_file", { filePath });
+    if (password) {
+      store.setPasswordModal(null);
+    }
+    store.setCurrentFileContent(content, filePath);
+
+    // 2. 识别敏感信息（regex + dict + NER 三路并行）
+    store.setProcessingStep("detecting");
+
+    const isSpreadsheet = content.type === "Spreadsheet";
+
+    const detectPromises: [
+      Promise<PromiseSettledResult<SensitiveItem[]>[]>,
+      Promise<ColumnInference[] | null>,
+    ] = [
+      Promise.allSettled([
+        invoke<SensitiveItem[]>("detect_by_regex", { content, enabledTypes }),
+        ws.dict_entries.length > 0
+          ? invoke<SensitiveItem[]>("detect_by_dict", { content, dictEntries: ws.dict_entries })
+          : Promise.resolve([] as SensitiveItem[]),
+        invoke<SensitiveItem[]>("detect_by_ner", { content }),
+      ]),
+      isSpreadsheet
+        ? invoke<ColumnInference[]>("detect_columns", { content, sampleSize: 100 })
+            .catch(() => null)
+        : Promise.resolve(null),
+    ];
+
+    const [scanResults, columnInferences] = await Promise.all(detectPromises);
+
+    if (columnInferences) {
+      store.setColumnInferences(columnInferences);
+      store.setIsColumnMode(true);
+    }
+
+    const [regexResult, dictResult, nerResult] = scanResults;
+
+    if (regexResult.status === "rejected") {
+      throw regexResult.reason;
+    }
+    const regexItems = regexResult.value;
+    const dictItems = dictResult.status === "fulfilled" ? dictResult.value : [];
+    const nerItems = nerResult.status === "fulfilled" ? nerResult.value : [];
+
+    if (isSpreadsheet && nerItems.length > 0 && content.type === "Spreadsheet") {
+      const nerColInferences = buildNerColumnInferences(nerItems, content);
+      if (nerColInferences.length > 0) {
+        const regexColInferences = columnInferences || [];
+        const merged = mergeColumnInferences(regexColInferences, nerColInferences);
+        store.setColumnInferences(merged);
+        store.setIsColumnMode(true);
+      }
+    }
+
+    const mergedItems = [...regexItems];
+    for (const di of [...dictItems, ...nerItems]) {
+      const overlap = mergedItems.some(
+        (ex) =>
+          ex.sheet_index === di.sheet_index &&
+          ex.row === di.row &&
+          ex.col === di.col &&
+          ex.start < di.end &&
+          di.start < ex.end
+      );
+      if (!overlap) mergedItems.push(di);
+    }
+
+    const whitelist = ws.whitelist || [];
+    if (whitelist.length > 0) {
+      const afterWhitelist = mergedItems.filter((item) =>
+        !whitelist.some((w) =>
+          w.match_mode === "Exact"
+            ? item.text === w.text
+            : item.text.toLowerCase() === w.text.toLowerCase()
+        )
+      );
+      mergedItems.length = 0;
+      mergedItems.push(...afterWhitelist);
+    }
+
+    const filteredItems = mergedItems.filter((item) => {
+      const key = typeof item.sensitive_type === "string" ? item.sensitive_type : "Custom";
+      return enabledTypes.includes(key);
+    });
+
+    mergedItems.length = 0;
+    mergedItems.push(...filteredItems);
+
+    const nerOnlyCount = nerItems.filter(
+      (ni) =>
+        !regexItems.some(
+          (ex) =>
+            ex.sheet_index === ni.sheet_index &&
+            ex.row === ni.row &&
+            ex.col === ni.col &&
+            ex.start < ni.end &&
+            ni.start < ex.end
+        ) &&
+        !dictItems.some(
+          (ex) =>
+            ex.sheet_index === ni.sheet_index &&
+            ex.row === ni.row &&
+            ex.col === ni.col &&
+            ex.start < ni.end &&
+            ni.start < ex.end
+        )
+    ).length;
+    if (nerOnlyCount > 0) {
+      toast.success(i18n.t("hook.nerFound", { count: nerOnlyCount }));
+    }
+
+    if (mergedItems.length === 0) {
+      store.setCurrentSensitiveItems([]);
+      const emptyResult: DesensitizeResult = {
+        content: content,
+        mappings: [],
+        summary: { total: 0, by_type: {} },
+      };
+      store.setCurrentResult(emptyResult);
+      store.setCenterView("comparison");
+      store.setProcessingStep("done");
+      toast(i18n.t("hook.noSensitiveManual"), { icon: "ℹ️" });
+      return;
+    }
+
+    store.setRawSensitiveItems(mergedItems);
+    store.setCurrentSensitiveItems(mergedItems);
+
+    const isTemplateMode = ws.mode === "TemplateReplace";
+
+    if (isTemplateMode) {
+      store.setCurrentSensitiveItems(mergedItems);
+      store.setCenterView("comparison");
+      store.setProcessingStep("done");
+      return;
+    }
+
+    // 3. 构建策略配置并执行脱敏
+    store.setProcessingStep("desensitizing");
+    const strategies: StrategyConfig[] = mergedItems
+      .reduce<string[]>((acc, item) => {
+        const key = typeof item.sensitive_type === "string" ? item.sensitive_type : "Custom";
+        if (!acc.includes(key)) acc.push(key);
+        return acc;
+      }, [])
+      .map((key) => ({
+        sensitive_type: key === "Custom"
+          ? { Custom: "Custom" }
+          : (key as SensitiveItem["sensitive_type"]),
+        strategy: ws.strategies[key] || { Mask: { keep_prefix: 1, keep_suffix: 1 } },
+        consistent: true,
+      }));
+
+    const result = await invoke<DesensitizeResult>("apply_desensitize", {
+      content,
+      items: mergedItems,
+      strategies,
+      workspaceId: ws.id,
+    });
+
+    // 4. 保存处理记录
+    store.setProcessingStep("saving");
+    const record: ProcessingRecord = {
+      id: generateRecordId(),
+      file_name: name,
+      file_path: filePath,
+      file_type: content.file_type,
+      processed_at: new Date().toISOString(),
+      mappings: result.mappings,
+      sensitive_count: result.summary.total,
+      status: "Completed",
+    };
+
+    await invoke("add_processing_record", {
+      workspaceId: ws.id,
+      record,
+    });
+
+    // 5. 更新 store 并切换到对比视图
+    store.setCurrentRecordId(record.id);
+    store.setCurrentResult(result);
+    await store.refreshActiveWorkspace();
+    store.setCenterView("comparison");
+    store.setProcessingStep("done");
+  } catch (err) {
+    const message =
+      typeof err === "string" ? err :
+      err instanceof Error ? err.message : i18n.t("hook.processFailed");
+    toast.error(message);
+    store.setProcessingStep("idle");
+    store.setCenterView("dropzone");
+  }
+}
+
+// E2E 测试支持：DEV 模式或 E2E 标志下，将 processFileStandalone 暴露到 window
+if ((window as any).__DIMKEY_E2E__ || import.meta.env.DEV) {
+  (window as any).__DIMKEY_PROCESS_FILE__ = processFileStandalone;
+}

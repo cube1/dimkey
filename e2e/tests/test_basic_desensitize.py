@@ -1,10 +1,6 @@
 """P0: 基础脱敏流程 — 导入→识别→验证高亮→导出"""
 
 import pytest
-from pathlib import Path
-
-import sys
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from utils.helpers import (
     wait_for_view,
@@ -12,7 +8,7 @@ from utils.helpers import (
     count_highlights,
     take_diagnostic,
     get_fixture_path,
-    import_file_via_store,
+    import_file_via_ipc,
 )
 
 pytestmark = pytest.mark.p0
@@ -32,7 +28,7 @@ class TestBasicDesensitize:
         fixture_path = get_fixture_path(filename)
 
         wait_for_view(page, "dropzone", timeout=10_000)
-        import_file_via_store(page, fixture_path)
+        import_file_via_ipc(page, fixture_path)
         wait_for_processing_done(page, timeout=60_000)
 
         highlights = count_highlights(page)
@@ -43,7 +39,7 @@ class TestBasicDesensitize:
         """comparison 视图应存在且可见"""
         fixture_path = get_fixture_path("sample.txt")
         wait_for_view(page, "dropzone", timeout=10_000)
-        import_file_via_store(page, fixture_path)
+        import_file_via_ipc(page, fixture_path)
         wait_for_processing_done(page)
 
         comparison = page.locator('[data-testid="view-comparison"]')
@@ -53,7 +49,7 @@ class TestBasicDesensitize:
         """脱敏完成后导出按钮应可用"""
         fixture_path = get_fixture_path("sample.csv")
         wait_for_view(page, "dropzone", timeout=10_000)
-        import_file_via_store(page, fixture_path)
+        import_file_via_ipc(page, fixture_path)
         wait_for_processing_done(page)
 
         export_btn = page.locator('[data-testid="btn-export"]')
