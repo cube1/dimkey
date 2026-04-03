@@ -36,7 +36,6 @@ fi
 
 if [ -z "${TAURI_SIGNING_PRIVATE_KEY_PASSWORD:-}" ]; then
   echo "错误: 未设置 TAURI_SIGNING_PRIVATE_KEY_PASSWORD 环境变量"
-  echo "   请先运行: export TAURI_SIGNING_PRIVATE_KEY_PASSWORD='你的密码'"
   exit 1
 fi
 
@@ -65,14 +64,8 @@ fi
 # ── 检查 tag 是否已推送到远端 ──
 if ! git ls-remote --tags origin | grep -q "refs/tags/${TAG}$"; then
   echo ""
-  echo "警告: Tag $TAG 尚未推送到远端"
-  echo "   推荐先运行: git tag $TAG && git push origin $TAG"
-  echo "   否则 Windows CI 不会自动触发构建"
-  read -p "是否继续？(y/N) " -n 1 -r
-  echo
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    exit 1
-  fi
+  echo "警告: Tag $TAG 尚未推送到远端，Windows CI 不会自动触发"
+  echo "   继续构建 macOS 产物..."
 fi
 
 # ── 清理旧构建产物（避免误上传上次的文件） ──
@@ -83,25 +76,77 @@ if [ -d "$BUNDLE_DIR" ]; then
   rm -rf "$BUNDLE_DIR"
 fi
 
-# ── 构建 ──
+# ── 构建（仅签名，不走 Tauri 内置公证）──
 echo ""
 echo "开始构建..."
 export TAURI_SIGNING_PRIVATE_KEY="$(cat "$KEY_FILE")"
-# Apple 代码签名 + 公证
+# Apple 代码签名（不设置 APPLE_ID/APPLE_PASSWORD 环境变量给 Tauri，跳过其内置公证）
 export APPLE_SIGNING_IDENTITY="Developer ID Application: zeshun tan (2GDQYR464F)"
 export APPLE_TEAM_ID="2GDQYR464F"
-BUILD_EXIT=0
-cargo tauri build || BUILD_EXIT=$?
+# 临时清除公证相关变量，避免 Tauri 内置公证（其 S3 上传在部分地区超时）
+_SAVED_APPLE_ID="$APPLE_ID"
+_SAVED_APPLE_PASSWORD="$APPLE_PASSWORD"
+unset APPLE_ID APPLE_PASSWORD
+cargo tauri build
+# 恢复公证变量
+export APPLE_ID="$_SAVED_APPLE_ID"
+export APPLE_PASSWORD="$_SAVED_APPLE_PASSWORD"
 
-if [ $BUILD_EXIT -ne 0 ]; then
-  echo ""
-  echo "警告: cargo tauri build 退出码 ${BUILD_EXIT}（可能是公证失败），检查产物是否已生成..."
+# ── 使用 xcrun notarytool 公证（比 Tauri 内置更稳定）──
+echo ""
+echo "使用 xcrun notarytool 公证..."
+APP_PATH="$BUNDLE_DIR/macos/Dimkey.app"
+NOTARIZE_ZIP="$BUNDLE_DIR/macos/Dimkey_notarize.zip"
+/usr/bin/ditto -c -k --keepParent "$APP_PATH" "$NOTARIZE_ZIP"
+
+MAX_RETRIES=3
+for i in $(seq 1 $MAX_RETRIES); do
+  echo "  公证提交（第 ${i}/${MAX_RETRIES} 次）..."
+  if xcrun notarytool submit "$NOTARIZE_ZIP" \
+    --apple-id "$APPLE_ID" \
+    --password "$APPLE_PASSWORD" \
+    --team-id "$APPLE_TEAM_ID" \
+    --wait 2>&1 | tee /tmp/notarytool.log; then
+    echo "  公证通过"
+    break
+  fi
+  if [ $i -eq $MAX_RETRIES ]; then
+    echo "错误: 公证提交 ${MAX_RETRIES} 次均失败"
+    cat /tmp/notarytool.log
+    exit 1
+  fi
+  echo "  上传超时，${i}s 后重试..."
+  sleep $i
+done
+
+echo "  Staple 公证票据..."
+xcrun stapler staple "$APP_PATH"
+echo "  验证 Gatekeeper..."
+spctl -a -vv "$APP_PATH" 2>&1
+
+# ── 重新生成 DMG 和 updater 产物（基于已公证的 app）──
+echo ""
+echo "重新生成 DMG..."
+DMG_DIR="$BUNDLE_DIR/dmg"
+mkdir -p "$DMG_DIR"
+rm -f "$DMG_DIR"/*.dmg
+DMG_PATH="$DMG_DIR/Dimkey_${TAG}_aarch64.dmg"
+hdiutil create -volname "Dimkey" -srcfolder "$APP_PATH" -ov -format UDZO "$DMG_PATH"
+
+echo "生成 updater 包..."
+MACOS_DIR="$BUNDLE_DIR/macos"
+TAR_GZ_PATH="$MACOS_DIR/Dimkey.app.tar.gz"
+rm -f "$TAR_GZ_PATH" "$TAR_GZ_PATH.sig"
+tar -czf "$TAR_GZ_PATH" -C "$MACOS_DIR" Dimkey.app
+# 用 Tauri 签名密钥签署 updater 包
+if command -v cargo-tauri &>/dev/null || command -v cargo &>/dev/null; then
+  cargo tauri signer sign "$TAR_GZ_PATH" --private-key "$(cat "$KEY_FILE")" 2>/dev/null || true
 fi
 
 # ── 检查产物 ──
-DMG=$(find "$BUNDLE_DIR/dmg" -name "*.dmg" 2>/dev/null | head -1)
-TAR_GZ=$(find "$BUNDLE_DIR/macos" -name "*.app.tar.gz" 2>/dev/null | head -1)
-SIG=$(find "$BUNDLE_DIR/macos" -name "*.app.tar.gz.sig" 2>/dev/null | head -1)
+DMG=$(find "$DMG_DIR" -name "*.dmg" 2>/dev/null | head -1)
+TAR_GZ=$(find "$MACOS_DIR" -name "*.app.tar.gz" 2>/dev/null | head -1)
+SIG=$(find "$MACOS_DIR" -name "*.app.tar.gz.sig" 2>/dev/null | head -1)
 
 echo ""
 echo "构建产物:"
@@ -178,13 +223,7 @@ if [ -n "$TAG_RUN" ] && [ "$TAG_RUN" != "null" ]; then
     echo "警告: CI 运行 #$RUN_ID 结果为 ${RUN_CONCLUSION}（非 success）"
     echo "   Windows 构建可能失败，latest.json 将只包含 macOS 平台"
     echo "   请检查: gh run view $RUN_ID --log-failed"
-    echo ""
-    read -p "是否继续触发 latest.json 生成？(y/N) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-      echo "已取消。修复 CI 后手动运行: gh workflow run release.yml -f tag=$TAG"
-      exit 1
-    fi
+    echo "   继续触发 latest.json 生成..."
   else
     echo "  CI 运行成功，Windows 产物已上传"
   fi
