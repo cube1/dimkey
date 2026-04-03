@@ -170,7 +170,7 @@ pub async fn apply_desensitize(
                     }
                     Strategy::Replace { ref style } => {
                         let r = match lang {
-                            Language::En => replace::apply_replace_en(&item.text, &item.sensitive_type, &mut replace_state, style),
+                            Language::En => replace::apply_replace(&item.text, &item.sensitive_type, &mut replace_state, style),
                             Language::Zh => replace::apply_replace(&item.text, &item.sensitive_type, &mut replace_state, style),
                         };
                         (r, StrategyType::Replace)
@@ -507,7 +507,7 @@ pub async fn apply_desensitize_by_columns(
                         }
                         Strategy::Replace { ref style } => {
                             match lang {
-                                Language::En => replace::apply_replace_en(&cell_text, &st, &mut replace_state, style),
+                                Language::En => replace::apply_replace(&cell_text, &st, &mut replace_state, style),
                                 Language::Zh => replace::apply_replace(&cell_text, &st, &mut replace_state, style),
                             }
                         }
@@ -527,7 +527,7 @@ pub async fn apply_desensitize_by_columns(
                     }
                     Strategy::Replace { ref style } => {
                         match lang {
-                            Language::En => replace::apply_replace_en(&cell_text, &st, &mut replace_state, style),
+                            Language::En => replace::apply_replace(&cell_text, &st, &mut replace_state, style),
                             Language::Zh => replace::apply_replace(&cell_text, &st, &mut replace_state, style),
                         }
                     }

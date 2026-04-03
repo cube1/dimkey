@@ -6,8 +6,11 @@
 # 前置要求:
 #   1. ~/.tauri/dimkey.key 存在（Tauri updater 签名私钥）
 #   2. TAURI_SIGNING_PRIVATE_KEY_PASSWORD 环境变量已设置（私钥密码）
-#   3. gh CLI 已登录
-#   4. cargo tauri 已安装
+#   3. APPLE_ID 环境变量已设置（Apple ID 邮箱，用于公证）
+#   4. APPLE_PASSWORD 环境变量已设置（App 专用密码，用于公证）
+#   5. "Developer ID Application" 证书已安装在 Keychain 中
+#   6. gh CLI 已登录
+#   7. cargo tauri 已安装
 
 set -euo pipefail
 
@@ -34,6 +37,18 @@ fi
 if [ -z "${TAURI_SIGNING_PRIVATE_KEY_PASSWORD:-}" ]; then
   echo "错误: 未设置 TAURI_SIGNING_PRIVATE_KEY_PASSWORD 环境变量"
   echo "   请先运行: export TAURI_SIGNING_PRIVATE_KEY_PASSWORD='你的密码'"
+  exit 1
+fi
+
+if [ -z "${APPLE_ID:-}" ]; then
+  echo "错误: 未设置 APPLE_ID 环境变量（Apple ID 邮箱，用于公证）"
+  echo "   请先运行: export APPLE_ID='your@email.com'"
+  exit 1
+fi
+
+if [ -z "${APPLE_PASSWORD:-}" ]; then
+  echo "错误: 未设置 APPLE_PASSWORD 环境变量（App 专用密码，用于公证）"
+  echo "   请先运行: export APPLE_PASSWORD='xxxx-xxxx-xxxx-xxxx'"
   exit 1
 fi
 
@@ -72,9 +87,9 @@ fi
 echo ""
 echo "开始构建..."
 export TAURI_SIGNING_PRIVATE_KEY="$(cat "$KEY_FILE")"
-# 跳过 Apple 代码签名（签名后未公证会被 macOS 提示"移入废纸篓"）
-# 保留 Tauri updater 签名（.sig 文件用于自动更新校验）
-export APPLE_SIGNING_IDENTITY="-"
+# Apple 代码签名 + 公证
+export APPLE_SIGNING_IDENTITY="Developer ID Application: zeshun tan (2GDQYR464F)"
+export APPLE_TEAM_ID="2GDQYR464F"
 BUILD_EXIT=0
 cargo tauri build || BUILD_EXIT=$?
 

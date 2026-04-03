@@ -516,6 +516,66 @@ pub fn apply_replace(
             }
             code
         }
+        SensitiveType::Ssn => {
+            format!(
+                "{:03}-{:02}-{:04}",
+                rng.gen_range(100..899),
+                rng.gen_range(10..99),
+                rng.gen_range(1000..9999)
+            )
+        }
+        SensitiveType::CreditCard => {
+            // 生成 16 位假信用卡号（4开头，Visa 风格）
+            let mut num = format!("4{:015}", rng.gen_range(0u64..999_999_999_999_999));
+            num.truncate(16);
+            num
+        }
+        SensitiveType::UsPhone => {
+            format!(
+                "({:03}) {:03}-{:04}",
+                rng.gen_range(200..999),
+                rng.gen_range(200..999),
+                rng.gen_range(1000..9999)
+            )
+        }
+        SensitiveType::UkPhone => {
+            format!("+44 {:04} {:06}", rng.gen_range(1000..9999), rng.gen_range(100000..999999))
+        }
+        SensitiveType::Passport => {
+            let letter = (b'A' + rng.gen_range(0..26u8)) as char;
+            format!("{}{:08}", letter, rng.gen_range(10000000u32..99999999))
+        }
+        SensitiveType::Iban => {
+            format!(
+                "GB{:02}BANK{:014}",
+                rng.gen_range(10..99),
+                rng.gen_range(10000000000000u64..99999999999999)
+            )
+        }
+        SensitiveType::ZipCode => {
+            format!("{:05}", rng.gen_range(10000..99999))
+        }
+        SensitiveType::UkPostcode => {
+            let letter1 = (b'A' + rng.gen_range(0..26u8)) as char;
+            let letter2 = (b'A' + rng.gen_range(0..26u8)) as char;
+            let letter3 = (b'A' + rng.gen_range(0..26u8)) as char;
+            format!(
+                "{}{}{} {}{}{}",
+                letter1, letter2, rng.gen_range(1..9),
+                rng.gen_range(1..9), letter3, (b'A' + rng.gen_range(0..26u8)) as char
+            )
+        }
+        SensitiveType::DriversLicense => {
+            let mut dl = String::with_capacity(12);
+            for _ in 0..12 {
+                if rng.gen_bool(0.5) {
+                    dl.push((b'A' + rng.gen_range(0..26u8)) as char);
+                } else {
+                    dl.push((b'0' + rng.gen_range(0..10u8)) as char);
+                }
+            }
+            dl
+        }
         SensitiveType::Custom(_) => "[已替换]".to_string(),
     }
 }

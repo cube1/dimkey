@@ -35,6 +35,10 @@
     "active": true,
     "createUpdaterArtifacts": "v1Compatible",
     "targets": ["app", "dmg", "nsis"],
+    "macOS": {
+      "entitlements": "Entitlements.plist",
+      "signingIdentity": "Developer ID Application: zeshun tan (2GDQYR464F)"
+    },
     "resources": {
       "resources/ner/*": "ner/",
       "resources/pdfium/*": "pdfium/"
