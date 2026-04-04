@@ -51,6 +51,9 @@ impl DictEngine {
         }
 
         for entry in &self.entries {
+            if entry.text.is_empty() {
+                continue;
+            }
             match entry.match_mode {
                 MatchMode::Exact => {
                     // 区分大小写的子串匹配

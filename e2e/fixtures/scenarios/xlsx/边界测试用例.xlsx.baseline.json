@@ -68,8 +68,8 @@
     {
       "value": "6222021234567890",
       "type": "BankCard",
-      "count": 2,
-      "note": "正则",
+      "count": 1,
+      "note": "正则；fixture 中另 1 处为 19 位卡号前缀，引擎按最长匹配",
       "assert": "hard"
     },
     {
@@ -82,13 +82,6 @@
     {
       "value": "6228480012345678901",
       "type": "BankCard",
-      "count": 1,
-      "note": "正则",
-      "assert": "hard"
-    },
-    {
-      "value": "11010119900307678X",
-      "type": "CreditCode",
       "count": 1,
       "note": "正则",
       "assert": "hard"

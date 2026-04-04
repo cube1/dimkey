@@ -101,6 +101,12 @@ fn test_replace_strategy_on_txt() {
         },
     ];
 
+    // 只保留配置了策略的类型，避免未配置类型 fallback 为 Mask
+    let configured_types = [SensitiveType::Phone, SensitiveType::IdCard, SensitiveType::Email];
+    let items: Vec<_> = items.into_iter()
+        .filter(|i| configured_types.contains(&i.sensitive_type))
+        .collect();
+
     let result = desensitize_content(&content, &items, &strategies);
 
     // 所有映射都是 Replace

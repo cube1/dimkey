@@ -33,9 +33,11 @@ fn test_xlsx_boundary_detect_counts() {
         "应识别出至少 6 个邮箱，实际: {}",
         count_by_type(&items, &SensitiveType::Email)
     );
+    // 16 位卡号 6222021234567890 在 fixture 中有 2 处，
+    // 但其中 1 处为 19 位 6222021234567890123 的前缀，引擎按最长匹配去重，实际 3 个
     assert!(
-        count_by_type(&items, &SensitiveType::BankCard) >= 4,
-        "应识别出至少 4 个银行卡号，实际: {}",
+        count_by_type(&items, &SensitiveType::BankCard) >= 3,
+        "应识别出至少 3 个银行卡号，实际: {}",
         count_by_type(&items, &SensitiveType::BankCard)
     );
 }
