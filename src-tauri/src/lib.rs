@@ -41,7 +41,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
-        .plugin(tauri_plugin_aptabase::Builder::new("A-US-3333134309").build());
+        .plugin(tauri_plugin_aptabase::Builder::new("A-US-1575489135").build());
 
     // E2E 测试：仅 debug 模式加载 WebDriver plugin
     #[cfg(debug_assertions)]

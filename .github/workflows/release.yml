@@ -115,7 +115,7 @@ jobs:
           FILES=()
           while IFS= read -r -d '' f; do
             FILES+=("$f")
-          done < <(find src-tauri/target -type f \( -name "*.tar.gz" -o -name "*.tar.gz.sig" -o -name "*.nsis.zip" -o -name "*.nsis.zip.sig" \) -print0 2>/dev/null)
+          done < <(find src-tauri/target -type f \( -name "*.tar.gz" -o -name "*.tar.gz.sig" -o -name "*.nsis.zip" -o -name "*.nsis.zip.sig" -o -name "*-setup.exe" \) -print0 2>/dev/null)
 
           if [ ${#FILES[@]} -eq 0 ]; then
             echo "未找到更新包产物，跳过上传"
@@ -124,6 +124,32 @@ jobs:
           for f in "${FILES[@]}"; do
             echo "上传 $(basename "$f")..."
             gh release upload "${{ github.ref_name }}" "$f" --clobber
+          done
+
+      - name: 同步产物到公开仓库 dimkey-site
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.SITE_DEPLOY_TOKEN }}
+        run: |
+          SITE_REPO="cube1/dimkey-site"
+          TAG="${{ github.ref_name }}"
+
+          # 确保 dimkey-site Release 存在
+          if ! gh release view "$TAG" --repo "$SITE_REPO" 2>/dev/null; then
+            gh release create "$TAG" --repo "$SITE_REPO" \
+              --title "Dimkey $TAG" \
+              --notes "请查看 [更新日志](https://dimkey.com) 了解详细变更。"
+          fi
+
+          shopt -s nullglob
+          FILES=()
+          while IFS= read -r -d '' f; do
+            FILES+=("$f")
+          done < <(find src-tauri/target -type f \( -name "*.tar.gz" -o -name "*.tar.gz.sig" -o -name "*.nsis.zip" -o -name "*.nsis.zip.sig" -o -name "*-setup.exe" \) -print0 2>/dev/null)
+
+          for f in "${FILES[@]}"; do
+            echo "同步 $(basename "$f") → $SITE_REPO..."
+            gh release upload "$TAG" "$f" --clobber --repo "$SITE_REPO"
           done
 
   # ── 2.5 生成更新元数据 latest.json ──
@@ -158,6 +184,7 @@ jobs:
 
       - name: 生成 latest.json
         run: |
+          SITE_REPO="cube1/dimkey-site"
           VERSION="${TAG_NAME#v}"
           PUB_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           PLATFORMS="{}"
@@ -167,7 +194,7 @@ jobs:
           if [ -n "$SIG_FILE" ]; then
             SIG=$(cat "$SIG_FILE")
             BUNDLE=$(basename "${SIG_FILE%.sig}")
-            URL="https://github.com/${{ github.repository }}/releases/download/${TAG_NAME}/${BUNDLE}"
+            URL="https://github.com/${SITE_REPO}/releases/download/${TAG_NAME}/${BUNDLE}"
             PLATFORMS=$(echo "$PLATFORMS" | jq \
               --arg sig "$SIG" --arg url "$URL" \
               '. + {"darwin-aarch64": {signature: $sig, url: $url}}')
@@ -178,7 +205,7 @@ jobs:
           if [ -n "$SIG_FILE" ]; then
             SIG=$(cat "$SIG_FILE")
             BUNDLE=$(basename "${SIG_FILE%.sig}")
-            URL="https://github.com/${{ github.repository }}/releases/download/${TAG_NAME}/${BUNDLE}"
+            URL="https://github.com/${SITE_REPO}/releases/download/${TAG_NAME}/${BUNDLE}"
             PLATFORMS=$(echo "$PLATFORMS" | jq \
               --arg sig "$SIG" --arg url "$URL" \
               '. + {"windows-x86_64": {signature: $sig, url: $url}}')
@@ -199,7 +226,7 @@ jobs:
           echo "=== latest.json ==="
           cat latest.json
 
-      - name: 上传 latest.json 到 Release
+      - name: 上传 latest.json 到私有仓库 Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -209,4 +236,31 @@ jobs:
           fi
           gh release upload "${TAG_NAME}" latest.json \
             --clobber --repo "${{ github.repository }}"
+
+      - name: 同步 latest.json 到 dimkey-site（GitHub Pages）
+        env:
+          GH_TOKEN: ${{ secrets.SITE_DEPLOY_TOKEN }}
+        run: |
+          if [ ! -f latest.json ]; then
+            echo "latest.json 不存在，跳过同步"
+            exit 0
+          fi
+
+          SITE_REPO="cube1/dimkey-site"
+
+          # 克隆 dimkey-site 仓库
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/${SITE_REPO}.git" dimkey-site-repo
+          cp latest.json dimkey-site-repo/latest.json
+
+          cd dimkey-site-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add latest.json
+          if git diff --cached --quiet; then
+            echo "latest.json 无变化，跳过提交"
+          else
+            git commit -m "chore: 更新 latest.json (${TAG_NAME})"
+            git push
+            echo "latest.json 已同步到 ${SITE_REPO}"
+          fi
 

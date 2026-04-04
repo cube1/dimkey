@@ -182,7 +182,7 @@ for f in "${UPLOAD_FILES[@]}"; do
 done
 
 echo ""
-echo "macOS 产物已上传到 GitHub Release"
+echo "macOS 产物已上传到 GitHub Release (私有仓库)"
 
 # ── 从 CHANGELOG.md 提取当前版本日志，更新 Release 描述 ──
 echo ""
@@ -199,6 +199,28 @@ if [ -n "$RELEASE_NOTES" ]; then
 else
   echo "  警告: 未在 CHANGELOG.md 中找到 ${TAG} 的条目，Release 描述未更新"
 fi
+
+# ── 上传到公开仓库 dimkey-site Releases ──
+SITE_REPO="cube1/dimkey-site"
+echo ""
+echo "上传到公开仓库 ($SITE_REPO) Release..."
+
+# 确保 dimkey-site Release 存在
+if ! gh release view "$TAG" --repo "$SITE_REPO" &>/dev/null; then
+  echo "  Release 不存在，先创建..."
+  SITE_RELEASE_NOTES="${RELEASE_NOTES:-Release $TAG}"
+  gh release create "$TAG" \
+    --repo "$SITE_REPO" \
+    --title "Dimkey $TAG" \
+    --notes "$SITE_RELEASE_NOTES"
+fi
+
+for f in "${UPLOAD_FILES[@]}"; do
+  echo "  上传 $(basename "$f") → $SITE_REPO..."
+  gh release upload "$TAG" "$f" --clobber --repo "$SITE_REPO"
+done
+
+echo "  macOS 产物已上传到 $SITE_REPO Release"
 
 # ── 检查 Windows CI 构建结果 ──
 echo ""
@@ -232,9 +254,9 @@ else
   echo "  latest.json 将只包含 macOS 平台"
 fi
 
-# ── 触发 workflow_dispatch 重新生成 latest.json ──
+# ── 触发 workflow_dispatch 生成 latest.json 并同步到 dimkey-site ──
 echo ""
-echo "触发 workflow_dispatch 重新生成 latest.json..."
+echo "触发 workflow_dispatch 生成 latest.json 并同步到 dimkey-site..."
 if gh workflow run release.yml -f tag="$TAG"; then
   echo "  已触发，等待运行开始..."
   sleep 5
@@ -254,5 +276,7 @@ echo "========================================="
 echo "  macOS 发布完成: $TAG"
 echo "========================================="
 echo ""
-echo "验证更新配置:"
-echo "  gh release download ${TAG} --pattern latest.json --dir /tmp && cat /tmp/latest.json | jq .version"
+echo "验证:"
+echo "  公开下载页: https://dimkey.com"
+echo "  自动更新:   curl -s https://dimkey.com/latest.json | jq .version"
+echo "  Release:    gh release view ${TAG} --repo $SITE_REPO"
