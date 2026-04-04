@@ -14,24 +14,26 @@ class TestUIExtras:
         """U05: 切换语言到英文，验证界面文案变化"""
         wait_for_view(page, "dropzone", timeout=10_000)
 
-        # 找到语言切换按钮（中文模式下显示 "EN"）
-        lang_btn = page.locator("button", has_text="EN")
-        if not lang_btn.is_visible():
-            # 可能已经是英文模式，显示 "中"
-            lang_btn = page.locator("button", has_text="中")
-            if lang_btn.is_visible():
-                # 先切回中文
-                lang_btn.click()
-                page.wait_for_timeout(500)
-                lang_btn = page.locator("button", has_text="EN")
-
+        lang_btn = page.locator('[data-testid="lang-switcher"]')
         assert lang_btn.is_visible(), "语言切换按钮应可见"
+
+        # 获取当前按钮文案
+        text_before = lang_btn.inner_text().strip()
+
+        # 如果���经是英文（显示"中"），先切回中文
+        if text_before == "中":
+            lang_btn.click()
+            page.wait_for_timeout(500)
+            text_before = lang_btn.inner_text().strip()
+
+        # 此时应为中文模式（显示"EN"）
+        assert text_before == "EN", f"中文模式下按钮应显示 EN，实际: {text_before}"
         lang_btn.click()
         page.wait_for_timeout(500)
 
         # 切换后按钮文案应变为 "中"
-        zh_btn = page.locator("button", has_text="中")
-        assert zh_btn.is_visible(), "切换到英文后应显示 '中' 按钮"
+        text_after = lang_btn.inner_text().strip()
+        assert text_after == "中", f"切换到英文后应显示 '中'，实际: {text_after}"
 
         take_diagnostic(page, "lang_switched_to_en")
 
@@ -39,27 +41,25 @@ class TestUIExtras:
         """U05: 中→英→中 往返切换"""
         wait_for_view(page, "dropzone", timeout=10_000)
 
-        # 确保初始为中文
-        zh_btn = page.locator("button", has_text="中")
-        if zh_btn.is_visible():
-            zh_btn.click()
+        lang_btn = page.locator('[data-testid="lang-switcher"]')
+        assert lang_btn.is_visible(), "语言切换按钮应可见"
+
+        # 确保初始为中文（显示"EN"）
+        if lang_btn.inner_text().strip() == "中":
+            lang_btn.click()
             page.wait_for_timeout(500)
 
+        assert lang_btn.inner_text().strip() == "EN", "初始应为中文模式"
+
         # 中文 → 英文
-        en_btn = page.locator("button", has_text="EN")
-        assert en_btn.is_visible(), "中文模式下应显示 EN 按钮"
-        en_btn.click()
+        lang_btn.click()
         page.wait_for_timeout(500)
+        assert lang_btn.inner_text().strip() == "中", "切换到英文后应显示 '中'"
 
         # 英文 → 中文
-        zh_btn = page.locator("button", has_text="中")
-        assert zh_btn.is_visible(), "英文模式下应显示 '中' 按钮"
-        zh_btn.click()
+        lang_btn.click()
         page.wait_for_timeout(500)
-
-        # 验证回到中文
-        en_btn = page.locator("button", has_text="EN")
-        assert en_btn.is_visible(), "切回中文后应再次显示 EN 按钮"
+        assert lang_btn.inner_text().strip() == "EN", "切回中文后应显示 EN"
 
         take_diagnostic(page, "lang_roundtrip")
 

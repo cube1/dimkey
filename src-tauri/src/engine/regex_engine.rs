@@ -204,14 +204,17 @@ impl RegexEngine {
                     continue;
                 }
 
-                // IP 地址额外校验：每段数值不超过 255
+                // IP 地址额外校验：IPv4 每段不超过 255，IPv6 跳过（正则已足够严格）
                 if rule.sensitive_type == SensitiveType::IpAddress {
                     let ip_text = &text[byte_start..byte_end];
-                    let valid = ip_text.split('.').all(|part| {
-                        part.parse::<u32>().map_or(false, |n| n <= 255)
-                    });
-                    if !valid {
-                        continue;
+                    if ip_text.contains('.') && !ip_text.contains(':') {
+                        // IPv4 校验
+                        let valid = ip_text.split('.').all(|part| {
+                            part.parse::<u32>().map_or(false, |n| n <= 255)
+                        });
+                        if !valid {
+                            continue;
+                        }
                     }
                 }
 

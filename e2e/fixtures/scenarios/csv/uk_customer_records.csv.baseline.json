@@ -66,49 +66,49 @@
       "assert": "hard"
     },
     {
-      "value": "5425 2334 1102 8976",
+      "value": "5425 1043 3218 1961",
       "type": "CreditCard",
       "count": 1,
       "note": "Mastercard",
       "assert": "hard"
     },
     {
-      "value": "4716 0912 3456 7890",
+      "value": "4716 0013 3890 8382",
       "type": "CreditCard",
       "count": 1,
       "note": "Visa",
       "assert": "hard"
     },
     {
-      "value": "5543 2109 8765 4321",
+      "value": "5543 6379 4026 5426",
       "type": "CreditCard",
       "count": 1,
       "note": "Mastercard",
       "assert": "hard"
     },
     {
-      "value": "4929 5678 9012 3456",
+      "value": "4929 2553 4192 8323",
       "type": "CreditCard",
       "count": 1,
       "note": "Visa",
       "assert": "hard"
     },
     {
-      "value": "5187 6543 2109 8765",
+      "value": "5187 3511 6155 9407",
       "type": "CreditCard",
       "count": 1,
       "note": "Mastercard",
       "assert": "hard"
     },
     {
-      "value": "4024 0071 2345 6789",
+      "value": "4024 7816 1849 5930",
       "type": "CreditCard",
       "count": 1,
       "note": "Visa",
       "assert": "hard"
     },
     {
-      "value": "5264 1893 0574 6281",
+      "value": "5264 1034 1316 4759",
       "type": "CreditCard",
       "count": 1,
       "note": "Mastercard",

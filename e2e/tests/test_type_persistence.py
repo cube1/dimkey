@@ -18,7 +18,7 @@ class TestEnabledTypesPersistence:
             const store = window.__DIMKEY_STORE__;
             if (!store) return null;
             const state = store.getState();
-            return state.wsData?.workspace?.enabled_types || null;
+            return state.activeWorkspaceData?.workspace?.enabled_types || null;
         }""")
 
         assert enabled is not None, "store 中应有 enabled_types"
@@ -38,7 +38,7 @@ class TestEnabledTypesPersistence:
             const store = window.__DIMKEY_STORE__;
             if (store) {
                 const state = store.getState();
-                const current = state.wsData?.workspace?.enabled_types || [];
+                const current = state.activeWorkspaceData?.workspace?.enabled_types || [];
                 const newTypes = current.filter(t => t !== 'Phone');
                 try {
                     await state.updateEnabledTypes(newTypes);

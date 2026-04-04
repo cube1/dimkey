@@ -17,5 +17,12 @@ pub fn rules() -> Vec<RegexRule> {
             sensitive_type: SensitiveType::IpAddress,
             boundary: BoundaryCheck::NotDigit,
         },
+        // IPv6 地址（完整格式 + :: 压缩格式）
+        // 注意顺序：混合模式（前后都有组）必须在纯前缀模式之前，避免贪婪匹配截断
+        RegexRule {
+            regex: Regex::new(r"(?i)(?:[0-9a-f]{1,4}:){7}[0-9a-f]{1,4}|(?:[0-9a-f]{1,4}:){6}:[0-9a-f]{1,4}|(?:[0-9a-f]{1,4}:){5}(?::[0-9a-f]{1,4}){1,2}|(?:[0-9a-f]{1,4}:){4}(?::[0-9a-f]{1,4}){1,3}|(?:[0-9a-f]{1,4}:){3}(?::[0-9a-f]{1,4}){1,4}|(?:[0-9a-f]{1,4}:){2}(?::[0-9a-f]{1,4}){1,5}|(?:[0-9a-f]{1,4}:){1}(?::[0-9a-f]{1,4}){1,6}|(?:[0-9a-f]{1,4}:){1,7}:|:(?::[0-9a-f]{1,4}){1,7}|::").unwrap(),
+            sensitive_type: SensitiveType::IpAddress,
+            boundary: BoundaryCheck::None,
+        },
     ]
 }

@@ -1,0 +1,9 @@
+Customer ID,Full Name,UK Phone,Email,Credit Card,Postcode,Address,Notes
+UK-001,Oliver Thompson,+44 7911 123456,oliver.thompson@barclays.co.uk,4539 1488 0343 6467,SW1A 1AA,"10 Downing Street, London","Premium tier client, renewed contract on 15 March 2024"
+UK-002,Charlotte Davies,+44 7700 900123,charlotte.davies@hsbc.com,5425 1043 3218 1961,EC2R 8AH,"1 Poultry, City of London","Pending KYC review, passport GB 123456789"
+UK-003,George Wilson,07456 789012,g.wilson@lloyds.co.uk,4716 0013 3890 8382,M1 1AE,"3 Hardman Street, Manchester","Referred by UK-001, driver's licence WILSO703159GW9IJ"
+UK-004,Amelia Brown,+44 20 7946 0958,amelia.brown@natwest.com,5543 6379 4026 5426,B1 1BB,"1 Centenary Square, Birmingham","Corporate account, IBAN GB29 NWBK 6016 1331 9268 19"
+UK-005,Harry Taylor,07891 234567,harry.taylor@rbs.co.uk,4929 2553 4192 8323,EH1 1YZ,"36 St Andrew Square, Edinburgh",Flagged for suspicious transaction on 2024-08-22
+UK-006,Isabella Martin,+44 7534 567890,isabella.martin@santander.co.uk,5187 3511 6155 9407,LS1 1UR,"2 Trevelyan Square, Leeds","Student account, ZIP 10001 listed as US correspondence address"
+UK-007,William Harris,+44 161 496 0000,w.harris@virgin.co.uk,4024 7816 1849 5930,CF10 1EP,"Churchill Way, Cardiff","Joint account with spouse, alt phone 07654 321098"
+UK-008,Sophia Clark,07321 098765,sophia.clark@metro.co.uk,5264 1034 1316 4759,G1 1DU,"110 Queen Street, Glasgow","Account closed 2024-06-30, credit card cancelled"

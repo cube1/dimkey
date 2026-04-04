@@ -121,6 +121,13 @@ def page(browser):
 
     # 等待 React 渲染，自动选中第一个工作区进入 dropzone 视图
     pg.wait_for_selector('[data-testid="workspace-list"]', timeout=10_000)
+
+    # 等待 workspaces 加载完成（mock IPC 返回 list_workspaces 后 store 才更新）
+    pg.wait_for_function("""() => {
+        const store = window.__DIMKEY_STORE__;
+        return store && store.getState().workspaces.length > 0;
+    }""", timeout=10_000)
+
     pg.evaluate("""async () => {
         const store = window.__DIMKEY_STORE__;
         if (store) {

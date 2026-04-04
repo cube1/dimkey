@@ -15,6 +15,7 @@ export default function LanguageSwitcher() {
   return (
     <button
       onClick={toggleLanguage}
+      data-testid="lang-switcher"
       className="flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
       title={isEn ? "切换到中文" : "Switch to English"}
     >

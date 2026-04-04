@@ -53,5 +53,17 @@ pub fn rules() -> Vec<RegexRule> {
             sensitive_type: SensitiveType::UkPostcode,
             boundary: BoundaryCheck::NotAlphanumeric,
         },
+        // 9. 美国驾照号（字母+数字+短横线格式：D123-4567-8901）
+        RegexRule {
+            regex: Regex::new(r"[A-Z]\d{3}-\d{4}-\d{4}").unwrap(),
+            sensitive_type: SensitiveType::DriversLicense,
+            boundary: BoundaryCheck::NotAlphanumeric,
+        },
+        // 10. 英国驾照号（DVLA 格式：5字母+6数字+2字母+2字母数字，16位）
+        RegexRule {
+            regex: Regex::new(r"[A-Z]{5}\d{6}[A-Z0-9]{2}\d[A-Z]{2}").unwrap(),
+            sensitive_type: SensitiveType::DriversLicense,
+            boundary: BoundaryCheck::NotAlphanumeric,
+        },
     ]
 }

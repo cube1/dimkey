@@ -17,28 +17,28 @@
       "assert": "hard"
     },
     {
-      "value": "4539 7890 1234 5678",
+      "value": "4539 9550 7586 9922",
       "type": "CreditCard",
       "count": 1,
       "note": "Visa",
       "assert": "hard"
     },
     {
-      "value": "5425 6789 0123 4567",
+      "value": "5425 2165 5923 1988",
       "type": "CreditCard",
       "count": 1,
       "note": "Mastercard",
       "assert": "hard"
     },
     {
-      "value": "4716 5432 1098 7654",
+      "value": "4716 8014 4818 4950",
       "type": "CreditCard",
       "count": 1,
       "note": "Visa",
       "assert": "hard"
     },
     {
-      "value": "5543 8765 4321 0987",
+      "value": "5543 0119 3640 9200",
       "type": "CreditCard",
       "count": 1,
       "note": "Mastercard",

@@ -30,9 +30,9 @@ pub fn rules() -> Vec<RegexRule> {
             sensitive_type: SensitiveType::Phone,
             boundary: BoundaryCheck::NotDigit,
         },
-        // 5. 固定电话
+        // 5. 固定电话（含 400/800 全国热线）
         RegexRule {
-            regex: Regex::new(r"0\d{2,3}-?\d{7,8}").unwrap(),
+            regex: Regex::new(r"(?:0\d{2,3}|400|800)-?\d{3,4}-?\d{4}").unwrap(),
             sensitive_type: SensitiveType::LandlinePhone,
             boundary: BoundaryCheck::NotDigit,
         },
