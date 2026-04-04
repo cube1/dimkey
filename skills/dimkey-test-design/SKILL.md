@@ -34,9 +34,14 @@ Step 3: 读取 fixture 内容，AI 分析敏感值
     区分 hard（正则类）和 soft（NER 类）断言模式
     │
     ▼
+Step 3.5: 生成 .baseline.json sidecar 文件
+    与 fixture 同目录同名，如 sample.csv → sample.csv.baseline.json
+    这是基线数据的**单一数据源**，测试代码运行时直接读取
+    │
+    ▼
 Step 4: 写 Excel
     Sheet1: 新增用例行（add_testcase）
-    Sheet2: 新增基线数据（add_baseline）
+    Sheet2: 从 .baseline.json 聚合写入（非数据源，仅展示用）
     详见 [references/excel-manager.md](references/excel-manager.md)
     │
     ▼
@@ -54,8 +59,8 @@ Step 6: 输出汇报，等待用户审核
 
 | 模式 | 适用类型 | 含义 |
 |------|----------|------|
-| hard | Phone, IdCard, Email, BankCard, CreditCode, Landline, LicensePlate | 正则类，必须命中 |
-| soft | PersonName, OrgName, Address | NER 类，未命中只 warning |
+| hard | Phone, IdCard, Email, BankCard, CreditCode, Landline, LicensePlate, IpAddress, SSN, CreditCard, UsPhone, UkPhone, Passport, IBAN, ZipCode, UkPostcode, DriversLicense | 正则类，必须命中 |
+| soft | PersonName, OrgName, Address, Title | NER 类，未命中只 warning |
 
 ## Fixture 文件
 
@@ -63,12 +68,39 @@ Step 6: 输出汇报，等待用户审核
 
 ```
 e2e/fixtures/scenarios/
-├── xlsx/    # Excel 场景文件
-├── csv/     # CSV 场景文件
-├── docx/    # Word 场景文件
-├── txt/     # 纯文本场景文件
-└── en/      # 英文/双语场景
+├── xlsx/       # Excel 场景（含中英文）
+├── csv/        # CSV 场景（含中英文）
+├── docx/       # Word 场景（含中英文）
+├── txt/        # 纯文本场景
+└── pdf/        # PDF 场景（预留）
+
+e2e/fixtures/boundary/  # 边界/编码/异常场景（不按格式归类）
 ```
+
+**分类规则**: 按文件格式归目录，英文/双语文件用英文命名放入对应格式目录（如 `csv/english_employee.csv`）。边界和编码测试统一放 `boundary/`。
+
+### .baseline.json Sidecar 文件
+
+每个 fixture 旁边放一个 `.baseline.json`，记录该 fixture 中所有预期敏感值：
+
+```json
+{
+  "fixture": "scenarios/csv/uk_customer_records.csv",
+  "generated_by": "dimkey-test-design",
+  "generated_at": "2026-04-04",
+  "expected": [
+    {"value": "+44 7911 123456", "type": "UkPhone", "count": 1, "note": "移动号码", "assert": "hard"},
+    {"value": "Oliver Thompson", "type": "PersonName", "count": 1, "note": "NER", "assert": "soft"}
+  ]
+}
+```
+
+**关键原则**：
+- Sidecar 是基线数据的**单一数据源**，fixture 和 sidecar 必须同时生成
+- `assert: "hard"` → 正则类，测试必须命中，否则 fail
+- `assert: "soft"` → NER 类，未命中只打 warning
+- `count` → 该值在文件中出现的次数
+- Sheet2 从 sidecar 聚合生成，不再是数据源
 
 ### 生成规范
 
@@ -78,7 +110,7 @@ e2e/fixtures/scenarios/
 - 贴近真实业务，多种敏感类型混合
 - 每个 fixture 至少 3 种敏感类型
 - 表格类 10-30 行，文档类 1-3 页
-- 中文场景为主，英文放 `en/`
+- 英文/双语文件用英文命名，放入对应格式目录
 
 ## 不做的事
 

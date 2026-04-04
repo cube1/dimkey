@@ -7,7 +7,9 @@
 - 使用 Python 脚本生成（`e2e/.venv/bin/python`）
 - 数据要**贴近真实业务场景**，不要用 "test1", "test2" 这类假数据
 - 敏感值使用**合法格式的虚构数据**（能通过正则校验但非真实个人信息）
-- 保存到 `e2e/fixtures/scenarios/{ext}/` 对应目录
+- 保存到 `e2e/fixtures/scenarios/{ext}/` 对应格式目录
+- 英文/双语文件用英文命名，放入对应格式目录（如 `csv/english_employee.csv`）
+- 边界/编码/异常场景放 `e2e/fixtures/boundary/`
 
 ## Excel (xlsx)
 
@@ -98,11 +100,22 @@ with open("e2e/fixtures/scenarios/txt/文件名.txt", "w", encoding="utf-8") as 
 | IdCard | 6位地区码 + 8位生日 + 3位序号 + 1位校验 | 110101199003076789 |
 | Email | 合法邮箱格式 | zhangsan@qq.com |
 | BankCard | 62开头，16-19位 | 6222021234567890123 |
-| PersonName | 2-4字中文姓名 | 张三、欧阳修 |
+| PersonName | 2-4字中文姓名 / 英文 First Last | 张三、James Anderson |
 | Address | 省市区+街道+门牌 | 北京市海淀区中关村大街1号 |
 | CreditCode | 18位统一社会信用代码 | 91110108MA01XXXXXX |
 | Landline | 区号-号码 | 010-62345678 |
+| IpAddress | IPv4 / IPv6 | 192.168.1.10, 2001:db8::1 |
+| SSN | 美国社会安全号 XXX-XX-XXXX | 539-48-2671 |
+| CreditCard | Visa(4开头)/Mastercard(5开头), 16位 | 4539 1488 0343 6467 |
+| UsPhone | 美国电话 (XXX) XXX-XXXX | (415) 293-8847 |
+| UkPhone | 英国电话 +44 / 07开头 | +44 7911 123456 |
+| Passport | 各国护照号 | 533410987, GA 1234567 |
+| IBAN | 国际银行账号 | GB29 NWBK 6016 1331 9268 19 |
+| ZipCode | 美国 ZIP 5位 | 94102 |
+| UkPostcode | 英国邮编 | SW1A 1AA |
+| DriversLicense | 驾照号码 | D123-4567-8901 |
+| Title | 职位头衔（NER） | 技术总监, Chief Financial Officer |
 
 ## 已有 fixture 参考
 
-生成前先检查 `e2e/fixtures/scenarios/` 下已有文件，避免重复场景。已有生成脚本在 `e2e/fixtures/generators/` 可供参考。
+生成前先检查 `e2e/fixtures/scenarios/` 和 `e2e/fixtures/boundary/` 下已有文件，避免重复场景。已有生成脚本在 `e2e/fixtures/generators/` 可供参考。

@@ -1,0 +1,62 @@
+{
+  "fixture": "boundary/fullwidth_digits.csv",
+  "generated_from": "Sheet2迁移",
+  "expected": [
+    {
+      "value": "13912345678",
+      "type": "Phone",
+      "count": 1,
+      "note": "半角正常",
+      "assert": "hard"
+    },
+    {
+      "value": "18733334444",
+      "type": "Phone",
+      "count": 1,
+      "note": "半角正常",
+      "assert": "hard"
+    },
+    {
+      "value": "110101199001011234",
+      "type": "IdCard",
+      "count": 1,
+      "note": "半角正常",
+      "assert": "hard"
+    },
+    {
+      "value": "320106198805151235",
+      "type": "IdCard",
+      "count": 1,
+      "note": "半角正常",
+      "assert": "hard"
+    },
+    {
+      "value": "510108199507081237",
+      "type": "IdCard",
+      "count": 1,
+      "note": "半角正常",
+      "assert": "hard"
+    },
+    {
+      "value": "13644445555",
+      "type": "Phone",
+      "count": 1,
+      "note": "前有全角空格",
+      "assert": "hard"
+    },
+    {
+      "value": "１３９１２３４５６７８",
+      "type": "Phone",
+      "count": 1,
+      "note": "全角数字-可能需归一化",
+      "assert": "soft"
+    },
+    {
+      "value": "１５８２２２２３３３３",
+      "type": "Phone",
+      "count": 1,
+      "note": "全角数字-可能需归一化",
+      "assert": "soft"
+    }
+  ]
+}

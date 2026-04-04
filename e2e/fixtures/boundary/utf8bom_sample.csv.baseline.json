@@ -1,0 +1,111 @@
+{
+  "fixture": "boundary/utf8bom_sample.csv",
+  "generated_from": "Sheet2迁移",
+  "expected": [
+    {
+      "value": "13711119999",
+      "type": "Phone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "15822228888",
+      "type": "Phone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "18733337777",
+      "type": "Phone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "13644446666",
+      "type": "Phone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "15955555555",
+      "type": "Phone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "110105199201011234",
+      "type": "IdCard",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "320102198906151235",
+      "type": "IdCard",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "440106199103201236",
+      "type": "IdCard",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "510102199407081237",
+      "type": "IdCard",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "330106199612250088",
+      "type": "IdCard",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "sunwk@test.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "zhubj@test.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "shahs@test.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "tangsz@test.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "bailm@test.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    }
+  ]
+}

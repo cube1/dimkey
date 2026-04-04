@@ -23,6 +23,12 @@ Step 2: 确定测试层
     根据用例分类自动选择 Rust 或 Pytest（见映射表）
     │
     ▼
+Step 2.5: 校验 .baseline.json 与 fixture 一致性
+    读取 fixture 对应的 .baseline.json sidecar 文件
+    验证 sidecar 中每个 hard 值在 fixture 文件中确实存在
+    不一致则停止生成，报告差异
+    │
+    ▼
 Step 3: 读取已有测试文件
     Rust: 读 src-tauri/tests/ 中同分类的已有测试
     Pytest: 读 e2e/tests/ 中同分类的已有测试
@@ -30,8 +36,9 @@ Step 3: 读取已有测试文件
     │
     ▼
 Step 4: 生成测试代码
-    参考已有模板 + Excel 用例的场景/步骤/期望/fixture
-    断言值从 Sheet2 基线硬编码（不在运行时用 AI 判断）
+    参考已有模板 + .baseline.json 的基线数据
+    Rust 测试使用 common::assert_baseline_from_sidecar() 自动加载断言
+    同时生成按类型的 count 数量断言作为 smoke test
     │
     ▼
 Step 5: 回写 Excel
@@ -63,8 +70,12 @@ Step 6: 输出汇报，等待用户 review
 详见 [references/rust-test-patterns.md](references/rust-test-patterns.md)。
 
 关键原则：
-- 测试文件放 `src-tauri/tests/`，使用 `common::test_data_path()` 定位 fixture
-- 断言值硬编码：基线 hard → `assert!`，soft → `eprintln!` warning
+- 测试文件放 `src-tauri/tests/`，使用 `common::fixture_path()` 定位 fixture
+- **基线断言**：
+  - 全类型扫描 → `assert_baseline_from_sidecar(&items, &path)` — 检查 baseline 中所有类型
+  - 类型过滤测试 → `assert_baseline_from_sidecar_filtered(&items, &path, Some(&[SensitiveType::Phone]))` — 只检查启用的类型，未启用类型自动跳过
+- 同时保留按类型的 `count_by_type()` 数量断言作为 smoke test
+- 引擎暂不支持的类型/格式：对应测试标记 `#[ignore = "原因"]`，baseline_coverage 测试也标记 ignore
 - 函数名 `test_{snake_case_scenario}`，注释标注用例 ID
 
 ### Pytest（UI 测试）
@@ -89,4 +100,4 @@ Step 6: 输出汇报，等待用户 review
 - **不创建测试用例** → 交给 `dimkey-test-design`
 - **不执行测试** → 交给 `dimkey-test-run`
 - **不修改 fixture 文件**
-- **不在测试运行时引入 AI 判断** — 所有断言必须硬编码
+- **不在测试运行时引入 AI 判断** — 断言值来自 .baseline.json（由 dimkey-test-design 生成）
