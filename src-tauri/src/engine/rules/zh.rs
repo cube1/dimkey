@@ -30,13 +30,19 @@ pub fn rules() -> Vec<RegexRule> {
             sensitive_type: SensitiveType::Phone,
             boundary: BoundaryCheck::NotDigit,
         },
-        // 5. 固定电话（含 400/800 全国热线）
+        // 5. 固定电话
         RegexRule {
-            regex: Regex::new(r"(?:0\d{2,3}|400|800)-?\d{3,4}-?\d{4}").unwrap(),
+            regex: Regex::new(r"0\d{2,3}-?\d{7,8}").unwrap(),
             sensitive_type: SensitiveType::LandlinePhone,
             boundary: BoundaryCheck::NotDigit,
         },
-        // 6. 车牌号（支持中间点分隔符：京A·12345）
+        // 5b. 400/800 全国热线（必须有分隔符，减少误报）
+        RegexRule {
+            regex: Regex::new(r"(?:400|800)-\d{3,4}-?\d{4}|(?:400|800)\d{3}-\d{4}").unwrap(),
+            sensitive_type: SensitiveType::LandlinePhone,
+            boundary: BoundaryCheck::NotDigit,
+        },
+        // 7. 车牌号（支持中间点分隔符：京A·12345）
         RegexRule {
             regex: Regex::new(r"[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤川青藏琼宁][A-Z][·.]?[A-HJ-NP-Z0-9]{5}").unwrap(),
             sensitive_type: SensitiveType::LicensePlate,
