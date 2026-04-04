@@ -1,21 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0B1420"/>
-      <stop offset="100%" stop-color="#162544"/>
-    </linearGradient>
-  </defs>
+  <!-- 暖白背景 -->
+  <rect width="1024" height="1024" rx="0" fill="#e8e2d8"/>
 
-  <!-- 背景（无圆角，由 OS 处理） -->
-  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <!-- D — 主字母 -->
+  <text x="410" y="666" text-anchor="middle"
+        font-family="'Helvetica Neue', 'Arial', sans-serif"
+        font-size="492" font-weight="400" fill="#1a2235">D</text>
 
-  <!-- 圆相（ensō）— 不完整的圆环 = 刻意的留缺 -->
-  <circle cx="512" cy="495" r="218"
-          stroke="#EDE6DB" stroke-width="54" fill="none"
-          stroke-linecap="round"
-          stroke-dasharray="1060 310"
-          stroke-dashoffset="-440"/>
-
-  <!-- 缺口处的金点 — 缺失之中的一粒留存 -->
-  <circle cx="555" cy="700" r="14" fill="#C9A96E" opacity="0.6"/>
+  <!-- K — 半透明微歪，靠着 D -->
+  <text x="656" y="666" text-anchor="middle"
+        font-family="'Helvetica Neue', 'Arial', sans-serif"
+        font-size="266" font-weight="400" fill="#1a2235" opacity="0.55"
+        transform="rotate(-12, 656, 584)">K</text>
 </svg>
