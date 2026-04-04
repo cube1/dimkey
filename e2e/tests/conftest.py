@@ -38,24 +38,44 @@ def page(browser):
                     currentWebview: { windowLabel: 'main', label: 'main' },
                 },
                 invoke: async (cmd, args) => {
-                    // 返回各命令的默认空值，让 React 不崩溃
+                    // 记录 IPC 调用，供测试断言
+                    if (!window.__E2E_IPC_LOG__) window.__E2E_IPC_LOG__ = [];
+                    window.__E2E_IPC_LOG__.push({ cmd, args, ts: Date.now() });
+
+                    // 动态覆盖：测试可通过 window.__E2E_IPC_OVERRIDES__ 自定义返回值
+                    if (window.__E2E_IPC_OVERRIDES__ && cmd in window.__E2E_IPC_OVERRIDES__) {
+                        const override = window.__E2E_IPC_OVERRIDES__[cmd];
+                        return typeof override === 'function' ? override(args) : override;
+                    }
+
+                    const now = new Date().toISOString();
                     const defaults = {
-                        'list_workspaces': [{ id: 'e2e-ws', name: 'E2E 测试', created_at: Date.now(), updated_at: Date.now() }],
+                        'list_workspaces': [
+                            { id: 'e2e-ws', name: 'E2E 测试', created_at: now, updated_at: now },
+                            { id: 'e2e-ws-2', name: 'E2E 测试 2', created_at: now, updated_at: now },
+                        ],
                         'get_workspace': {
                             workspace: {
-                                id: 'e2e-ws', name: 'E2E 测试', source: null,
-                                created_at: new Date().toISOString(),
-                                updated_at: new Date().toISOString(),
-                                strategies: {}, replace_style: 'fake',
+                                id: args?.id || 'e2e-ws', name: 'E2E 测试', source: null,
+                                created_at: now, updated_at: now,
+                                strategies: {}, replace_style: 'Fake',
                                 dict_entries: [], column_rules: {},
                                 output_dir: null, consistency_mappings: [],
                                 enabled_types: ['PersonName','Phone','IdCard','Email','Address','OrgName','BankCard','CreditCode'],
                                 mode: 'Desensitize', whitelist: [], alias_groups: [],
+                                replace_seed: 42, replace_counters: {},
                             },
                             history: [],
                         },
-                        'create_workspace': 'mock-ws-id',
-                        'load_config': { strategies: {}, replace_style: 'fake' },
+                        'create_workspace': { id: 'mock-ws-new', name: args?.name || '新工作区', created_at: now, updated_at: now, strategies: {}, dict_entries: [], column_rules: {}, output_dir: null, consistency_mappings: [], enabled_types: ['Phone','IdCard','Email'], mode: 'Desensitize', whitelist: [], alias_groups: [], replace_style: 'Fake', replace_seed: 42, replace_counters: {}, source: null },
+                        'create_clipboard_workspace': { id: 'mock-clipboard-ws', name: args?.name || '粘贴板', created_at: now, updated_at: now, strategies: {}, dict_entries: [], column_rules: {}, output_dir: null, consistency_mappings: [], enabled_types: ['Phone','IdCard','Email'], mode: 'Desensitize', whitelist: [], alias_groups: [], replace_style: 'Fake', replace_seed: 42, replace_counters: {}, source: 'Clipboard' },
+                        'rename_workspace': null,
+                        'update_workspace': null,
+                        'delete_workspace': null,
+                        'restore_ai_response': { original_content: null, restored_content: null, matched_count: 3, restore_items: [], original_items: [], file_path: '' },
+                        'restore_from_workspace': { original_content: null, restored_content: null, matched_count: 2, restore_items: [], original_items: [], file_path: '' },
+                        'restore_processing': { original_content: null, restored_content: null, matched_count: 1, restore_items: [], original_items: [], file_path: '' },
+                        'load_config': { strategies: {}, replace_style: 'Fake' },
                         'load_dict': [],
                         'get_builtin_dict': [],
                         'list_tasks': [],
@@ -69,7 +89,6 @@ def page(browser):
                         'check_file_exists': true,
                     };
                     if (cmd in defaults) return defaults[cmd];
-                    // 未知命令返回 null
                     console.warn('[E2E mock] unhandled invoke:', cmd, args);
                     return null;
                 },
