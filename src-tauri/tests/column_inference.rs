@@ -34,38 +34,35 @@ fn test_auto_column_inference() {
 
     // 验证手机号列
     let phone_col = inferences.iter()
-        .find(|i| i.header == "手机号");
-    if let Some(col) = phone_col {
-        assert_eq!(
-            col.inferred_type,
-            Some(SensitiveType::Phone),
-            "手机号列应推断为 Phone"
-        );
-        assert!(col.confidence >= 0.8, "手机号列置信度应 >= 0.8，实际: {:.2}", col.confidence);
-    }
+        .find(|i| i.header == "手机号")
+        .expect("应有 '手机号' 列");
+    assert_eq!(
+        phone_col.inferred_type,
+        Some(SensitiveType::Phone),
+        "手机号列应推断为 Phone"
+    );
+    assert!(phone_col.confidence >= 0.8, "手机号列置信度应 >= 0.8，实际: {:.2}", phone_col.confidence);
 
     // 验证身份证号列
     let id_col = inferences.iter()
-        .find(|i| i.header == "身份证号");
-    if let Some(col) = id_col {
-        assert_eq!(
-            col.inferred_type,
-            Some(SensitiveType::IdCard),
-            "身份证号列应推断为 IdCard"
-        );
-        assert!(col.confidence >= 0.8, "身份证号列置信度应 >= 0.8");
-    }
+        .find(|i| i.header == "身份证号")
+        .expect("应有 '身份证号' 列");
+    assert_eq!(
+        id_col.inferred_type,
+        Some(SensitiveType::IdCard),
+        "身份证号列应推断为 IdCard"
+    );
+    assert!(id_col.confidence >= 0.8, "身份证号列置信度应 >= 0.8");
 
     // 验证邮箱列
     let email_col = inferences.iter()
-        .find(|i| i.header == "邮箱");
-    if let Some(col) = email_col {
-        assert_eq!(
-            col.inferred_type,
-            Some(SensitiveType::Email),
-            "邮箱列应推断为 Email"
-        );
-    }
+        .find(|i| i.header == "邮箱")
+        .expect("应有 '邮箱' 列");
+    assert_eq!(
+        email_col.inferred_type,
+        Some(SensitiveType::Email),
+        "邮箱列应推断为 Email"
+    );
 }
 
 // ============================================================
@@ -117,14 +114,13 @@ fn test_non_sensitive_column_inferred_as_none() {
 
     // "工号" 列不应推断为任何敏感类型
     let emp_id_col = inferences.iter()
-        .find(|i| i.header == "工号");
-    if let Some(col) = emp_id_col {
-        assert!(
-            col.inferred_type.is_none() || col.confidence < 0.3,
-            "工号列不应推断为敏感类型，推断: {:?}, 置信度: {:.2}",
-            col.inferred_type, col.confidence
-        );
-    }
+        .find(|i| i.header == "工号")
+        .expect("应有 '工号' 列");
+    assert!(
+        emp_id_col.inferred_type.is_none() || emp_id_col.confidence < 0.3,
+        "工号列不应推断为敏感类型，推断: {:?}, 置信度: {:.2}",
+        emp_id_col.inferred_type, emp_id_col.confidence
+    );
 }
 
 // ============================================================

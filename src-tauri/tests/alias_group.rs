@@ -3,8 +3,7 @@ mod common;
 use std::collections::HashMap;
 
 use dimkey_lib::commands::alias_group::{create_alias_group_internal, select_primary};
-use dimkey_lib::models::sensitive::SensitiveType;
-use dimkey_lib::models::strategy::{ReplaceStyle, Strategy};
+use dimkey_lib::models::strategy::ReplaceStyle;
 use dimkey_lib::models::task::StrategyType;
 use dimkey_lib::models::workspace::*;
 
