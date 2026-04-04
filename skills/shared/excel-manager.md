@@ -71,7 +71,6 @@ items = read_baseline("scenarios/csv/员工信息表.csv")
 - **hard**: 正则类（Phone, IdCard, Email, CreditCode, BankCard）— 必须命中
 - **soft**: NER 类（PersonName, OrgName, Address）— 未命中只 warning
 
-## 当前数据量
+## 数据量
 
-- Sheet1: 69 条用例
-- Sheet2: 498 条基线，覆盖 25 个 fixture
+运行 `read_testcases()` / `read_baseline()` 获取实时条数，此处不写死。
