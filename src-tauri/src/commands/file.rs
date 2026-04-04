@@ -122,8 +122,8 @@ pub async fn import_file(
     result
 }
 
-/// 内部带密码文件导入
-fn import_file_with_password_internal(path: &str, password: &str) -> Result<FileContent, String> {
+/// 内部带密码文件导入（pub 供集成测试使用）
+pub fn import_file_with_password_internal(path: &str, password: &str) -> Result<FileContent, String> {
     let file_path = Path::new(path);
 
     if !file_path.exists() {

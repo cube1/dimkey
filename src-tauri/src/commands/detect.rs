@@ -160,21 +160,19 @@ pub async fn get_builtin_dict(
     Ok(load_builtin_dict(lang))
 }
 
-/// 列级类型推断：对表格每列采样前 N 行，统计各类型命中率
-#[tauri::command]
-pub async fn detect_columns(
-    content: FileContent,
+/// 列级类型推断核心逻辑（无 Tauri 依赖，可直接测试）
+pub fn detect_columns_internal(
+    content: &FileContent,
     sample_size: Option<usize>,
-    language_state: tauri::State<'_, AppLanguage>,
+    language: Language,
 ) -> Result<Vec<ColumnInference>, String> {
-    let sheets = match &content {
-        FileContent::Spreadsheet { sheets, .. } => sheets.clone(),
+    let sheets = match content {
+        FileContent::Spreadsheet { sheets, .. } => sheets,
         _ => return Err("列级推断仅支持表格类型文件".to_string()),
     };
 
     let sample_n = sample_size.unwrap_or(100);
-    let lang = *language_state.0.read().map_err(|e| format!("语言状态锁失败: {}", e))?;
-    let engine = match lang {
+    let engine = match language {
         Language::En => REGEX_ENGINE_EN.get_or_init(|| RegexEngine::for_language(Language::En)),
         Language::Zh => REGEX_ENGINE.get_or_init(RegexEngine::new),
     };
@@ -246,4 +244,15 @@ pub async fn detect_columns(
     }
 
     Ok(inferences)
+}
+
+/// 列级类型推断（Tauri command 薄壳）
+#[tauri::command]
+pub async fn detect_columns(
+    content: FileContent,
+    sample_size: Option<usize>,
+    language_state: tauri::State<'_, AppLanguage>,
+) -> Result<Vec<ColumnInference>, String> {
+    let lang = *language_state.0.read().map_err(|e| format!("语言状态锁失败: {}", e))?;
+    detect_columns_internal(&content, sample_size, lang)
 }

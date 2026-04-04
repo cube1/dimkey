@@ -138,6 +138,28 @@ fn test_encrypted_xlsx_import_fails() {
     );
 }
 
+/// C07: 密码错误重试 — 错误密码应返回 WRONG_PASSWORD 错误
+#[test]
+fn test_encrypted_xlsx_wrong_password() {
+    use dimkey_lib::commands::file::import_file_with_password_internal;
+
+    let path = fixture_path("sample_encrypted.xlsx");
+
+    // 错误密码
+    let result = import_file_with_password_internal(&path, "wrong_password_123");
+    assert!(result.is_err(), "错误密码应返回错误");
+    let err = result.unwrap_err();
+    assert!(
+        err.contains("WRONG_PASSWORD") || err.contains("密码") || err.contains("password"),
+        "错误信息应提示密码错误: {}",
+        err
+    );
+
+    // 空密码
+    let result2 = import_file_with_password_internal(&path, "");
+    assert!(result2.is_err(), "空密码应返回错误");
+}
+
 // ============================================================
 // C08: 空文件 — 不应崩溃
 // ============================================================

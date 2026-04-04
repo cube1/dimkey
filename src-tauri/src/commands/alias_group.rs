@@ -1,35 +1,32 @@
-use crate::models::workspace::{AliasGroup, ConsistencyMapping};
+use crate::models::workspace::{AliasGroup, ConsistencyMapping, Workspace};
 use crate::commands::workspace::{
     get_workspaces_dir, read_workspace_data, write_workspace_data, chrono_now,
 };
 
 /// 选择组内最长文本为主名
-fn select_primary(members: &[String]) -> String {
+pub fn select_primary(members: &[String]) -> String {
     members.iter()
         .max_by_key(|m| m.chars().count())
         .cloned()
         .unwrap_or_default()
 }
 
-/// 创建别名组
-#[tauri::command]
-pub async fn create_alias_group(
-    workspace_id: String,
+/// 创建别名组核心逻辑（无 Tauri 依赖，可直接测试）
+///
+/// 操作 Workspace 的 alias_groups 和 consistency_mappings 字段。
+/// 调用方负责 I/O（读写 JSON）。
+pub fn create_alias_group_internal(
+    workspace: &mut Workspace,
     members: Vec<String>,
     sensitive_type_key: String,
-    app_handle: tauri::AppHandle,
 ) -> Result<AliasGroup, String> {
     if members.len() < 2 {
         return Err("别名组至少需要 2 个成员".to_string());
     }
 
-    let dir = get_workspaces_dir(&app_handle)?;
-    let path = dir.join(format!("{}.json", workspace_id));
-    let mut ws_data = read_workspace_data(&path)?;
-
     // 校验：成员不能已属于同类型的其他别名组
     for m in &members {
-        let already = ws_data.workspace.alias_groups.iter()
+        let already = workspace.alias_groups.iter()
             .any(|g| g.sensitive_type_key == sensitive_type_key && g.members.contains(m));
         if already {
             return Err(format!("成员「{}」已属于其他别名组", m));
@@ -48,12 +45,12 @@ pub async fn create_alias_group(
     };
 
     // 找到主名的替换值（如果已有一致性映射）
-    let primary_replaced = ws_data.workspace.consistency_mappings.iter()
+    let primary_replaced = workspace.consistency_mappings.iter()
         .find(|m| m.original_text == primary && m.sensitive_type_key == sensitive_type_key)
         .map(|m| (m.replaced_text.clone(), m.strategy.clone()));
 
     // 同步 consistency_mappings：所有成员的 alias_group_id 设为新组 ID
-    for m in &mut ws_data.workspace.consistency_mappings {
+    for m in &mut workspace.consistency_mappings {
         if m.sensitive_type_key == sensitive_type_key && members.contains(&m.original_text) {
             m.alias_group_id = Some(group_id.clone());
             if let Some((ref replaced, ref strategy)) = primary_replaced {
@@ -63,10 +60,31 @@ pub async fn create_alias_group(
         }
     }
 
-    ws_data.workspace.alias_groups.push(group.clone());
-    ws_data.workspace.updated_at = chrono_now();
-    write_workspace_data(&path, &ws_data)?;
+    workspace.alias_groups.push(group.clone());
+    workspace.updated_at = chrono_now();
 
+    Ok(group)
+}
+
+/// 创建别名组（Tauri command 薄壳）
+#[tauri::command]
+pub async fn create_alias_group(
+    workspace_id: String,
+    members: Vec<String>,
+    sensitive_type_key: String,
+    app_handle: tauri::AppHandle,
+) -> Result<AliasGroup, String> {
+    let dir = get_workspaces_dir(&app_handle)?;
+    let path = dir.join(format!("{}.json", workspace_id));
+    let mut ws_data = read_workspace_data(&path)?;
+
+    let group = create_alias_group_internal(
+        &mut ws_data.workspace,
+        members,
+        sensitive_type_key,
+    )?;
+
+    write_workspace_data(&path, &ws_data)?;
     Ok(group)
 }
 
