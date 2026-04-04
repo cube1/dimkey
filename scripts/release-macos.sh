@@ -235,7 +235,7 @@ if [ -n "$TAG_RUN" ] && [ "$TAG_RUN" != "null" ]; then
 
   if [ "$RUN_STATUS" != "completed" ]; then
     echo "  CI (Run #$RUN_ID) 运行中，等待完成..."
-    echo "  （按 Ctrl+C 可跳过等待，之后手动运行: gh workflow run release.yml -f tag=$TAG）"
+    echo "  （按 Ctrl+C 可跳过等待，之后手动运行: gh workflow run release.yml -f tag=$TAG)"
     gh run watch "$RUN_ID" --exit-status || true
     RUN_CONCLUSION=$(gh run view "$RUN_ID" --json conclusion --jq '.conclusion' 2>/dev/null || echo "unknown")
   fi
