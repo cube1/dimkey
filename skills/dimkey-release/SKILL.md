@@ -51,17 +51,14 @@ git log $(git describe --tags --abbrev=0)..HEAD --oneline
 ```markdown
 ## [vX.Y.Z] — YYYY-MM-DD
 
-**下载：** [Windows 安装包](https://github.com/cube1/dimkey-site/releases/download/vX.Y.Z/Dimkey_X.Y.Z_x64-setup.exe) | [macOS DMG](https://github.com/cube1/dimkey-site/releases/download/vX.Y.Z/Dimkey_X.Y.Z_aarch64.dmg)
+**下载：** [官网下载](https://dimkey.com/#download)
 ```
-
-**文件名规则：**
-- Windows: `Dimkey_{version}_x64-setup.exe`
-- macOS: `Dimkey_{version}_aarch64.dmg`
 
 **产物分发架构：**
 - 私有仓库 `cube1/dimkey` Releases: 存放全部构建产物（内部备份）
-- 公开仓库 `cube1/dimkey-site` Releases: 存放 DMG、EXE、updater 包（用户下载）
-- `dimkey.com/latest.json`: 自动更新元数据（通过 GitHub Pages 提供）
+- 公开仓库 `cube1/dimkey-site` Releases: 存放 DMG、EXE、updater 包
+- `dimkey.com/#download`: 官网下载区域，JS 读取 latest.json 动态生成下载链接
+- `dimkey.com/latest.json`: 自动更新元数据 + 官网下载链接数据源（通过 GitHub Pages 提供）
 
 生成后让用户确认/修改 changelog 内容，确认后写入文件。
 
@@ -105,7 +102,7 @@ gh release view vX.Y.Z
 # 公开仓库 Release
 gh release view vX.Y.Z --repo cube1/dimkey-site
 # 自动更新元数据
-curl -s https://dimkey.com/latest.json | jq .
+curl -s https://www.dimkey.com/latest.json | jq .
 ```
 
 ## 注意事项
