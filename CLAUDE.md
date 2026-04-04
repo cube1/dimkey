@@ -13,13 +13,15 @@ cargo tauri dev          # 开发模式（前端热重载 + Rust 自动编译）
 cargo tauri build        # 构建发布版本
 npm run dev              # 仅前端开发（不启动 Rust 后端）
 cd src-tauri && cargo check   # Rust 类型检查
-cd src-tauri && cargo test    # Rust 测试
+cd src-tauri && cargo test    # Rust 全部测试（165 个：单元 + 集成）
 cd src-tauri && cargo test engine::regex_engine  # 单模块测试
 
-# E2E 测试
-pip install -r e2e/requirements.txt  # 首次安装
-python e2e/scripts/with_tauri.py -- pytest e2e/tests/ -v  # 全部测试
-python e2e/scripts/with_tauri.py -- pytest e2e/tests/ -v -m p0  # 仅核心测试
+# UI E2E 测试（Playwright + IPC Mock，不需要 Tauri 后端）
+python3.11 -m venv e2e/.venv && e2e/.venv/bin/pip install -r e2e/requirements.txt  # 首次安装
+e2e/.venv/bin/python -m playwright install chromium  # 首次安装浏览器
+TAURI_DEV_HOST=127.0.0.1 npm run dev &  # 先启动 Vite
+DIMKEY_E2E=1 DIMKEY_TEST_URL=http://127.0.0.1:1420 e2e/.venv/bin/pytest e2e/tests/ -v -m "not needs_backend"
+# needs_backend 标记的测试需要真实 Tauri 后端，macOS 暂无 WebView WebDriver 方案
 ```
 
 ## 技术栈

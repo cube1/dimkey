@@ -143,6 +143,8 @@ mod tests {
             sensitive_type: SensitiveType::Custom("机密项目".to_string()),
             match_mode: MatchMode::Exact,
             replacement: None,
+            language: None,
+            builtin: false,
         }];
         let engine = DictEngine::new(entries);
         let content = make_spreadsheet(vec![vec!["这是机密项目的文档", "普通内容"]]);
@@ -162,6 +164,8 @@ mod tests {
             sensitive_type: SensitiveType::Custom("ABC".to_string()),
             match_mode: MatchMode::Exact,
             replacement: None,
+            language: None,
+            builtin: false,
         }];
         let engine = DictEngine::new(entries);
         let content = make_spreadsheet(vec![vec!["abc ABC Abc"]]);
@@ -177,6 +181,8 @@ mod tests {
             sensitive_type: SensitiveType::Custom("ABC".to_string()),
             match_mode: MatchMode::Fuzzy,
             replacement: None,
+            language: None,
+            builtin: false,
         }];
         let engine = DictEngine::new(entries);
         let content = make_spreadsheet(vec![vec!["abc ABC Abc"]]);
@@ -191,6 +197,8 @@ mod tests {
             sensitive_type: SensitiveType::Custom("敏感".to_string()),
             match_mode: MatchMode::Exact,
             replacement: None,
+            language: None,
+            builtin: false,
         }];
         let engine = DictEngine::new(entries);
         let content = make_spreadsheet(vec![vec!["敏感数据和敏感信息"]]);
@@ -213,6 +221,8 @@ mod tests {
             sensitive_type: SensitiveType::Custom("秘密".to_string()),
             match_mode: MatchMode::Exact,
             replacement: None,
+            language: None,
+            builtin: false,
         }];
         let engine = DictEngine::new(entries);
         let content = FileContent::Document {

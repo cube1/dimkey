@@ -36,12 +36,20 @@ pub struct PdfiumState(pub Mutex<Option<Pdfium>>);
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let mut builder = tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
-        .plugin(tauri_plugin_aptabase::Builder::new("A-US-3333134309").build())
+        .plugin(tauri_plugin_aptabase::Builder::new("A-US-3333134309").build());
+
+    // E2E 测试：仅 debug 模式加载 WebDriver plugin
+    #[cfg(debug_assertions)]
+    {
+        builder = builder.plugin(tauri_plugin_webdriver_automation::init());
+    }
+
+    builder
         .setup(|app| {
             use tauri::Manager;
 

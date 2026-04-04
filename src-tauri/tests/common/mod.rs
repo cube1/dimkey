@@ -9,10 +9,21 @@ use dimkey_lib::models::sensitive::*;
 use dimkey_lib::models::strategy::*;
 use dimkey_lib::models::task::*;
 
-/// 获取 test-data 目录下的文件路径
+/// 获取测试数据文件路径（从 e2e/fixtures/scenarios/ 按扩展名查找）
 pub fn test_data_path(filename: &str) -> String {
     let manifest_dir = env!("CARGO_MANIFEST_DIR");
-    format!("{}/../test-data/{}", manifest_dir, filename)
+    let ext = std::path::Path::new(filename)
+        .extension()
+        .and_then(|e| e.to_str())
+        .unwrap_or("");
+    let subdir = match ext {
+        "xlsx" | "xls" => "xlsx",
+        "csv" => "csv",
+        "docx" => "docx",
+        "pdf" => "pdf",
+        _ => "csv",
+    };
+    format!("{}/../e2e/fixtures/scenarios/{}/{}", manifest_dir, subdir, filename)
 }
 
 /// 统计识别结果中某种类型的数量

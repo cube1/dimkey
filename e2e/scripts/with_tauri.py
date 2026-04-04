@@ -12,29 +12,30 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 DEV_PORT = 1420
+DEV_HOST = "127.0.0.1"
 
 
-def is_port_open(port: int) -> bool:
+def is_port_open(host: str, port: int) -> bool:
     """检查端口是否可连接"""
     try:
-        with socket.create_connection(("127.0.0.1", port), timeout=1):
+        with socket.create_connection((host, port), timeout=1):
             return True
     except (ConnectionRefusedError, TimeoutError, OSError):
         return False
 
 
-def wait_for_port(port: int, proc: subprocess.Popen, timeout: int = 120):
+def wait_for_port(host: str, port: int, proc: subprocess.Popen, timeout: int = 120):
     """轮询端口直到可用"""
-    print(f"[with_tauri] 等待端口 {port} 就绪...")
+    print(f"[with_tauri] 等待 {host}:{port} 就绪...")
     start = time.time()
     while time.time() - start < timeout:
         if proc.poll() is not None:
             raise RuntimeError(f"进程意外退出，退出码: {proc.returncode}")
-        if is_port_open(port):
-            print(f"[with_tauri] 端口 {port} 已就绪 ({time.time() - start:.1f}s)")
+        if is_port_open(host, port):
+            print(f"[with_tauri] {host}:{port} 已就绪 ({time.time() - start:.1f}s)")
             return
         time.sleep(1)
-    raise TimeoutError(f"端口 {port} 在 {timeout} 秒内未就绪")
+    raise TimeoutError(f"{host}:{port} 在 {timeout} 秒内未就绪")
 
 
 def main():
@@ -55,11 +56,15 @@ def main():
 
     env = os.environ.copy()
     env["DIMKEY_E2E"] = "1"
+    # 让 Vite 监听 127.0.0.1，否则默认 host:false 不对外暴露端口
+    env["TAURI_DEV_HOST"] = DEV_HOST
+
+    test_url = f"http://{DEV_HOST}:{args.port}"
 
     # 检查端口是否已被占用（可能已有 dev server 在运行）
-    if is_port_open(args.port):
+    if is_port_open(DEV_HOST, args.port):
         print(f"[with_tauri] 端口 {args.port} 已在使用，跳过启动")
-        env["DIMKEY_TEST_URL"] = f"http://localhost:{args.port}"
+        env["DIMKEY_TEST_URL"] = test_url
         result = subprocess.run(cmd, cwd=PROJECT_ROOT, env=env)
         sys.exit(result.returncode)
 
@@ -74,12 +79,12 @@ def main():
     )
 
     try:
-        wait_for_port(args.port, proc, args.timeout)
+        wait_for_port(DEV_HOST, args.port, proc, args.timeout)
 
         # 额外等待 WebView 初始化
         time.sleep(3)
 
-        env["DIMKEY_TEST_URL"] = f"http://localhost:{args.port}"
+        env["DIMKEY_TEST_URL"] = test_url
         print(f"[with_tauri] 执行测试: {' '.join(cmd)}")
         result = subprocess.run(cmd, cwd=PROJECT_ROOT, env=env)
 

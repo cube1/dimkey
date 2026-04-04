@@ -11,7 +11,7 @@ from utils.helpers import (
     import_file_via_ipc,
 )
 
-pytestmark = pytest.mark.p1
+pytestmark = [pytest.mark.p1, pytest.mark.needs_backend]
 
 
 class TestColumnRules:

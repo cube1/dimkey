@@ -55,3 +55,6 @@ e2e/__pycache__/
 e2e/.pytest_cache/
 e2e/tests/__pycache__/
 e2e/utils/__pycache__/
+
+# 测试数据（不提交）
+test-data/

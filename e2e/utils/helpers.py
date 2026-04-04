@@ -76,15 +76,15 @@ def import_file_via_ipc(page: Page, file_path: str):
     触发：解析 → 识别（regex/dict/NER）→ 脱敏 → UI 更新
     """
     abs_path = str(Path(file_path).resolve())
-    page.evaluate(f"""
-        async () => {{
+    page.evaluate("""
+        async (filePath) => {
             const processFile = window.__DIMKEY_PROCESS_FILE__;
-            if (!processFile) {{
+            if (!processFile) {
                 throw new Error('processFile 未暴露到 window，请确认 DEV 模式');
-            }}
-            await processFile('{abs_path}');
-        }}
-    """)
+            }
+            await processFile(filePath);
+        }
+    """, abs_path)
 
 
 def import_text_via_clipboard(page: Page, text: str):
@@ -92,15 +92,15 @@ def import_text_via_clipboard(page: Page, text: str):
 
     调用 DEV 模式下暴露的 window.__DIMKEY_PROCESS_TEXT__。
     """
-    page.evaluate(f"""
-        async () => {{
+    page.evaluate("""
+        async (content) => {
             const processText = window.__DIMKEY_PROCESS_TEXT__;
-            if (!processText) {{
+            if (!processText) {
                 throw new Error('processClipboardText 未暴露到 window，请确认 DEV 模式');
-            }}
-            await processText(`{text}`);
-        }}
-    """)
+            }
+            await processText(content);
+        }
+    """, text)
 
 
 def get_detected_items(page: Page) -> list[str]:

@@ -14,6 +14,7 @@ pytestmark = pytest.mark.p1
 class TestWorkspaceCRUD:
     """工作区 CRUD 测试"""
 
+    @pytest.mark.needs_backend
     def test_create_workspace_via_shortcut(self, page):
         """Cmd+N 创建新工作区"""
         count_before = get_workspace_count(page)

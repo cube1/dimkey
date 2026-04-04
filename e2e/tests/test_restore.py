@@ -29,6 +29,7 @@ class TestRestore:
         assert ai_btn.is_visible(), "AI 还原按钮应可见"
         assert ws_btn.is_visible(), "工作区还原按钮应可见"
 
+    @pytest.mark.needs_backend
     def test_desensitize_then_back_to_dropzone(self, page):
         """脱敏完成后点返回 → 回到 dropzone"""
         fixture_path = get_fixture_path("sample.txt")

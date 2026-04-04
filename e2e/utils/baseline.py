@@ -1,5 +1,7 @@
 """Fixture 数据基线对照 — 验证检测结果是否匹配期望"""
 
+import warnings
+
 from utils.excel_manager import read_baseline
 
 
@@ -23,6 +25,7 @@ def assert_baseline(detected_texts: list[str], fixture_file: str) -> dict:
     """
     baseline = read_baseline(fixture_file)
     if not baseline:
+        warnings.warn(f"fixture {fixture_file!r} 在 Excel 中无基线数据，跳过对照")
         return {
             "passed": True,
             "hard_missing": [],
