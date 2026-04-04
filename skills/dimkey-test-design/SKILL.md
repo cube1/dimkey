@@ -40,7 +40,7 @@ Step 3.5: 生成 .baseline.json sidecar 文件
     │
     ▼
 Step 4: 写 Excel
-    Sheet1: 新增用例行（add_testcase）
+    Sheet1: 新增用例行（add_testcase），不传 test_file（由 codegen 阶段回写）
     Sheet2: 从 .baseline.json 聚合写入（非数据源，仅展示用）
     详见 [references/excel-manager.md](references/excel-manager.md)
     │

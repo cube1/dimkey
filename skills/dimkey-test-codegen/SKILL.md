@@ -41,8 +41,10 @@ Step 4: 生成测试代码
     同时生成按类型的 count 数量断言作为 smoke test
     │
     ▼
-Step 5: 回写 Excel
-    更新 "对应测试文件" 列和 "自动化覆盖" 状态
+Step 5: 回写 Excel（必须）
+    对每个生成了测试代码的用例，调用：
+    update_result(case_id, {"test_file": "xxx.rs", "coverage": "已覆盖"})
+    test_file 为测试文件名（不含路径前缀），coverage 为覆盖状态
     │
     ▼
 Step 6: 输出汇报，等待用户 review

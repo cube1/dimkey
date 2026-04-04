@@ -205,16 +205,22 @@ def add_baseline(fixture_file: str, items: list[dict]):
 def update_result(case_id: str, result: dict):
     """回写执行结果到 Sheet1
 
-    result keys: exec_result ("通过"/"失败"), fail_reason, screenshot, coverage
+    result keys: exec_result ("通过"/"失败"), fail_reason, screenshot, coverage, test_file
     """
     wb = _load_wb()
     ws = wb["测试用例"]
     for row in range(2, ws.max_row + 1):
         if ws.cell(row, COL_ID).value == case_id:
-            ws.cell(row, COL_EXEC_RESULT, result.get("exec_result", ""))
-            ws.cell(row, COL_FAIL_REASON, result.get("fail_reason", ""))
-            ws.cell(row, COL_EXEC_TIME, datetime.now().strftime("%Y-%m-%d %H:%M"))
-            ws.cell(row, COL_SCREENSHOT, result.get("screenshot", ""))
+            if result.get("exec_result") is not None:
+                ws.cell(row, COL_EXEC_RESULT, result.get("exec_result", ""))
+            if result.get("fail_reason") is not None:
+                ws.cell(row, COL_FAIL_REASON, result.get("fail_reason", ""))
+            if result.get("exec_result") is not None or result.get("fail_reason") is not None:
+                ws.cell(row, COL_EXEC_TIME, datetime.now().strftime("%Y-%m-%d %H:%M"))
+            if result.get("screenshot"):
+                ws.cell(row, COL_SCREENSHOT, result["screenshot"])
+            if result.get("test_file"):
+                ws.cell(row, COL_TEST_FILE, result["test_file"])
             if result.get("coverage"):
                 ws.cell(row, COL_COVERAGE, result["coverage"])
                 fill_map = {

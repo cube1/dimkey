@@ -1,7 +1,7 @@
 # Bug 清单
 
-> 更新时间: 2026-04-04（第 6 次执行）
-> 来源: 全量测试执行（Rust ~237通过/10失败 + Pytest 20通过/2失败/2跳过）
+> 更新时间: 2026-04-04（第 7 次执行）
+> 来源: 全量测试执行（Rust 317通过/14失败 + Pytest 20通过/2失败/2跳过）
 
 ## 活跃 Bug
 
@@ -9,10 +9,11 @@
 |---|--------|------|----------|----------|------|
 | BUG-014 | P1 | parser::csv | `test_gbk_csv_*` ×4 (encoding_boundary.rs) | GBK 编码 CSV 解析失败，csv crate 仅支持 UTF-8，未做编码自动检测/转换 | 功能缺失 |
 | BUG-015 | P2 | regex_engine | `test_uk_csv_baseline_coverage` (desensitize_uk.rs) | UkPhone `+44 161 496 0000`（含空格格式）未被正则识别，正则要求连续数字或 `-` 分隔 | 识别遗漏 |
-| BUG-016 | P2 | regex_engine | `test_us_compliance_baseline`, `test_us_compliance_detect_drivers_license` (desensitize_us_compliance.rs) | US DriversLicense `S012-3456-7890` 未识别（首字母 S 不在正则范围？），识别 9/10 | 识别遗漏 |
+| BUG-016 | P2 | regex_engine | `test_us_compliance_baseline_coverage`, `test_us_compliance_detect_drivers_license` (desensitize_us_compliance.rs) | US DriversLicense `S012-3456-7890` 未识别（首字母 S 不在正则范围？），识别 9/10 | 识别遗漏 |
 | BUG-017 | P1 | regex_engine | `test_intl_docx_detect_passport`, `test_intl_docx_detect_drivers_license`, `test_intl_docx_baseline` (desensitize_international.rs) | Passport 号码完全未识别（0/3），国际驾照格式缺失，baseline 覆盖不足 | 功能缺失 |
 | BUG-018 | P2 | E2E | `test_enabled_types_roundtrip` (test_type_persistence.py) | IPC mock override get_workspace 后 selectWorkspace 未正确触发 store 更新，wsData.workspace.enabled_types 仍为 null | 测试代码 |
 | BUG-019 | P2 | E2E | `test_workspace_list_has_multiple` (test_workspace_advanced.py) | IPC mock 返回 2 个工作区但列表只显示 1 个，竞态或 store 渲染时序问题 | 测试代码 |
+| BUG-020 | P2 | parser::xlsx | `test_encrypted_xlsx_wrong_password` (boundary.rs) | 错误密码解密后文件解析返回 "Cannot detect file format" 而非密码错误提示，错误分类不够精确 | 逻辑错误 |
 
 ## 环境问题（非 Bug）
 

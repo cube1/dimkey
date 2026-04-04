@@ -34,13 +34,24 @@ case_id = add_testcase({
 
 ### 回写结果
 
+`update_result()` 支持按需更新，只传需要更新的字段即可。
+
 ```python
+# codegen 完成后：回写 test_file 和 coverage（不传 exec_result 不会覆盖执行结果）
+update_result("C01", {
+    "test_file": "desensitize_csv.rs",
+    "coverage": "已覆盖",
+})
+
+# test-run 执行后：回写执行结果
 update_result("C01", {
     "exec_result": "通过",    # 或 "失败"
     "fail_reason": "",
     "coverage": "已覆盖",     # 或 "部分覆盖" / "未覆盖"
 })
 ```
+
+支持的 result keys: `exec_result`, `fail_reason`, `coverage`, `test_file`, `screenshot`
 
 ### 读取用例
 
