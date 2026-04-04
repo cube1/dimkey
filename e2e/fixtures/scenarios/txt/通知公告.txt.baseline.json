@@ -1,0 +1,167 @@
+{
+  "fixture": "scenarios/txt/通知公告.txt",
+  "generated_from": "Sheet2迁移",
+  "expected": [
+    {
+      "value": "13611223344",
+      "type": "Phone",
+      "count": 2,
+      "note": "周建华手机(出现2次)",
+      "assert": "hard"
+    },
+    {
+      "value": "18755667788",
+      "type": "Phone",
+      "count": 1,
+      "note": "马超手机",
+      "assert": "hard"
+    },
+    {
+      "value": "15899001122",
+      "type": "Phone",
+      "count": 1,
+      "note": "林小燕手机",
+      "assert": "hard"
+    },
+    {
+      "value": "13800001111",
+      "type": "Phone",
+      "count": 1,
+      "note": "吴志远手机",
+      "assert": "hard"
+    },
+    {
+      "value": "13800002222",
+      "type": "Phone",
+      "count": 1,
+      "note": "何芳手机",
+      "assert": "hard"
+    },
+    {
+      "value": "13800003333",
+      "type": "Phone",
+      "count": 1,
+      "note": "孙德明手机",
+      "assert": "hard"
+    },
+    {
+      "value": "13800004444",
+      "type": "Phone",
+      "count": 1,
+      "note": "方晓琳手机",
+      "assert": "hard"
+    },
+    {
+      "value": "330106198712250088",
+      "type": "IdCard",
+      "count": 1,
+      "note": "林小燕身份证",
+      "assert": "hard"
+    },
+    {
+      "value": "330102199303151234",
+      "type": "IdCard",
+      "count": 1,
+      "note": "吴志远身份证",
+      "assert": "hard"
+    },
+    {
+      "value": "330102199508201235",
+      "type": "IdCard",
+      "count": 1,
+      "note": "何芳身份证",
+      "assert": "hard"
+    },
+    {
+      "value": "zhoujh@company.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "wuzy@company.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "fangxl@company.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "91330106MA2B3C4D5E",
+      "type": "CreditCode",
+      "count": 1,
+      "note": "统一社会信用代码",
+      "assert": "hard"
+    },
+    {
+      "value": "6217001234567891234",
+      "type": "BankCard",
+      "count": 1,
+      "note": "孙德明银行卡",
+      "assert": "hard"
+    },
+    {
+      "value": "1202012345678901234",
+      "type": "BankCard",
+      "count": 1,
+      "note": "公司账号",
+      "assert": "hard"
+    },
+    {
+      "value": "0571-88889999",
+      "type": "Landline",
+      "count": 1,
+      "note": "公司座机",
+      "assert": "hard"
+    },
+    {
+      "value": "0571-88889998",
+      "type": "Landline",
+      "count": 1,
+      "note": "传真",
+      "assert": "hard"
+    },
+    {
+      "value": "浙A12345",
+      "type": "LicensePlate",
+      "count": 1,
+      "note": "车牌1",
+      "assert": "hard"
+    },
+    {
+      "value": "浙A67890",
+      "type": "LicensePlate",
+      "count": 1,
+      "note": "车牌2",
+      "assert": "hard"
+    },
+    {
+      "value": "周建华",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "林小燕",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "吴志远",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    }
+  ]
+}

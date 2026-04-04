@@ -1,0 +1,83 @@
+{
+  "fixture": "scenarios/docx/民事判决书-商品房买卖纠纷.docx",
+  "generated_from": "Sheet2迁移",
+  "expected": [
+    {
+      "value": "13974561234",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "13512345678",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "13823456789",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "18765432109",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "18923456789",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "430104198805123456",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "440301197206081234",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "440305198901156789",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "zhaoqiming@gdpclawyer.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "6225881234509876543",
+      "type": "BankCard",
+      "count": 2,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "91440300MA5F1234AB",
+      "type": "CreditCode",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    }
+  ]
+}

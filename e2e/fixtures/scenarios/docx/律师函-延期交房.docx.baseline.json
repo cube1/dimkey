@@ -1,0 +1,76 @@
+{
+  "fixture": "scenarios/docx/律师函-延期交房.docx",
+  "generated_from": "Sheet2迁移",
+  "expected": [
+    {
+      "value": "13974561234",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "18923456789",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "13512345678",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "430104198805123456",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "liuxiaoyan@163.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "sunhao@jincheng-re.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "chenguodong@gdzylawyer.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "6222021234500087654",
+      "type": "BankCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "6225881234509876543",
+      "type": "BankCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "0755-86123456",
+      "type": "Landline",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    }
+  ]
+}

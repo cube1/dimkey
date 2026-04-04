@@ -1,0 +1,111 @@
+{
+  "fixture": "scenarios/docx/人事变动通知.docx",
+  "generated_from": "Sheet2迁移",
+  "expected": [
+    {
+      "value": "14700001111",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "18300002222",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "17088889999",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "15233334444",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "18955556666",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "230102199601080034",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "370102199802145678",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "320102198706251234",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "wufang@yeah.net",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "zhenggang@aliyun.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "liuba@126.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "xutingting@tom.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "6222081234567890006",
+      "type": "BankCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "6217991234567890007",
+      "type": "BankCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "6225881234567890002",
+      "type": "BankCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    }
+  ]
+}

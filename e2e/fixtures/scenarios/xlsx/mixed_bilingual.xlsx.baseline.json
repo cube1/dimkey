@@ -1,0 +1,195 @@
+{
+  "fixture": "scenarios/xlsx/mixed_bilingual.xlsx",
+  "generated_from": "Sheet2迁移",
+  "expected": [
+    {
+      "value": "13812345678",
+      "type": "Phone",
+      "count": 1,
+      "note": "中文手机号",
+      "assert": "hard"
+    },
+    {
+      "value": "13955667788",
+      "type": "Phone",
+      "count": 1,
+      "note": "中文手机号",
+      "assert": "hard"
+    },
+    {
+      "value": "15012349876",
+      "type": "Phone",
+      "count": 1,
+      "note": "中文手机号",
+      "assert": "hard"
+    },
+    {
+      "value": "18698765432",
+      "type": "Phone",
+      "count": 1,
+      "note": "中文手机号",
+      "assert": "hard"
+    },
+    {
+      "value": "13611223344",
+      "type": "Phone",
+      "count": 1,
+      "note": "中文手机号",
+      "assert": "hard"
+    },
+    {
+      "value": "15899887766",
+      "type": "Phone",
+      "count": 1,
+      "note": "中文手机号",
+      "assert": "hard"
+    },
+    {
+      "value": "18501234567",
+      "type": "Phone",
+      "count": 1,
+      "note": "中文手机号",
+      "assert": "hard"
+    },
+    {
+      "value": "13700112233",
+      "type": "Phone",
+      "count": 1,
+      "note": "中文手机号",
+      "assert": "hard"
+    },
+    {
+      "value": "110101199003071234",
+      "type": "IdCard",
+      "count": 1,
+      "note": "中文身份证",
+      "assert": "hard"
+    },
+    {
+      "value": "320106198507124567",
+      "type": "IdCard",
+      "count": 1,
+      "note": "中文身份证",
+      "assert": "hard"
+    },
+    {
+      "value": "440301199201156789",
+      "type": "IdCard",
+      "count": 1,
+      "note": "中文身份证",
+      "assert": "hard"
+    },
+    {
+      "value": "210102198812250011",
+      "type": "IdCard",
+      "count": 1,
+      "note": "中文身份证",
+      "assert": "hard"
+    },
+    {
+      "value": "523-45-6789",
+      "type": "SSN",
+      "count": 1,
+      "note": "US SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "441-22-3344",
+      "type": "SSN",
+      "count": 1,
+      "note": "US SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "667-88-9900",
+      "type": "SSN",
+      "count": 1,
+      "note": "US SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "556-77-8899",
+      "type": "SSN",
+      "count": 1,
+      "note": "US SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "zhangwei@qq.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "john.smith@gmail.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "lina@outlook.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "michael.chen@company.cn",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "wangfang@163.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "emily.j@yahoo.co.uk",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "zhaoming@hotmail.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "sarah.wang@icloud.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "W1U 3BW",
+      "type": "UkPostcode",
+      "count": 1,
+      "note": "UK Postcode",
+      "assert": "hard"
+    },
+    {
+      "value": "M1 5QA",
+      "type": "UkPostcode",
+      "count": 1,
+      "note": "UK Postcode",
+      "assert": "hard"
+    },
+    {
+      "value": "SW1A 2AA",
+      "type": "UkPostcode",
+      "count": 1,
+      "note": "UK Postcode",
+      "assert": "hard"
+    }
+  ]
+}

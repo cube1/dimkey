@@ -1,0 +1,104 @@
+{
+  "fixture": "scenarios/xlsx/边界测试用例.xlsx",
+  "generated_from": "Sheet2迁移",
+  "expected": [
+    {
+      "value": "13800138001",
+      "type": "Phone",
+      "count": 4,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "18676543210",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "110101199003076789",
+      "type": "IdCard",
+      "count": 2,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "11010119900307678X",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "440305199212253456",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "zhangsan@qq.com",
+      "type": "Email",
+      "count": 3,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "zhang123@163.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "zhang_san@gmail.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "zhang.san@company.com.cn",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "6222021234567890",
+      "type": "BankCard",
+      "count": 2,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "6222021234567890123",
+      "type": "BankCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "6228480012345678901",
+      "type": "BankCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "11010119900307678X",
+      "type": "CreditCode",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "010-62345678",
+      "type": "Landline",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    }
+  ]
+}

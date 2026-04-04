@@ -1,0 +1,83 @@
+{
+  "fixture": "sample.docx",
+  "generated_from": "Sheet2迁移",
+  "expected": [
+    {
+      "value": "张三",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER 识别",
+      "assert": "soft"
+    },
+    {
+      "value": "13800138000",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "110101199001011234",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "zhangsan@example.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "北京市朝阳区建国路88号",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "李四",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "13912345678",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "320102198512152345",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "lisi@test.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "上海市浦东新区陆家嘴环路1000号",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "阿里巴巴集团控股有限公司",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    }
+  ]
+}

@@ -9,6 +9,8 @@ use dimkey_lib::models::sensitive::*;
 use dimkey_lib::models::strategy::*;
 use dimkey_lib::models::task::*;
 
+use serde::Deserialize;
+
 /// 获取测试数据文件路径（从 e2e/fixtures/scenarios/ 按扩展名查找）
 pub fn test_data_path(filename: &str) -> String {
     let manifest_dir = env!("CARGO_MANIFEST_DIR");
@@ -21,14 +23,231 @@ pub fn test_data_path(filename: &str) -> String {
         "csv" => "csv",
         "docx" => "docx",
         "pdf" => "pdf",
+        "txt" => "txt",
         _ => "csv",
     };
     format!("{}/../e2e/fixtures/scenarios/{}/{}", manifest_dir, subdir, filename)
 }
 
+/// 获取 e2e/fixtures/ 下的任意文件路径（用于非 scenarios/ 目录的 fixture）
+pub fn fixture_path(relative: &str) -> String {
+    let manifest_dir = env!("CARGO_MANIFEST_DIR");
+    format!("{}/../e2e/fixtures/{}", manifest_dir, relative)
+}
+
 /// 统计识别结果中某种类型的数量
 pub fn count_by_type(items: &[SensitiveItem], st: &SensitiveType) -> usize {
     items.iter().filter(|i| &i.sensitive_type == st).count()
+}
+
+/// 提取识别结果中某种类型的所有去重文本
+pub fn texts_by_type(items: &[SensitiveItem], st: &SensitiveType) -> Vec<String> {
+    let mut seen = std::collections::HashSet::new();
+    items
+        .iter()
+        .filter(|i| &i.sensitive_type == st)
+        .filter(|i| seen.insert(i.text.clone()))
+        .map(|i| i.text.clone())
+        .collect()
+}
+
+/// 断言基线中每个 hard 模式的具体值都被识别到
+/// expected: &[(&str, &SensitiveType)] — 基线中���记为 hard 的 (文本, 类型) 对
+/// 对于未匹配项会 panic 并列出漏检值
+pub fn assert_baseline_covered(items: &[SensitiveItem], expected: &[(&str, &SensitiveType)]) {
+    let mut missing: Vec<String> = Vec::new();
+    for (text, st) in expected {
+        // 用 contains ��配：识别结果的 text 可能包含空格差异，做 trim 后精确匹配
+        let text_trimmed = text.trim();
+        let found = items.iter().any(|i| {
+            &i.sensitive_type == *st && i.text.trim() == text_trimmed
+        });
+        if !found {
+            missing.push(format!("  {:?} '{}'", st, text));
+        }
+    }
+    if !missing.is_empty() {
+        panic!(
+            "基线覆盖检查失败，以下 {} 项未被识别:\n{}",
+            missing.len(),
+            missing.join("\n")
+        );
+    }
+}
+
+// ============================================================
+// .baseline.json sidecar 支持
+// ============================================================
+
+/// .baseline.json 文件结构
+#[derive(Deserialize)]
+pub struct BaselineFile {
+    pub fixture: String,
+    pub expected: Vec<BaselineEntry>,
+}
+
+/// 基线条目
+#[derive(Deserialize)]
+pub struct BaselineEntry {
+    pub value: String,
+    #[serde(rename = "type")]
+    pub sensitive_type: String,
+    pub count: usize,
+    #[serde(default)]
+    pub note: String,
+    #[serde(rename = "assert", default = "default_assert_mode")]
+    pub assert_mode: String,
+}
+
+fn default_assert_mode() -> String {
+    "hard".to_string()
+}
+
+/// 从 fixture 路径自动加载对应的 .baseline.json
+/// fixture_path: fixture 文件的绝对路径
+pub fn load_baseline(fixture_abs_path: &str) -> BaselineFile {
+    let sidecar = format!("{}.baseline.json", fixture_abs_path);
+    let content = std::fs::read_to_string(&sidecar)
+        .unwrap_or_else(|e| panic!("无法读取 baseline 文件 {}: {}", sidecar, e));
+    serde_json::from_str(&content)
+        .unwrap_or_else(|e| panic!("解析 baseline JSON 失败 {}: {}", sidecar, e))
+}
+
+/// 将基线中的类型字符串映射为 SensitiveType 枚举
+fn parse_sensitive_type(s: &str) -> Option<SensitiveType> {
+    match s {
+        "Phone" => Some(SensitiveType::Phone),
+        "IdCard" => Some(SensitiveType::IdCard),
+        "Email" => Some(SensitiveType::Email),
+        "Address" => Some(SensitiveType::Address),
+        "PersonName" => Some(SensitiveType::PersonName),
+        "OrgName" => Some(SensitiveType::OrgName),
+        "BankCard" => Some(SensitiveType::BankCard),
+        "CreditCode" => Some(SensitiveType::CreditCode),
+        "LicensePlate" => Some(SensitiveType::LicensePlate),
+        "IpAddress" => Some(SensitiveType::IpAddress),
+        "LandlinePhone" | "Landline" => Some(SensitiveType::LandlinePhone),
+        "Title" => Some(SensitiveType::Title),
+        "Ssn" | "SSN" => Some(SensitiveType::Ssn),
+        "UsPhone" => Some(SensitiveType::UsPhone),
+        "UkPhone" => Some(SensitiveType::UkPhone),
+        "Passport" => Some(SensitiveType::Passport),
+        "CreditCard" => Some(SensitiveType::CreditCard),
+        "ZipCode" => Some(SensitiveType::ZipCode),
+        "DriversLicense" => Some(SensitiveType::DriversLicense),
+        "Iban" | "IBAN" => Some(SensitiveType::Iban),
+        "UkPostcode" => Some(SensitiveType::UkPostcode),
+        _ => None,
+    }
+}
+
+/// 自动从 .baseline.json 加载基线并断言（全类型模式）
+///
+/// 等价于 `assert_baseline_from_sidecar_filtered(items, path, None)`
+pub fn assert_baseline_from_sidecar(items: &[SensitiveItem], fixture_abs_path: &str) {
+    assert_baseline_from_sidecar_filtered(items, fixture_abs_path, None);
+}
+
+/// 自动从 .baseline.json 加载基线并断言（可选类型过滤）
+///
+/// - `enabled_types: None` → 校验 baseline 中所有类型
+/// - `enabled_types: Some(&[Phone, Email])` → 只校验 Phone 和 Email，其余类型跳过
+///
+/// 适用场景：
+/// - 全类型扫描测试 → `None`
+/// - 类型过滤测试（如 T02 只启用手机号）→ `Some(&[SensitiveType::Phone])`
+/// - 关闭单一类型（如 T04 关闭身份证）→ `Some(&[除 IdCard 外的所有类型])`
+///
+/// 行为：
+/// - hard 项且类型在 enabled 范围内：必须命中，否则 panic
+/// - hard 项但类型不在 enabled 范围内：跳过（不检查也不 warning）
+/// - soft 项且类型在 enabled 范围内：未命中打印 warning
+pub fn assert_baseline_from_sidecar_filtered(
+    items: &[SensitiveItem],
+    fixture_abs_path: &str,
+    enabled_types: Option<&[SensitiveType]>,
+) {
+    let baseline = load_baseline(fixture_abs_path);
+    let mut hard_missing: Vec<String> = Vec::new();
+    let mut soft_missing: Vec<String> = Vec::new();
+    let mut skipped_types: std::collections::HashSet<String> = std::collections::HashSet::new();
+
+    // 按类型汇总 hard 项的期望数量
+    let mut hard_counts: HashMap<SensitiveType, usize> = HashMap::new();
+
+    for entry in &baseline.expected {
+        let st = match parse_sensitive_type(&entry.sensitive_type) {
+            Some(st) => st,
+            None => {
+                eprintln!(
+                    "[baseline] 跳过未知类型: {} '{}'",
+                    entry.sensitive_type, entry.value
+                );
+                continue;
+            }
+        };
+
+        // 类型过滤：不在启用范围内的类型直接跳过
+        if let Some(enabled) = enabled_types {
+            if !enabled.contains(&st) {
+                skipped_types.insert(entry.sensitive_type.clone());
+                continue;
+            }
+        }
+
+        let text_trimmed = entry.value.trim();
+        let found = items
+            .iter()
+            .any(|i| i.sensitive_type == st && i.text.trim() == text_trimmed);
+
+        if entry.assert_mode == "hard" {
+            *hard_counts.entry(st.clone()).or_default() += entry.count;
+            if !found {
+                hard_missing.push(format!("  {} '{}'", entry.sensitive_type, entry.value));
+            }
+        } else if !found {
+            soft_missing.push(format!("  {} '{}'", entry.sensitive_type, entry.value));
+        }
+    }
+
+    // 被过滤掉的类型打印提示
+    if !skipped_types.is_empty() {
+        let mut types: Vec<&String> = skipped_types.iter().collect();
+        types.sort();
+        eprintln!(
+            "[baseline] 跳过未启用的类型: {}",
+            types.iter().map(|t| t.as_str()).collect::<Vec<_>>().join(", ")
+        );
+    }
+
+    // soft 项只打印 warning
+    if !soft_missing.is_empty() {
+        eprintln!(
+            "[baseline] ⚠️  {} 个 soft 项未识别（不影响测试通过）:\n{}",
+            soft_missing.len(),
+            soft_missing.join("\n")
+        );
+    }
+
+    // hard 项必须全部通过
+    if !hard_missing.is_empty() {
+        panic!(
+            "基线覆盖检查失败，以下 {} 个 hard 项未被识别:\n{}\n\n实际识别到 {} 项",
+            hard_missing.len(),
+            hard_missing.join("\n"),
+            items.len()
+        );
+    }
+
+    // 按类型验证数量下限
+    for (st, expected_count) in &hard_counts {
+        let actual = count_by_type(items, st);
+        assert!(
+            actual >= *expected_count,
+            "{:?} 数量不足: 期望 >= {}, 实际 {}",
+            st, expected_count, actual
+        );
+    }
 }
 
 /// 在文本中替换敏感项（从后往前替换，避免偏移问题）

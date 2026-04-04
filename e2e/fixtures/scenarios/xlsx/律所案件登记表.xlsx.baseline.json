@@ -1,0 +1,237 @@
+{
+  "fixture": "scenarios/xlsx/律所案件登记表.xlsx",
+  "generated_from": "Sheet2迁移",
+  "expected": [
+    {
+      "value": "13801234567",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "13901234568",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "13607012345",
+      "type": "Phone",
+      "count": 3,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "13812345678",
+      "type": "Phone",
+      "count": 2,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "13512345678",
+      "type": "Phone",
+      "count": 2,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "15879012345",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "15823456789",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "13823456789",
+      "type": "Phone",
+      "count": 2,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "13723456789",
+      "type": "Phone",
+      "count": 2,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "13974561234",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "13867012345",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "15867012345",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "18610012345",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "13901234567",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "13912345678",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "110101199005123456",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "360102199507151234",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "440106199103151234",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "430104198805123456",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "110105199208151234",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "320505198803121234",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "zhanglifang@qq.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "gumingyuan@xhzn.com",
+      "type": "Email",
+      "count": 2,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "fangzhicheng@outlook.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "liangmeiling@163.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "liuxiaoyan@163.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "jiangwenbin72@sina.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "tangjunjie@gmail.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "91320500MA1WXYZ123",
+      "type": "CreditCode",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "91330100MA2BXYZ789",
+      "type": "CreditCode",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "0510-85123456",
+      "type": "Landline",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "0791-88123456",
+      "type": "Landline",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "0755-86123456",
+      "type": "Landline",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    }
+  ]
+}

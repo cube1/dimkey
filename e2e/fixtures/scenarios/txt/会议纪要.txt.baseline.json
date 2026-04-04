@@ -1,0 +1,167 @@
+{
+  "fixture": "scenarios/txt/会议纪要.txt",
+  "generated_from": "Sheet2迁移",
+  "expected": [
+    {
+      "value": "13912345678",
+      "type": "Phone",
+      "count": 1,
+      "note": "王建国手机",
+      "assert": "hard"
+    },
+    {
+      "value": "18687654321",
+      "type": "Phone",
+      "count": 1,
+      "note": "张美玲手机",
+      "assert": "hard"
+    },
+    {
+      "value": "15011223344",
+      "type": "Phone",
+      "count": 1,
+      "note": "陈志强手机",
+      "assert": "hard"
+    },
+    {
+      "value": "13700998877",
+      "type": "Phone",
+      "count": 1,
+      "note": "刘洋手机",
+      "assert": "hard"
+    },
+    {
+      "value": "18966778899",
+      "type": "Phone",
+      "count": 1,
+      "note": "赵小红手机",
+      "assert": "hard"
+    },
+    {
+      "value": "13588776655",
+      "type": "Phone",
+      "count": 1,
+      "note": "赵鹏手机",
+      "assert": "hard"
+    },
+    {
+      "value": "13322114455",
+      "type": "Phone",
+      "count": 1,
+      "note": "黄明辉手机",
+      "assert": "hard"
+    },
+    {
+      "value": "110105198803152345",
+      "type": "IdCard",
+      "count": 1,
+      "note": "张美玲身份证",
+      "assert": "hard"
+    },
+    {
+      "value": "320106199205281234",
+      "type": "IdCard",
+      "count": 1,
+      "note": "赵小红身份证",
+      "assert": "hard"
+    },
+    {
+      "value": "310101199001011234",
+      "type": "IdCard",
+      "count": 1,
+      "note": "李伟身份证",
+      "assert": "hard"
+    },
+    {
+      "value": "wangjg@xxtech.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "chenzq@xxtech.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "liuyang@xxtech.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "sunli@xxtech.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "91110105MA01B2CH3X",
+      "type": "CreditCode",
+      "count": 1,
+      "note": "统一社会信用代码",
+      "assert": "hard"
+    },
+    {
+      "value": "192.168.1.100",
+      "type": "IP",
+      "count": 1,
+      "note": "服务器IP",
+      "assert": "hard"
+    },
+    {
+      "value": "010-87654321",
+      "type": "Landline",
+      "count": 1,
+      "note": "座机",
+      "assert": "hard"
+    },
+    {
+      "value": "6222021234567890123",
+      "type": "BankCard",
+      "count": 1,
+      "note": "银行账户",
+      "assert": "hard"
+    },
+    {
+      "value": "王建国",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "张美玲",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "陈志强",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "李伟",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "黄明辉",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    }
+  ]
+}

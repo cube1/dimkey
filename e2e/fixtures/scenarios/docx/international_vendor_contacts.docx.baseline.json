@@ -1,0 +1,202 @@
+{
+  "fixture": "scenarios/docx/international_vendor_contacts.docx",
+  "generated_from": "Sheet2迁移",
+  "expected": [
+    {
+      "value": "+44 7911 234567",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "+44 20 7946 1234",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "紧急联系",
+      "assert": "hard"
+    },
+    {
+      "value": "4539 7890 1234 5678",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Visa",
+      "assert": "hard"
+    },
+    {
+      "value": "5425 6789 0123 4567",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Mastercard",
+      "assert": "hard"
+    },
+    {
+      "value": "4716 5432 1098 7654",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Visa",
+      "assert": "hard"
+    },
+    {
+      "value": "5543 8765 4321 0987",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Mastercard",
+      "assert": "hard"
+    },
+    {
+      "value": "GB82 WEST 1234 5698 7654 32",
+      "type": "IBAN",
+      "count": 2,
+      "note": "出现2次",
+      "assert": "hard"
+    },
+    {
+      "value": "DE89 3704 0044 0532 0130 00",
+      "type": "IBAN",
+      "count": 2,
+      "note": "出现2次",
+      "assert": "hard"
+    },
+    {
+      "value": "FR76 1234 5003 1234 5678 9012 345",
+      "type": "IBAN",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "533410987",
+      "type": "Passport",
+      "count": 1,
+      "note": "UK护照",
+      "assert": "hard"
+    },
+    {
+      "value": "12AB34567",
+      "type": "Passport",
+      "count": 1,
+      "note": "法国护照",
+      "assert": "hard"
+    },
+    {
+      "value": "GA 1234567",
+      "type": "Passport",
+      "count": 1,
+      "note": "加拿大护照",
+      "assert": "hard"
+    },
+    {
+      "value": "B072RRE2I55",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "德国驾照",
+      "assert": "hard"
+    },
+    {
+      "value": "D890-1234-5678",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "美国驾照",
+      "assert": "hard"
+    },
+    {
+      "value": "345-89-1627",
+      "type": "SSN",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "(415) 555-0147",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "+1 416-555-0198",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "加拿大",
+      "assert": "hard"
+    },
+    {
+      "value": "94105",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "j.fletcher@techbridge.co.uk",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "k.weber@muenchen-data.de",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "m.dupont@paris-analytics.fr",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "m.torres@dataflow.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "s.obrien@mapletech.ca",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "compliance@globalcorp.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "James Fletcher",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "Klaus Weber",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "Marie Dupont",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "Michael Torres",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    }
+  ]
+}

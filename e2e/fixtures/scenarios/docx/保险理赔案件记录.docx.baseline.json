@@ -1,0 +1,76 @@
+{
+  "fixture": "scenarios/docx/保险理赔案件记录.docx",
+  "generated_from": "Sheet2迁移",
+  "expected": [
+    {
+      "value": "13423456789",
+      "type": "Phone",
+      "count": 2,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "13823456789",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "15823456789",
+      "type": "Phone",
+      "count": 2,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "13623456789",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "440106198709231234",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "440106199103151234",
+      "type": "IdCard",
+      "count": 2,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "xieguoqiang@139.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "6222031234567890001",
+      "type": "BankCard",
+      "count": 2,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "粤A·D1234",
+      "type": "LicensePlate",
+      "count": 3,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "粤A·F6789",
+      "type": "LicensePlate",
+      "count": 2,
+      "note": "正则",
+      "assert": "hard"
+    }
+  ]
+}

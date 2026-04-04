@@ -1,0 +1,265 @@
+{
+  "fixture": "scenarios/txt/IT运维事件报告.txt",
+  "generated_from": "Sheet2迁移",
+  "expected": [
+    {
+      "value": "192.168.1.10",
+      "type": "IpAddress",
+      "count": 1,
+      "note": "内网Web",
+      "assert": "hard"
+    },
+    {
+      "value": "192.168.1.11",
+      "type": "IpAddress",
+      "count": 1,
+      "note": "内网Web",
+      "assert": "hard"
+    },
+    {
+      "value": "192.168.1.12",
+      "type": "IpAddress",
+      "count": 1,
+      "note": "内网Web",
+      "assert": "hard"
+    },
+    {
+      "value": "10.0.2.100",
+      "type": "IpAddress",
+      "count": 1,
+      "note": "API网关",
+      "assert": "hard"
+    },
+    {
+      "value": "172.16.0.1",
+      "type": "IpAddress",
+      "count": 2,
+      "note": "DB主节点,出现2次",
+      "assert": "hard"
+    },
+    {
+      "value": "172.16.0.2",
+      "type": "IpAddress",
+      "count": 1,
+      "note": "DB从节点",
+      "assert": "hard"
+    },
+    {
+      "value": "172.16.0.3",
+      "type": "IpAddress",
+      "count": 1,
+      "note": "DB从节点",
+      "assert": "hard"
+    },
+    {
+      "value": "10.0.0.1",
+      "type": "IpAddress",
+      "count": 1,
+      "note": "跳板机",
+      "assert": "hard"
+    },
+    {
+      "value": "10.0.3.50",
+      "type": "IpAddress",
+      "count": 1,
+      "note": "ETL服务器",
+      "assert": "hard"
+    },
+    {
+      "value": "192.168.10.100",
+      "type": "IpAddress",
+      "count": 1,
+      "note": "备用服务器",
+      "assert": "hard"
+    },
+    {
+      "value": "203.0.113.50",
+      "type": "IpAddress",
+      "count": 2,
+      "note": "公网IP,出现2次",
+      "assert": "hard"
+    },
+    {
+      "value": "198.51.100.23",
+      "type": "IpAddress",
+      "count": 1,
+      "note": "CDN",
+      "assert": "hard"
+    },
+    {
+      "value": "198.51.100.24",
+      "type": "IpAddress",
+      "count": 1,
+      "note": "CDN",
+      "assert": "hard"
+    },
+    {
+      "value": "8.8.8.8",
+      "type": "IpAddress",
+      "count": 1,
+      "note": "DNS",
+      "assert": "hard"
+    },
+    {
+      "value": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+      "type": "IpAddress",
+      "count": 1,
+      "note": "IPv6日志服务器",
+      "assert": "hard"
+    },
+    {
+      "value": "2001:4860:4860::8888",
+      "type": "IpAddress",
+      "count": 1,
+      "note": "IPv6 DNS",
+      "assert": "hard"
+    },
+    {
+      "value": "fd00::3:50",
+      "type": "IpAddress",
+      "count": 1,
+      "note": "IPv6 ETL",
+      "assert": "hard"
+    },
+    {
+      "value": "2001:db8::1",
+      "type": "IpAddress",
+      "count": 1,
+      "note": "IPv6备用",
+      "assert": "hard"
+    },
+    {
+      "value": "13855556666",
+      "type": "Phone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "18712345678",
+      "type": "Phone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "13900001234",
+      "type": "Phone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "15800009999",
+      "type": "Phone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "13711112222",
+      "type": "Phone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "18600001111",
+      "type": "Phone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "chenzy@xxtech.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "zhaomh@xxtech.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "yangfan@xxtech.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "运维总监",
+      "type": "Title",
+      "count": 2,
+      "note": "NER,出现2次",
+      "assert": "soft"
+    },
+    {
+      "value": "技术总监",
+      "type": "Title",
+      "count": 2,
+      "note": "NER,出现2次",
+      "assert": "soft"
+    },
+    {
+      "value": "高级数据库管理员",
+      "type": "Title",
+      "count": 2,
+      "note": "NER,出现2次",
+      "assert": "soft"
+    },
+    {
+      "value": "前端技术经理",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "首席技术官",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "陈志远",
+      "type": "PersonName",
+      "count": 2,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "刘阳",
+      "type": "PersonName",
+      "count": 2,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "赵明华",
+      "type": "PersonName",
+      "count": 2,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "孙文博",
+      "type": "PersonName",
+      "count": 2,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "王建国",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "fixture": "sample_encrypted.xlsx",
+  "generated_by": "dimkey-test-design",
+  "generated_at": "2026-04-04",
+  "expected": [
+    {"value": "测试用户", "type": "PersonName", "count": 1, "note": "NER", "assert": "soft"},
+    {"value": "13800000000", "type": "Phone", "count": 1, "note": "正则", "assert": "hard"}
+  ]
+}

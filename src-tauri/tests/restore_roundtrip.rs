@@ -4,6 +4,7 @@ use dimkey_lib::commands::file::{export_content, import_file_internal};
 use dimkey_lib::engine::regex_engine::RegexEngine;
 use dimkey_lib::models::sensitive::*;
 use dimkey_lib::models::strategy::*;
+use dimkey_lib::models::task::*;
 
 use common::*;
 
@@ -294,4 +295,115 @@ fn test_roundtrip_xlsx_law() {
             );
         }
     }
+}
+
+/// TXT 文件 Replace 策略往返测试（R05）
+#[test]
+fn test_roundtrip_txt() {
+    let path = test_data_path("会议纪要.txt");
+    let original = import_file_internal(&path).expect("TXT 导入失败");
+    let engine = RegexEngine::new();
+    let items = engine.detect(&original);
+
+    assert!(!items.is_empty(), "TXT 应检测到敏感信息");
+
+    let strategies = all_replace_strategies();
+    let result = desensitize_content(&original, &items, &strategies);
+
+    // 验证脱敏后内容与原文不同
+    let orig_paras = get_paragraphs(&original);
+    let new_paras = get_paragraphs(&result.content);
+    let has_change = orig_paras.iter().zip(new_paras.iter())
+        .any(|(o, n)| o.text != n.text);
+    assert!(has_change, "脱敏后应有段落发生变化");
+
+    // 使用映射还原
+    let mut restored = result.content.clone();
+    let restored_count = restore_from_mappings(&mut restored, &result.mappings);
+    assert!(restored_count > 0, "应有还原操作发生");
+
+    // 逐段落对比
+    let restored_paras = get_paragraphs(&restored);
+    for (i, (orig, rest)) in orig_paras.iter().zip(restored_paras.iter()).enumerate() {
+        assert_eq!(
+            orig.text, rest.text,
+            "第 {} 段落不一致: 原文='{}', 还原='{}'",
+            i, orig.text, rest.text
+        );
+    }
+}
+
+/// Generalize 策略不可逆验证（R06）
+#[test]
+fn test_generalize_not_reversible() {
+    let path = test_data_path("员工信息表.csv");
+    let original = import_file_internal(&path).expect("CSV 导入失败");
+    let engine = RegexEngine::new();
+    let items = engine.detect(&original);
+
+    let strategies = vec![
+        StrategyConfig {
+            sensitive_type: SensitiveType::Phone,
+            strategy: Strategy::Generalize,
+            consistent: true,
+        },
+        StrategyConfig {
+            sensitive_type: SensitiveType::IdCard,
+            strategy: Strategy::Generalize,
+            consistent: true,
+        },
+    ];
+
+    let phone_items: Vec<_> = items.into_iter()
+        .filter(|i| matches!(i.sensitive_type, SensitiveType::Phone | SensitiveType::IdCard))
+        .collect();
+    let result = desensitize_content(&original, &phone_items, &strategies);
+
+    // Generalize 映射的 strategy 应为 Generalize
+    for mapping in &result.mappings {
+        assert_eq!(mapping.strategy, StrategyType::Generalize);
+    }
+
+    // 尝试还原 — Generalize 不是 Replace，restore_from_mappings 应不还原
+    let mut content = result.content.clone();
+    let restored_count = restore_from_mappings(&mut content, &result.mappings);
+    assert_eq!(restored_count, 0, "Generalize 策略不应可还原");
+}
+
+/// R03: Mask 策略不可逆验证 — Mask 后 restore_from_mappings 应不还原
+#[test]
+fn test_mask_not_reversible() {
+    let path = fixture_path("sample.txt");
+    let original = import_file_internal(&path).expect("TXT 导入失败");
+    let engine = RegexEngine::new();
+    let items = engine.detect(&original);
+
+    let strategies = vec![
+        StrategyConfig {
+            sensitive_type: SensitiveType::Phone,
+            strategy: Strategy::Mask { keep_prefix: 3, keep_suffix: 4 },
+            consistent: true,
+        },
+        StrategyConfig {
+            sensitive_type: SensitiveType::IdCard,
+            strategy: Strategy::Mask { keep_prefix: 6, keep_suffix: 4 },
+            consistent: true,
+        },
+    ];
+
+    let phone_and_id: Vec<_> = items.into_iter()
+        .filter(|i| matches!(i.sensitive_type, SensitiveType::Phone | SensitiveType::IdCard))
+        .collect();
+
+    let result = desensitize_content(&original, &phone_and_id, &strategies);
+
+    // 验证所有映射都是 Mask
+    for mapping in &result.mappings {
+        assert_eq!(mapping.strategy, StrategyType::Mask);
+    }
+
+    // 尝试还原 — Mask 不是 Replace，不应被还原
+    let mut content = result.content.clone();
+    let restored_count = restore_from_mappings(&mut content, &result.mappings);
+    assert_eq!(restored_count, 0, "Mask 策略不应可还原");
 }

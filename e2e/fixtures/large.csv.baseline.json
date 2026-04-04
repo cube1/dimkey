@@ -1,0 +1,162 @@
+{
+  "fixture": "large.csv",
+  "generated_by": "dimkey-test-design",
+  "generated_at": "2026-04-04",
+  "summary": {
+    "total_rows": 500,
+    "total_phones": 500,
+    "total_idcards": 500,
+    "total_emails": 500,
+    "total_names": 476,
+    "total_addresses": 487
+  },
+  "expected": [
+    {
+      "value": "13113598909",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则（抽样前5）",
+      "assert": "hard"
+    },
+    {
+      "value": "13117783990",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则（抽样前5）",
+      "assert": "hard"
+    },
+    {
+      "value": "13127135757",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则（抽样前5）",
+      "assert": "hard"
+    },
+    {
+      "value": "13128198506",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则（抽样前5）",
+      "assert": "hard"
+    },
+    {
+      "value": "13139956218",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则（抽样前5）",
+      "assert": "hard"
+    },
+    {
+      "value": "110101197004162276",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则（抽样前5）",
+      "assert": "hard"
+    },
+    {
+      "value": "110101197008094430",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则（抽样前5）",
+      "assert": "hard"
+    },
+    {
+      "value": "110101197008248055",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则（抽样前5）",
+      "assert": "hard"
+    },
+    {
+      "value": "110101197010207456",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则（抽样前5）",
+      "assert": "hard"
+    },
+    {
+      "value": "110101197106212791",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则（抽样前5）",
+      "assert": "hard"
+    },
+    {
+      "value": "user0@test6.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则（抽样前5）",
+      "assert": "hard"
+    },
+    {
+      "value": "user100@test35.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则（抽样前5）",
+      "assert": "hard"
+    },
+    {
+      "value": "user101@test4.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则（抽样前5）",
+      "assert": "hard"
+    },
+    {
+      "value": "user102@test22.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则（抽样前5）",
+      "assert": "hard"
+    },
+    {
+      "value": "user103@test9.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则（抽样前5）",
+      "assert": "hard"
+    },
+    {
+      "value": "何伟兰",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER（抽样前3）",
+      "assert": "soft"
+    },
+    {
+      "value": "何兰明",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER（抽样前3）",
+      "assert": "soft"
+    },
+    {
+      "value": "何兰杰",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER（抽样前3）",
+      "assert": "soft"
+    },
+    {
+      "value": "上海市某区某路104号",
+      "type": "Address",
+      "count": 1,
+      "note": "NER（抽样前3）",
+      "assert": "soft"
+    },
+    {
+      "value": "上海市某区某路132号",
+      "type": "Address",
+      "count": 1,
+      "note": "NER（抽样前3）",
+      "assert": "soft"
+    },
+    {
+      "value": "上海市某区某路150号",
+      "type": "Address",
+      "count": 1,
+      "note": "NER（抽样前3）",
+      "assert": "soft"
+    }
+  ]
+}

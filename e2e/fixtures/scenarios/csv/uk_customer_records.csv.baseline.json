@@ -1,0 +1,272 @@
+{
+  "fixture": "scenarios/csv/uk_customer_records.csv",
+  "generated_from": "Sheet2迁移",
+  "expected": [
+    {
+      "value": "+44 7911 123456",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "移动号码",
+      "assert": "hard"
+    },
+    {
+      "value": "+44 7700 900123",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "移动号码",
+      "assert": "hard"
+    },
+    {
+      "value": "07456 789012",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "无国际前缀",
+      "assert": "hard"
+    },
+    {
+      "value": "+44 20 7946 0958",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "伦敦座机",
+      "assert": "hard"
+    },
+    {
+      "value": "07891 234567",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "移动号码",
+      "assert": "hard"
+    },
+    {
+      "value": "+44 7534 567890",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "移动号码",
+      "assert": "hard"
+    },
+    {
+      "value": "+44 161 496 0000",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "曼彻斯特座机",
+      "assert": "hard"
+    },
+    {
+      "value": "07321 098765",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "移动号码",
+      "assert": "hard"
+    },
+    {
+      "value": "4539 1488 0343 6467",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Visa",
+      "assert": "hard"
+    },
+    {
+      "value": "5425 2334 1102 8976",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Mastercard",
+      "assert": "hard"
+    },
+    {
+      "value": "4716 0912 3456 7890",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Visa",
+      "assert": "hard"
+    },
+    {
+      "value": "5543 2109 8765 4321",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Mastercard",
+      "assert": "hard"
+    },
+    {
+      "value": "4929 5678 9012 3456",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Visa",
+      "assert": "hard"
+    },
+    {
+      "value": "5187 6543 2109 8765",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Mastercard",
+      "assert": "hard"
+    },
+    {
+      "value": "4024 0071 2345 6789",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Visa",
+      "assert": "hard"
+    },
+    {
+      "value": "5264 1893 0574 6281",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Mastercard",
+      "assert": "hard"
+    },
+    {
+      "value": "SW1A 1AA",
+      "type": "UkPostcode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "EC2R 8AH",
+      "type": "UkPostcode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "M1 1AE",
+      "type": "UkPostcode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "B1 1BB",
+      "type": "UkPostcode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "EH1 1YZ",
+      "type": "UkPostcode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "LS1 1UR",
+      "type": "UkPostcode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "CF10 1EP",
+      "type": "UkPostcode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "G1 1DU",
+      "type": "UkPostcode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "oliver.thompson@barclays.co.uk",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "charlotte.davies@hsbc.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "g.wilson@lloyds.co.uk",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "amelia.brown@natwest.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "harry.taylor@rbs.co.uk",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "isabella.martin@santander.co.uk",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "w.harris@virgin.co.uk",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "sophia.clark@metro.co.uk",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "GB29 NWBK 6016 1331 9268 19",
+      "type": "IBAN",
+      "count": 1,
+      "note": "Notes字段内",
+      "assert": "hard"
+    },
+    {
+      "value": "WILSO703159GW9IJ",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "UK驾照号Notes内",
+      "assert": "hard"
+    },
+    {
+      "value": "Oliver Thompson",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "Charlotte Davies",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "George Wilson",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "Amelia Brown",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    }
+  ]
+}

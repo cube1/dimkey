@@ -1,0 +1,92 @@
+{
+  "fixture": "scenarios/xlsx/跨文件一致性_入职信息.xlsx",
+  "generated_by": "dimkey-test-design",
+  "generated_at": "2026-04-04",
+  "cross_file_group": "K02_consistency",
+  "expected": [
+    {
+      "value": "刘伟",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER，跨文件共享",
+      "assert": "soft"
+    },
+    {
+      "value": "陈静",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER，跨文件共享",
+      "assert": "soft"
+    },
+    {
+      "value": "孙浩然",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "13611223344",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则，跨文件共享",
+      "assert": "hard"
+    },
+    {
+      "value": "18755667788",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则，跨文件共享",
+      "assert": "hard"
+    },
+    {
+      "value": "15933445566",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "110101199505051234",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则，跨文件共享",
+      "assert": "hard"
+    },
+    {
+      "value": "320106199208181567",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则，跨文件共享",
+      "assert": "hard"
+    },
+    {
+      "value": "440305199712122345",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "liuwei@company.cn",
+      "type": "Email",
+      "count": 1,
+      "note": "正则，跨文件共享",
+      "assert": "hard"
+    },
+    {
+      "value": "chenjing@company.cn",
+      "type": "Email",
+      "count": 1,
+      "note": "正则，跨文件共享",
+      "assert": "hard"
+    },
+    {
+      "value": "sunhaoran@company.cn",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    }
+  ]
+}

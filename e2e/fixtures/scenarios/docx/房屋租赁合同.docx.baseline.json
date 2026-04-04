@@ -1,0 +1,62 @@
+{
+  "fixture": "scenarios/docx/房屋租赁合同.docx",
+  "generated_from": "Sheet2迁移",
+  "expected": [
+    {
+      "value": "13901234567",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "18610012345",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "110105199208151234",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "qinxiaoli@hjwy.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "tangjunjie@gmail.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "6225881234512345678",
+      "type": "BankCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "91110105MA01ABCD56",
+      "type": "CreditCode",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "010-65891234",
+      "type": "Landline",
+      "count": 2,
+      "note": "正则",
+      "assert": "hard"
+    }
+  ]
+}

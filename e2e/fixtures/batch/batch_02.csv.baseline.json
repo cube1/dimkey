@@ -1,0 +1,13 @@
+{
+  "fixture": "batch/batch_02.csv",
+  "generated_by": "dimkey-test-design",
+  "generated_at": "2026-04-04",
+  "expected": [
+    {"value": "郑华", "type": "PersonName", "count": 1, "note": "NER", "assert": "soft"},
+    {"value": "冯磊", "type": "PersonName", "count": 1, "note": "NER", "assert": "soft"},
+    {"value": "zhenghua@test.com", "type": "Email", "count": 1, "note": "正则", "assert": "hard"},
+    {"value": "fenglei@demo.com", "type": "Email", "count": 1, "note": "正则", "assert": "hard"},
+    {"value": "南京市玄武区中山路18号", "type": "Address", "count": 1, "note": "NER", "assert": "soft"},
+    {"value": "西安市碑林区南大街36号", "type": "Address", "count": 1, "note": "NER", "assert": "soft"}
+  ]
+}

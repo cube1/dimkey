@@ -1,0 +1,13 @@
+{
+  "fixture": "batch/batch_01.xlsx",
+  "generated_by": "dimkey-test-design",
+  "generated_at": "2026-04-04",
+  "expected": [
+    {"value": "周杰", "type": "PersonName", "count": 1, "note": "NER", "assert": "soft"},
+    {"value": "吴凡", "type": "PersonName", "count": 1, "note": "NER", "assert": "soft"},
+    {"value": "13100001111", "type": "Phone", "count": 1, "note": "正则", "assert": "hard"},
+    {"value": "15200002222", "type": "Phone", "count": 1, "note": "正则", "assert": "hard"},
+    {"value": "110101200001011234", "type": "IdCard", "count": 1, "note": "正则", "assert": "hard"},
+    {"value": "320106200102021234", "type": "IdCard", "count": 1, "note": "正则", "assert": "hard"}
+  ]
+}

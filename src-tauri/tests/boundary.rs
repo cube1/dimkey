@@ -4,6 +4,8 @@ use dimkey_lib::desensitizer::mask::apply_mask;
 use dimkey_lib::engine::regex_engine::RegexEngine;
 use dimkey_lib::models::sensitive::*;
 
+use common::*;
+
 /// 测试手机号嵌入在更长数字中不应被误识别
 #[test]
 fn test_phone_in_longer_number_not_detected() {
@@ -116,4 +118,106 @@ fn test_mask_short_text() {
     // 正常情况
     let result = apply_mask("12345678", &SensitiveType::Phone, 3, 4);
     assert_eq!(result, "123*5678", "前 3 后 4 中间 1 个 *");
+}
+
+// ============================================================
+// C06: 密码保护文件 — import_file_internal 应返回错误
+// ============================================================
+
+/// C06: 加密 XLSX 直接导入应失败，提示需要密码
+#[test]
+fn test_encrypted_xlsx_import_fails() {
+    use dimkey_lib::commands::file::import_file_internal;
+
+    let path = common::fixture_path("sample_encrypted.xlsx");
+    let result = import_file_internal(&path);
+
+    assert!(
+        result.is_err(),
+        "加密文件直接导入应返回错误"
+    );
+}
+
+// ============================================================
+// C08: 空文件 — 不应崩溃
+// ============================================================
+
+/// C08: 空 Excel 文件应能导入但不包含数据行
+#[test]
+fn test_empty_xlsx_import() {
+    use dimkey_lib::commands::file::import_file_internal;
+
+    let path = common::fixture_path("empty.xlsx");
+    let result = import_file_internal(&path);
+
+    match result {
+        Ok(content) => {
+            // 空文件导入成功时，应无数据行或段落
+            match &content {
+                FileContent::Spreadsheet { sheets, .. } => {
+                    let total_rows: usize = sheets.iter().map(|s| s.row_count).sum();
+                    assert_eq!(total_rows, 0, "空文件应无数据行");
+                }
+                FileContent::Document { paragraphs, .. } => {
+                    // 空文档可能有 0 或少量空段落
+                    let non_empty: Vec<_> = paragraphs.iter()
+                        .filter(|p| !p.text.trim().is_empty())
+                        .collect();
+                    assert!(non_empty.is_empty(), "空文件应无有效段落");
+                }
+            }
+
+            // 识别结果应为空
+            let engine = RegexEngine::new();
+            let items = engine.detect(&content);
+            assert!(items.is_empty(), "空文件不应识别出敏感信息");
+        }
+        Err(e) => {
+            // 空文件导入失败也是可接受的行为，记录错误
+            eprintln!("[C08] 空文件导入返回错误（可接受）: {}", e);
+        }
+    }
+}
+
+// ============================================================
+// C09: 大文件 — 不应崩溃或超时
+// ============================================================
+
+/// C09: 大 CSV 文件应能正常导入和识别
+#[test]
+fn test_large_csv_import_and_detect() {
+    use dimkey_lib::commands::file::import_file_internal;
+
+    let path = common::fixture_path("large.csv");
+    let content = import_file_internal(&path).expect("大文件导入失败");
+
+    if let FileContent::Spreadsheet { sheets, .. } = &content {
+        assert!(
+            sheets[0].row_count > 0,
+            "大文件应有数据行"
+        );
+    }
+
+    let engine = RegexEngine::new();
+    let items = engine.detect(&content);
+
+    // 大文件（500 行）应识别出大量敏感信息
+    assert!(
+        count_by_type(&items, &SensitiveType::Phone) >= 400,
+        "大文件应识别出至少 400 个手机号，实际: {}",
+        count_by_type(&items, &SensitiveType::Phone)
+    );
+    assert!(
+        count_by_type(&items, &SensitiveType::IdCard) >= 400,
+        "大文件应识别出至少 400 个身份证号，实际: {}",
+        count_by_type(&items, &SensitiveType::IdCard)
+    );
+    assert!(
+        count_by_type(&items, &SensitiveType::Email) >= 400,
+        "大文件应识别出至少 400 个邮箱，实际: {}",
+        count_by_type(&items, &SensitiveType::Email)
+    );
+
+    // 基线覆盖验证（抽样 15 个 hard 值）
+    assert_baseline_from_sidecar(&items, &path);
 }

@@ -1,0 +1,55 @@
+{
+  "fixture": "scenarios/docx/门诊病历摘要.docx",
+  "generated_from": "Sheet2迁移",
+  "expected": [
+    {
+      "value": "13867012345",
+      "type": "Phone",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "13757012345",
+      "type": "Phone",
+      "count": 2,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "330102197206153456",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "330102197206150019",
+      "type": "IdCard",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "jiangwenbin72@sina.com",
+      "type": "Email",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "ZJ330102197206150019",
+      "type": "MedicalInsurance",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    },
+    {
+      "value": "0571-87235678",
+      "type": "Landline",
+      "count": 1,
+      "note": "正则",
+      "assert": "hard"
+    }
+  ]
+}

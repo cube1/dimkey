@@ -1,0 +1,496 @@
+{
+  "fixture": "scenarios/xlsx/us_compliance_audit.xlsx",
+  "generated_from": "Sheet2迁移",
+  "expected": [
+    {
+      "value": "539-48-2671",
+      "type": "SSN",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "218-73-9045",
+      "type": "SSN",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "482-16-3759",
+      "type": "SSN",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "671-24-8903",
+      "type": "SSN",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "345-89-1627",
+      "type": "SSN",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "723-51-4089",
+      "type": "SSN",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "156-92-3748",
+      "type": "SSN",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "894-37-5210",
+      "type": "SSN",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "267-84-1935",
+      "type": "SSN",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "418-63-7092",
+      "type": "SSN",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "(415) 293-8847",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "312-547-6183",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "(212) 834-2196",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "(617) 429-5731",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "503-218-4765",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "(202) 614-3982",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "(310) 872-4591",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "646-903-2178",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "(773) 541-8629",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "206-734-5918",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "D123-4567-8901",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "W456-7890-1234",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "E789-0123-4567",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "S012-3456-7890",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "G234-5678-9012",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "C567-8901-2345",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "T890-1234-5678",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "R123-4567-8901",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "W345-6789-0123",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "B678-9012-3456",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "4539 1488 0343 6467",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Visa",
+      "assert": "hard"
+    },
+    {
+      "value": "5425 2334 1102 8976",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Mastercard",
+      "assert": "hard"
+    },
+    {
+      "value": "4716 0912 3456 7890",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Visa",
+      "assert": "hard"
+    },
+    {
+      "value": "5543 2109 8765 4321",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Mastercard",
+      "assert": "hard"
+    },
+    {
+      "value": "4929 5678 9012 3456",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Visa",
+      "assert": "hard"
+    },
+    {
+      "value": "5187 6543 2109 8765",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Mastercard",
+      "assert": "hard"
+    },
+    {
+      "value": "4024 0071 2345 6789",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Visa",
+      "assert": "hard"
+    },
+    {
+      "value": "5264 1893 0574 6281",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Mastercard",
+      "assert": "hard"
+    },
+    {
+      "value": "4485 3210 9876 5432",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Visa",
+      "assert": "hard"
+    },
+    {
+      "value": "5391 0567 8901 2345",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Mastercard",
+      "assert": "hard"
+    },
+    {
+      "value": "94102",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "60611",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "10022",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "02108",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "97205",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "20006",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "90028",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "10006",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "60606",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "98101",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "m.johnson@corpx.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "j.williams@corpx.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "d.martinez@corpx.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "s.anderson@corpx.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "r.garcia@corpx.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "l.chen@corpx.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "j.thompson@corpx.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "m.rodriguez@corpx.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "k.white@corpx.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "e.brown@corpx.com",
+      "type": "Email",
+      "count": 1,
+      "note": "",
+      "assert": "hard"
+    },
+    {
+      "value": "Chief Financial Officer",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "VP of Engineering",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "Senior Analyst",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "Director of Compliance",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "IT Security Manager",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "Head of HR",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "Software Engineer",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "General Counsel",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "Database Administrator",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    },
+    {
+      "value": "Product Manager",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "soft"
+    }
+  ]
+}
