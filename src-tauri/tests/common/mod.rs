@@ -1,15 +1,150 @@
 #![allow(dead_code)]
 
 use std::collections::HashMap;
+use std::sync::Mutex;
 
-use dimkey_lib::commands::desensitize::sensitive_type_to_key;
+use dimkey_lib::commands::desensitize::{sensitive_type_to_key, string_to_sensitive_type};
 use dimkey_lib::desensitizer::{generalize, mask, replace};
 use dimkey_lib::desensitizer::replace::ReplaceState;
+use dimkey_lib::engine::backends::onnx_backend::OnnxBackend;
+use dimkey_lib::engine::dict_engine::DictEngine;
+use dimkey_lib::engine::ner_engine::NerEngine;
+use dimkey_lib::engine::regex_engine::RegexEngine;
+use dimkey_lib::models::language::Language;
 use dimkey_lib::models::sensitive::*;
 use dimkey_lib::models::strategy::*;
 use dimkey_lib::models::task::*;
 
 use serde::Deserialize;
+
+// ============================================================
+// 全管道测试支持（正则 + NER + 词典 合并检测）
+// ============================================================
+
+static NER_ENGINE: std::sync::OnceLock<Mutex<NerEngine>> = std::sync::OnceLock::new();
+
+/// 获取或初始化全局 NER 引擎（真实 ONNX 模型）
+fn get_ner_engine() -> &'static Mutex<NerEngine> {
+    NER_ENGINE.get_or_init(|| {
+        let ner_dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("resources")
+            .join("ner");
+        let engine = match OnnxBackend::try_load(&ner_dir) {
+            Ok(Some(backend)) => {
+                let label_map = backend.build_label_map();
+                eprintln!("[test] NER 引擎已加载 (ONNX)");
+                NerEngine::new(Box::new(backend), label_map)
+            }
+            Ok(None) => {
+                eprintln!("[test] ⚠️ NER 模型文件不存在，降级运行");
+                NerEngine::degraded()
+            }
+            Err(e) => {
+                eprintln!("[test] ⚠️ NER 引擎加载失败: {}，降级运行", e);
+                NerEngine::degraded()
+            }
+        };
+        Mutex::new(engine)
+    })
+}
+
+/// 全管道检测：正则 + NER + 词典，合并去重
+/// 复现 useAutoDesensitize.ts:1058-1112 的完整逻辑
+pub fn detect_full_pipeline(content: &FileContent, lang: Language) -> Vec<SensitiveItem> {
+    // 1. 正则引擎
+    let regex_engine = RegexEngine::for_language(lang);
+    let regex_items = regex_engine.detect(content);
+
+    // 2. NER 引擎
+    let ner_items = {
+        let engine_mutex = get_ner_engine();
+        let mut engine = engine_mutex.lock().expect("NER 引擎锁获取失败");
+        engine.detect(content).unwrap_or_default()
+    };
+
+    // 3. 词典引擎（内置词典）
+    let builtin_dict_path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("resources")
+        .join("builtin_dict");
+    let dict_json = match lang {
+        Language::Zh => std::fs::read_to_string(builtin_dict_path.join("zh.json")).unwrap_or_default(),
+        Language::En => std::fs::read_to_string(builtin_dict_path.join("en.json")).unwrap_or_default(),
+    };
+
+    #[derive(Deserialize)]
+    struct BuiltinDictItem {
+        text: String,
+        sensitive_type: String,
+        match_mode: dimkey_lib::models::strategy::MatchMode,
+    }
+
+    let dict_entries: Vec<DictEntry> = serde_json::from_str::<Vec<BuiltinDictItem>>(&dict_json)
+        .unwrap_or_default()
+        .into_iter()
+        .map(|item| DictEntry {
+            text: item.text,
+            sensitive_type: string_to_sensitive_type(&item.sensitive_type),
+            match_mode: item.match_mode,
+            replacement: None,
+            language: None,
+            builtin: true,
+        })
+        .collect();
+
+    let dict_items = if dict_entries.is_empty() {
+        vec![]
+    } else {
+        DictEngine::new(dict_entries).detect(content)
+    };
+
+    // 4. 合并去重（与前端 useAutoDesensitize.ts:1101-1112 一致）
+    // 正则优先，词典和 NER 只补充非重叠区域
+    let mut merged = regex_items;
+    for di in dict_items.into_iter().chain(ner_items.into_iter()) {
+        let overlap = merged.iter().any(|ex| {
+            ex.sheet_index == di.sheet_index
+                && ex.row == di.row
+                && ex.col == di.col
+                && ex.start < di.end
+                && di.start < ex.end
+        });
+        if !overlap {
+            merged.push(di);
+        }
+    }
+
+    merged
+}
+
+/// 解析 fixture 文件为 FileContent
+pub fn parse_fixture(fixture_abs_path: &str) -> FileContent {
+    let path = std::path::Path::new(fixture_abs_path);
+    let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
+    match ext {
+        "xlsx" | "xls" => dimkey_lib::parser::excel::parse_excel(fixture_abs_path)
+            .unwrap_or_else(|e| panic!("Excel 导入失败: {}", e)),
+        "csv" => dimkey_lib::parser::excel::parse_csv(fixture_abs_path)
+            .unwrap_or_else(|e| panic!("CSV 导入失败: {}", e)),
+        "docx" => dimkey_lib::parser::word::parse_docx(fixture_abs_path)
+            .unwrap_or_else(|e| panic!("Docx 导入失败: {}", e)),
+        "txt" => dimkey_lib::parser::txt::parse_txt(fixture_abs_path)
+            .unwrap_or_else(|e| panic!("TXT 导入失败: {}", e)),
+        _ => panic!("不支持的格式: {}", ext),
+    }
+}
+
+/// 全管道基线断言：解析文件 → 三层引擎检测 → 与 sidecar baseline 对照
+pub fn assert_full_pipeline_baseline(fixture_abs_path: &str, lang: Language) {
+    let content = parse_fixture(fixture_abs_path);
+    let items = detect_full_pipeline(&content, lang);
+
+    let ner_loaded = get_ner_engine().lock().map(|e| e.is_loaded()).unwrap_or(false);
+    if !ner_loaded {
+        eprintln!("[test] ⚠️ NER 引擎降级中 — soft 项仍然断言但标注 [NER degraded]");
+    }
+
+    assert_baseline_from_sidecar_filtered(&items, fixture_abs_path, None);
+}
 
 /// 获取测试数据文件路径（从 e2e/fixtures/scenarios/ 按扩展名查找）
 pub fn test_data_path(filename: &str) -> String {
@@ -161,7 +296,7 @@ pub fn assert_baseline_from_sidecar(items: &[SensitiveItem], fixture_abs_path: &
 /// 行为：
 /// - hard 项且类型在 enabled 范围内：必须命中，否则 panic
 /// - hard 项但类型不在 enabled 范围内：跳过（不检查也不 warning）
-/// - soft 项且类型在 enabled 范围内：未命中打印 warning
+/// - soft 项且类型在 enabled 范围内：未命中则 panic（与 hard 同等严格）
 pub fn assert_baseline_from_sidecar_filtered(
     items: &[SensitiveItem],
     fixture_abs_path: &str,
@@ -220,21 +355,21 @@ pub fn assert_baseline_from_sidecar_filtered(
         );
     }
 
-    // soft 项只打印 warning
+    // hard + soft 合并，全部未命中项一起报错
+    let mut all_missing: Vec<String> = Vec::new();
+    if !hard_missing.is_empty() {
+        all_missing.push(format!("正则类未命中 ({}):", hard_missing.len()));
+        all_missing.extend(hard_missing);
+    }
     if !soft_missing.is_empty() {
-        eprintln!(
-            "[baseline] ⚠️  {} 个 soft 项未识别（不影响测试通过）:\n{}",
-            soft_missing.len(),
-            soft_missing.join("\n")
-        );
+        all_missing.push(format!("NER 类未命中 ({}):", soft_missing.len()));
+        all_missing.extend(soft_missing);
     }
 
-    // hard 项必须全部通过
-    if !hard_missing.is_empty() {
+    if !all_missing.is_empty() {
         panic!(
-            "基线覆盖检查失败，以下 {} 个 hard 项未被识别:\n{}\n\n实际识别到 {} 项",
-            hard_missing.len(),
-            hard_missing.join("\n"),
+            "基线覆盖检查失败，以下项未被识别:\n{}\n\n实际识别到 {} 项",
+            all_missing.join("\n"),
             items.len()
         );
     }
