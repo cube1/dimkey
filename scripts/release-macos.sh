@@ -21,6 +21,8 @@ if [ -z "$TAG" ]; then
   VERSION=$(grep '^version' src-tauri/Cargo.toml | head -1 | sed 's/.*"\(.*\)".*/\1/')
   TAG="v${VERSION}"
   echo "未指定 tag，自动使用: $TAG"
+else
+  VERSION="${TAG#v}"
 fi
 
 echo "========================================="
@@ -130,7 +132,7 @@ echo "重新生成 DMG..."
 DMG_DIR="$BUNDLE_DIR/dmg"
 mkdir -p "$DMG_DIR"
 rm -f "$DMG_DIR"/*.dmg
-DMG_PATH="$DMG_DIR/Dimkey_${TAG}_aarch64.dmg"
+DMG_PATH="$DMG_DIR/Dimkey_${VERSION}_aarch64.dmg"
 hdiutil create -volname "Dimkey" -srcfolder "$APP_PATH" -ov -format UDZO "$DMG_PATH"
 
 echo "生成 updater 包..."

@@ -102,7 +102,7 @@ gh release view vX.Y.Z
 # 公开仓库 Release
 gh release view vX.Y.Z --repo cube1/dimkey-site
 # 自动更新元数据
-curl -s https://www.dimkey.com/latest.json | jq .
+curl -s https://dimkey.com/latest.json | jq .
 ```
 
 ## 注意事项
