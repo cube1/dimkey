@@ -134,7 +134,6 @@ fn test_csv_complaint_detect_counts() {
 /// C21: 基线覆盖验证 — 车牌号带中间点格式暂未支持
 /// 注：MedicalInsurance 为未知类型，baseline 检查器自动跳过，不影响测试
 #[test]
-#[ignore = "LicensePlate 带中间点格式（粤A·D1234）暂未被正则覆盖"]
 fn test_csv_complaint_baseline_coverage() {
     let path = test_data_path("投诉工单记录.csv");
     let content = parse_csv(&path).expect("投诉工单 CSV 导入失败");

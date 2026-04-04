@@ -172,7 +172,6 @@ fn test_xlsx_property_owner_detect_counts() {
 
 /// C14: 基线覆盖验证 — 车牌号 "京A·12345" 带中间点格式暂未支持
 #[test]
-#[ignore = "LicensePlate 带中间点格式（京A·12345）暂未被正则覆盖"]
 fn test_xlsx_property_owner_baseline_coverage() {
     let path = test_data_path("物业业主信息表.xlsx");
     let content = parse_excel(&path).expect("物业业主 XLSX 导入失败");

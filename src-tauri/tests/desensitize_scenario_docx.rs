@@ -158,7 +158,6 @@ fn test_docx_insurance_claim_detect_counts() {
 
 /// C25: 基线覆盖验证 — 车牌号带中间点格式暂未支持
 #[test]
-#[ignore = "LicensePlate 带中间点格式（粤A·D1234）暂未被正则覆盖"]
 fn test_docx_insurance_claim_baseline_coverage() {
     let path = test_data_path("保险理赔案件记录.docx");
     let content = parse_docx(&path).expect("保险理赔 DOCX 导入失败");

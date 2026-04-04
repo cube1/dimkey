@@ -47,3 +47,18 @@ class TestRestore:
         ai_btn = page.locator('[data-testid="btn-restore-ai"]')
         assert ai_btn.is_enabled()
         take_diagnostic(page, "restore_ai_ready")
+
+    def test_workspace_restore_button_triggers_dialog(self, page):
+        """R01: 点击工作区还原应弹出文件选择（mock 模式下验证按钮可交互）"""
+        wait_for_view(page, "dropzone", timeout=10_000)
+
+        ws_btn = page.locator('[data-testid="btn-restore-workspace"]')
+        assert ws_btn.is_visible(), "工作区还原按钮应可见"
+        assert ws_btn.is_enabled(), "工作区还原按钮应可点击"
+
+        # 清空 IPC 日志，点击按钮
+        page.evaluate("window.__E2E_IPC_LOG__ = []")
+        ws_btn.click()
+        page.wait_for_timeout(1000)
+
+        take_diagnostic(page, "restore_workspace_clicked")

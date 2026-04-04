@@ -35,6 +35,26 @@ class TestWorkspaceCRUD:
         panel = page.locator('[data-testid="panel-strategy"]')
         assert panel.is_visible(), "策略面板应可见"
 
+    def test_create_workspace_via_store(self, page):
+        """W01: 通过 store 创建工作区应触发 create_workspace IPC"""
+        wait_for_view(page, "dropzone", timeout=10_000)
+
+        page.evaluate("window.__E2E_IPC_LOG__ = []")
+        page.evaluate("""async () => {
+            const store = window.__DIMKEY_STORE__;
+            if (store) {
+                try {
+                    await store.getState().createWorkspace('E2E新工作区');
+                } catch(e) {}
+            }
+        }""")
+        page.wait_for_timeout(500)
+
+        logs = page.evaluate("window.__E2E_IPC_LOG__")
+        create_calls = [l for l in logs if l["cmd"] == "create_workspace"]
+        assert len(create_calls) >= 1, "应触发 create_workspace IPC 调用"
+        take_diagnostic(page, "workspace_created_via_store")
+
     @pytest.mark.needs_backend
     def test_rename_workspace(self, page):
         """W02: 重命名工作区"""

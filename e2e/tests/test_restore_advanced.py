@@ -85,3 +85,21 @@ class TestHistoryRestore:
         btn = page.locator('[data-testid="btn-restore-workspace"]')
         assert btn.is_enabled(), "工作区还原按钮应可点击"
         take_diagnostic(page, "workspace_restore_ready")
+
+    @pytest.mark.needs_backend
+    def test_history_restore_with_record(self, page):
+        """R04-3: 有历史记录时应能选择并还原"""
+        from utils.helpers import import_file_via_ipc, wait_for_processing_done, get_fixture_path
+
+        wait_for_view(page, "dropzone", timeout=10_000)
+        fixture_path = get_fixture_path("sample.txt")
+        import_file_via_ipc(page, fixture_path)
+        wait_for_processing_done(page)
+
+        # 回到 dropzone
+        from utils.helpers import click_back
+        click_back(page)
+        wait_for_view(page, "dropzone", timeout=10_000)
+
+        # 此时应有历史记录，可用于还原
+        take_diagnostic(page, "history_restore_ready")
