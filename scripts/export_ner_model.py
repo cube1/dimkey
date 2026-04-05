@@ -1,112 +1,103 @@
 #!/usr/bin/env python3
 """
-导出 shibing624/bert4ner-base-chinese 为 ONNX + INT8 量化
-输出到 src-tauri/resources/ner/ 目录
+导出 NER 模型为 ONNX INT8 格式，输出到 .ner_cache/<name>/
 
 使用方法:
-  pip install optimum[onnxruntime] transformers torch
-  python scripts/export_ner_model.py
+  pip install optimum[onnxruntime] transformers torch huggingface_hub
+  python scripts/export_ner_model.py chinese
+  python scripts/export_ner_model.py multilingual
 """
 
 import json
 import shutil
+import sys
 from pathlib import Path
 
-MODEL_NAME = "shibing624/bert4ner-base-chinese"
-OUTPUT_DIR = Path(__file__).parent.parent / "src-tauri" / "resources" / "ner"
-TEMP_DIR = Path(__file__).parent / "_ner_export_tmp"
+REPO_ROOT = Path(__file__).parent.parent
+CACHE_ROOT = REPO_ROOT / ".ner_cache"
+
+MODELS = {
+    "chinese": {
+        "hf_id": "shibing624/bert4ner-base-chinese",
+        # BERT 模型：tokenizer 从模型自身保存
+        "tokenizer_source": "self",
+    },
+    "multilingual": {
+        "hf_id": "Davlan/xlm-roberta-base-ner-hrl",
+        # XLM-R：transformers 4.49+ 转 fast tokenizer 有 tiktoken bug，
+        # 直接从 xlm-roberta-base 借用 tokenizer.json（共享词表）
+        "tokenizer_source": "xlm-roberta-base",
+    },
+}
 
 
-def export_onnx():
-    """导出 FP32 ONNX 模型和 tokenizer"""
-    from optimum.onnxruntime import ORTModelForTokenClassification
-    from transformers import AutoTokenizer
+def export_model(name: str):
+    if name not in MODELS:
+        raise SystemExit(f"未知模型: {name}，可选: {list(MODELS.keys())}")
 
-    print(f"正在从 HuggingFace 下载并导出: {MODEL_NAME}")
-    model = ORTModelForTokenClassification.from_pretrained(
-        MODEL_NAME, export=True
-    )
-    model.save_pretrained(str(TEMP_DIR))
-
-    # 单独保存 tokenizer（包含 vocab.txt）
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-    tokenizer.save_pretrained(str(TEMP_DIR))
-    print(f"FP32 ONNX + tokenizer 已导出到: {TEMP_DIR}")
-
-
-def quantize():
-    """INT8 动态量化"""
-    from optimum.onnxruntime import ORTQuantizer
+    from optimum.onnxruntime import ORTModelForTokenClassification, ORTQuantizer
     from optimum.onnxruntime.configuration import AutoQuantizationConfig
+    from huggingface_hub import hf_hub_download
 
-    quantizer = ORTQuantizer.from_pretrained(str(TEMP_DIR))
-    config = AutoQuantizationConfig.avx512_vnni(is_static=False, per_channel=False)
-    quantizer.quantize(save_dir=str(TEMP_DIR / "quantized"), quantization_config=config)
-    print("INT8 量化完成")
+    cfg = MODELS[name]
+    hf_id = cfg["hf_id"]
+    target_dir = CACHE_ROOT / name
+    export_tmp = CACHE_ROOT / f"_tmp_{name}_fp32"
+    int8_tmp = CACHE_ROOT / f"_tmp_{name}_int8"
 
+    print(f"[{name}] 导出 {hf_id} → ONNX...")
+    model = ORTModelForTokenClassification.from_pretrained(hf_id, export=True)
+    model.save_pretrained(export_tmp)
 
-def build_id2label():
-    """从模型 config 提取 id2label 映射"""
-    config_path = TEMP_DIR / "config.json"
-    with open(config_path) as f:
-        config = json.load(f)
+    print(f"[{name}] INT8 动态量化...")
+    quantizer = ORTQuantizer.from_pretrained(export_tmp)
+    qconfig = AutoQuantizationConfig.avx512_vnni(is_static=False, per_channel=False)
+    quantizer.quantize(save_dir=int8_tmp, quantization_config=qconfig)
 
-    id2label = config.get("id2label", {})
-    print(f"标签数量: {len(id2label)}")
-    print(f"标签列表: {list(id2label.values())}")
-    return id2label
+    target_dir.mkdir(parents=True, exist_ok=True)
 
+    quantized = int8_tmp / "model_quantized.onnx"
+    if not quantized.exists():
+        quantized = int8_tmp / "model.onnx"
+    shutil.copy2(quantized, target_dir / "model.onnx")
+    print(f"[{name}] 模型已复制: {target_dir / 'model.onnx'}")
 
-def copy_to_resources(id2label: dict):
-    """将所需文件复制到 resources/ner/"""
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
-    # 优先使用量化版本
-    quantized_model = TEMP_DIR / "quantized" / "model_quantized.onnx"
-    fp32_model = TEMP_DIR / "model.onnx"
-
-    if quantized_model.exists():
-        shutil.copy(quantized_model, OUTPUT_DIR / "model.onnx")
-        size_mb = quantized_model.stat().st_size / 1024 / 1024
-        print(f"已复制量化模型 ({size_mb:.1f} MB)")
+    if cfg["tokenizer_source"] == "self":
+        # BERT：用 AutoTokenizer 保存 fast tokenizer（会生成 tokenizer.json）
+        from transformers import AutoTokenizer
+        tok = AutoTokenizer.from_pretrained(hf_id, use_fast=True)
+        tok.save_pretrained(target_dir)
+        # 清理 BERT 保存的多余文件，只保留 tokenizer.json
+        for f in target_dir.iterdir():
+            if f.name not in {"model.onnx", "tokenizer.json", "id2label.json"}:
+                f.unlink()
+        if not (target_dir / "tokenizer.json").exists():
+            raise SystemExit(f"[{name}] tokenizer.json 生成失败")
     else:
-        shutil.copy(fp32_model, OUTPUT_DIR / "model.onnx")
-        size_mb = fp32_model.stat().st_size / 1024 / 1024
-        print(f"已复制 FP32 模型 ({size_mb:.1f} MB)（量化失败，回退）")
+        # XLM-R：从基础模型下载 tokenizer.json
+        src = cfg["tokenizer_source"]
+        tok_path = hf_hub_download(src, "tokenizer.json")
+        shutil.copy2(tok_path, target_dir / "tokenizer.json")
+    print(f"[{name}] 分词器已复制: {target_dir / 'tokenizer.json'}")
 
-    # 复制词表
-    shutil.copy(TEMP_DIR / "vocab.txt", OUTPUT_DIR / "vocab.txt")
-    print("已复制 vocab.txt")
+    # id2label.json — 从 config.json 提取
+    config = json.loads((export_tmp / "config.json").read_text())
+    id2label = config.get("id2label", {})
+    (target_dir / "id2label.json").write_text(
+        json.dumps(id2label, indent=2, ensure_ascii=False)
+    )
+    print(f"[{name}] 标签映射已写入: {target_dir / 'id2label.json'}")
 
-    # 写入 id2label.json
-    with open(OUTPUT_DIR / "id2label.json", "w", encoding="utf-8") as f:
-        json.dump(id2label, f, ensure_ascii=False, indent=2)
-    print("已写入 id2label.json")
-
-
-def cleanup():
-    """清理临时文件"""
-    if TEMP_DIR.exists():
-        shutil.rmtree(TEMP_DIR)
-        print("已清理临时文件")
+    print(f"[{name}] 清理临时目录...")
+    shutil.rmtree(export_tmp, ignore_errors=True)
+    shutil.rmtree(int8_tmp, ignore_errors=True)
+    print(f"[{name}] 完成！")
 
 
 def main():
-    print("=" * 50)
-    print("NER 模型导出工具")
-    print(f"模型: {MODEL_NAME}")
-    print(f"输出: {OUTPUT_DIR}")
-    print("=" * 50)
-
-    try:
-        export_onnx()
-        id2label = build_id2label()
-        quantize()
-        copy_to_resources(id2label)
-        print("\n导出完成！模型文件已放入 src-tauri/resources/ner/")
-        print("重新运行 cargo tauri dev 即可加载模型")
-    finally:
-        cleanup()
+    if len(sys.argv) != 2:
+        raise SystemExit(f"用法: python {sys.argv[0]} <{'|'.join(MODELS.keys())}>")
+    export_model(sys.argv[1])
 
 
 if __name__ == "__main__":
