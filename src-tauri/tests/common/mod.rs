@@ -49,16 +49,27 @@ fn get_ner_engine() -> &'static Mutex<NerEngine> {
 }
 
 /// 全管道检测：正则 + NER + 词典，合并去重
-/// 复现 useAutoDesensitize.ts:1058-1112 的完整逻辑
+///
+/// 复现 `src/hooks/useAutoDesensitize.ts:1058-1112` 的敏感项合并逻辑。
+/// 注意：不复现列推断合并（1091-1099）和白名单过滤（1114-1125），
+/// 这些不影响 SensitiveItem 基线对照。
+///
+/// 性能警告：NER 引擎是全局单例 + Mutex，多个测试会在 NER 阶段串行化。
 pub fn detect_full_pipeline(content: &FileContent, lang: Language) -> Vec<SensitiveItem> {
     // 1. 正则引擎
     let regex_engine = RegexEngine::for_language(lang);
     let regex_items = regex_engine.detect(content);
 
-    // 2. NER 引擎
+    // 2. NER 引擎（poison 容错：如果前一次测试 panic 污染了锁，继续用内部数据）
     let ner_items = {
         let engine_mutex = get_ner_engine();
-        let mut engine = engine_mutex.lock().expect("NER 引擎锁获取失败");
+        let mut engine = match engine_mutex.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => {
+                eprintln!("[test] ⚠️ NER 锁被 poison，继续使用 inner 数据");
+                poisoned.into_inner()
+            }
+        };
         engine.detect(content).unwrap_or_default()
     };
 
@@ -133,17 +144,24 @@ pub fn parse_fixture(fixture_abs_path: &str) -> FileContent {
     }
 }
 
-/// 全管道基线断言：解析文件 → 三层引擎检测 → 与 sidecar baseline 对照
+/// 全管道基线断言：解析文件 → 三层引擎检测 → 与 sidecar baseline 严格对照
+///
+/// 如果 NER 引擎降级（模型加载失败），直接 panic 而不是让 soft 项漏检伪装成"NER 能力问题"。
 pub fn assert_full_pipeline_baseline(fixture_abs_path: &str, lang: Language) {
-    let content = parse_fixture(fixture_abs_path);
-    let items = detect_full_pipeline(&content, lang);
-
-    let ner_loaded = get_ner_engine().lock().map(|e| e.is_loaded()).unwrap_or(false);
+    let ner_loaded = {
+        let guard = get_ner_engine().lock().unwrap_or_else(|p| p.into_inner());
+        guard.is_loaded()
+    };
     if !ner_loaded {
-        eprintln!("[test] ⚠️ NER 引擎降级中 — soft 项仍然断言但标注 [NER degraded]");
+        panic!(
+            "NER 模型未加载 (resources/ner/model.onnx)，全管道测试无法运行。\n\
+             请先准备 NER 模型文件。降级模式会让所有 NER 类基线看起来像漏检。"
+        );
     }
 
-    assert_baseline_from_sidecar_filtered(&items, fixture_abs_path, None);
+    let content = parse_fixture(fixture_abs_path);
+    let items = detect_full_pipeline(&content, lang);
+    assert_baseline_from_sidecar_strict(&items, fixture_abs_path, None);
 }
 
 /// 获取测试数据文件路径（从 e2e/fixtures/scenarios/ 按扩展名查找）
@@ -278,7 +296,8 @@ fn parse_sensitive_type(s: &str) -> Option<SensitiveType> {
 
 /// 自动从 .baseline.json 加载基线并断言（全类型模式）
 ///
-/// 等价于 `assert_baseline_from_sidecar_filtered(items, path, None)`
+/// soft 项未命中只 warning（适合只跑正则引擎的集成测试）。
+/// 全管道测试请用 `assert_full_pipeline_baseline` 或 `assert_baseline_strict`。
 pub fn assert_baseline_from_sidecar(items: &[SensitiveItem], fixture_abs_path: &str) {
     assert_baseline_from_sidecar_filtered(items, fixture_abs_path, None);
 }
@@ -293,14 +312,37 @@ pub fn assert_baseline_from_sidecar(items: &[SensitiveItem], fixture_abs_path: &
 /// - 类型过滤测试（如 T02 只启用手机号）→ `Some(&[SensitiveType::Phone])`
 /// - 关闭单一类型（如 T04 关闭身份证）→ `Some(&[除 IdCard 外的所有类型])`
 ///
-/// 行为：
+/// 行为（宽松模式，供单引擎测试使用）：
 /// - hard 项且类型在 enabled 范围内：必须命中，否则 panic
 /// - hard 项但类型不在 enabled 范围内：跳过（不检查也不 warning）
-/// - soft 项且类型在 enabled 范围内：未命中则 panic（与 hard 同等严格）
+/// - soft 项且类型在 enabled 范围内：未命中只打 warning（不 panic）
+///
+/// 严格模式（soft 项未命中也 panic）请用 `assert_baseline_from_sidecar_strict`。
 pub fn assert_baseline_from_sidecar_filtered(
     items: &[SensitiveItem],
     fixture_abs_path: &str,
     enabled_types: Option<&[SensitiveType]>,
+) {
+    assert_baseline_from_sidecar_impl(items, fixture_abs_path, enabled_types, false);
+}
+
+/// 严格基线断言：soft 项未命中也 panic。
+///
+/// 仅用于全管道测试（正则+NER+词典 都跑）。如果只跑单引擎就用这个，所有 soft
+/// 项都会被标记为失败 —— 这是测试语义错误而不是被测代码错误。
+pub fn assert_baseline_from_sidecar_strict(
+    items: &[SensitiveItem],
+    fixture_abs_path: &str,
+    enabled_types: Option<&[SensitiveType]>,
+) {
+    assert_baseline_from_sidecar_impl(items, fixture_abs_path, enabled_types, true);
+}
+
+fn assert_baseline_from_sidecar_impl(
+    items: &[SensitiveItem],
+    fixture_abs_path: &str,
+    enabled_types: Option<&[SensitiveType]>,
+    strict_soft: bool,
 ) {
     let baseline = load_baseline(fixture_abs_path);
     let mut hard_missing: Vec<String> = Vec::new();
@@ -355,18 +397,29 @@ pub fn assert_baseline_from_sidecar_filtered(
         );
     }
 
-    // hard + soft 合并，全部未命中项一起报错
+    // 组装错误报告
     let mut all_missing: Vec<String> = Vec::new();
     if !hard_missing.is_empty() {
-        all_missing.push(format!("正则类未命中 ({}):", hard_missing.len()));
-        all_missing.extend(hard_missing);
+        all_missing.push(format!("硬断言项未命中 ({}):", hard_missing.len()));
+        all_missing.extend(hard_missing.iter().cloned());
     }
     if !soft_missing.is_empty() {
-        all_missing.push(format!("NER 类未命中 ({}):", soft_missing.len()));
-        all_missing.extend(soft_missing);
+        if strict_soft {
+            all_missing.push(format!("软断言项未命中 ({}):", soft_missing.len()));
+            all_missing.extend(soft_missing.iter().cloned());
+        } else {
+            // 宽松模式：soft 未命中只 warning
+            eprintln!(
+                "[baseline] ⚠️  {} 个软断言项未命中（宽松模式，不影响测试通过）:\n{}",
+                soft_missing.len(),
+                soft_missing.join("\n")
+            );
+        }
     }
 
-    if !all_missing.is_empty() {
+    let has_hard_failure = !hard_missing.is_empty();
+    let has_soft_failure_strict = strict_soft && !soft_missing.is_empty();
+    if has_hard_failure || has_soft_failure_strict {
         panic!(
             "基线覆盖检查失败，以下项未被识别:\n{}\n\n实际识别到 {} 项",
             all_missing.join("\n"),
