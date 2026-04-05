@@ -61,7 +61,7 @@ def assert_baseline(detected_texts: list[str], fixture_file: str) -> dict:
                 soft_missing.append((value, type_name))
 
     return {
-        "passed": len(hard_missing) == 0,
+        "passed": len(hard_missing) == 0 and len(soft_missing) == 0,
         "hard_missing": hard_missing,
         "soft_missing": soft_missing,
         "hard_found": hard_found,
@@ -89,8 +89,24 @@ def format_baseline_report(result: dict) -> str:
             lines.append(f"     - {type_name}: {value}")
 
     if result["passed"]:
-        lines.append("  正则类全部命中")
+        lines.append("  全部命中")
     else:
-        lines.append("  存在正则类未命中项，测试失败")
+        parts = []
+        if result["hard_missing"]:
+            parts.append(f"正则类 {len(result['hard_missing'])} 项")
+        if result["soft_missing"]:
+            parts.append(f"NER 类 {len(result['soft_missing'])} 项")
+        lines.append(f"  未命中: {', '.join(parts)}，测试失败")
 
     return "\n".join(lines)
+
+
+def check_baseline(detected_texts: list[str], fixture_file: str) -> None:
+    """一步完成基线对照 + 断言，fail 时输出漏检明细
+
+    用法：
+        check_baseline(detected_texts, "sample.txt")
+    """
+    result = assert_baseline(detected_texts, fixture_file)
+    report = format_baseline_report(result)
+    assert result["passed"], f"基线对照失败\n{report}"
