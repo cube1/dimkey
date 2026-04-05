@@ -133,7 +133,13 @@ DMG_DIR="$BUNDLE_DIR/dmg"
 mkdir -p "$DMG_DIR"
 rm -f "$DMG_DIR"/*.dmg
 DMG_PATH="$DMG_DIR/Dimkey_${VERSION}_aarch64.dmg"
-hdiutil create -volname "Dimkey" -srcfolder "$APP_PATH" -ov -format UDZO "$DMG_PATH"
+
+# 创建临时目录，放入 app 和 Applications 快捷方式
+DMG_STAGE=$(mktemp -d)
+cp -R "$APP_PATH" "$DMG_STAGE/"
+ln -s /Applications "$DMG_STAGE/Applications"
+hdiutil create -volname "Dimkey" -srcfolder "$DMG_STAGE" -ov -format UDZO "$DMG_PATH"
+rm -rf "$DMG_STAGE"
 
 echo "生成 updater 包..."
 MACOS_DIR="$BUNDLE_DIR/macos"

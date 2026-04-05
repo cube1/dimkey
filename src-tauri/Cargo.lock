@@ -1232,7 +1232,7 @@ dependencies = [
 
 [[package]]
 name = "dimkey"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "aho-corasick",
  "base64 0.22.1",
