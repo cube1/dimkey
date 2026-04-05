@@ -29,7 +29,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: src-tauri/resources/ner/
-          key: ner-model-shibing624-bert4ner-base-chinese-v1
+          key: ner-model-davlan-xlm-roberta-base-ner-hrl-v1
           enableCrossOsArchive: true
 
       - name: 设置 Python
@@ -41,8 +41,8 @@ jobs:
       - name: 下载并导出 NER 模型
         if: steps.cache-model.outputs.cache-hit != 'true'
         run: |
-          pip install optimum[onnxruntime] transformers torch
-          python scripts/export_ner_model.py
+          pip install optimum[onnxruntime] transformers torch huggingface_hub
+          PYTHON_BIN=python bash scripts/use_ner_model.sh multilingual
 
   # ── 2. Windows 自动构建（macOS 由本地构建后手动上传） ──
   build:
@@ -70,7 +70,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: src-tauri/resources/ner/
-          key: ner-model-shibing624-bert4ner-base-chinese-v1
+          key: ner-model-davlan-xlm-roberta-base-ner-hrl-v1
           enableCrossOsArchive: true
 
       - name: 设置 Node.js
