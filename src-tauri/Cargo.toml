@@ -1,6 +1,6 @@
 [package]
 name = "dimkey"
-version = "0.5.1"
+version = "0.5.2"
 description = "Dimkey — 本地文档脱敏工具"
 authors = ["you"]
 edition = "2021"

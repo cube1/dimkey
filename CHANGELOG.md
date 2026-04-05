@@ -1,5 +1,31 @@
 # 更新日志
 
+## [v0.5.2] — 2026-04-05
+
+**下载：** [官网下载](https://dimkey.com/#download)
+
+### 修复
+- **NER 模型正确打包**：修复 v0.5.1 遗漏的模型文件，机构名、人名、地址识别恢复正常
+- **DMG 添加 Applications 快捷方式**：macOS 安装包打开后可直接拖放到应用文件夹
+- 发版脚本全角括号导致变量解析失败
+
+### 新功能
+- **NER 模型快速切换**：本地一条命令 `./scripts/use_ner_model.sh <chinese|multilingual>` 秒切两个模型，首次自动下载缓存
+- **多语言 NER 模型**：切换到 `Davlan/xlm-roberta-base-ner-hrl`，支持中英文混排识别
+- **基线断言收紧**：E2E 测试基线 hard 和 soft 全部命中才算通过，新增 `check_baseline` 辅助函数
+- **Rust 全管道集成测试**：三层引擎（正则 + NER + 词典）端到端测试框架
+
+### 重构
+- 统一 NER 模型导出脚本 `scripts/export_ner_model.py`，参数化支持中文/多语言双模型
+
+### CI
+- 发版产物命名统一（去掉 DMG 文件名中的 `v` 前缀）
+- Release workflow 改用 `use_ner_model.sh` 下载模型
+
+### 其他
+- 删除冗余的 `prepare_ner_model.py`
+- gitignore 新增 `.ner_cache/` 模型缓存目录
+
 ## [v0.5.1] — 2026-04-04
 
 **下载：** [官网下载](https://dimkey.com/#download)
