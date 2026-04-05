@@ -1,7 +1,20 @@
 # Bug 清单
 
-> 更新时间: 2026-04-04（第 7 次执行）
-> 来源: 全量测试执行（Rust 317通过/14失败 + Pytest 20通过/2失败/2跳过）
+> 更新时间: 2026-04-05（第 9 次执行）
+> 来源: 新增全管道集成测试（full_pipeline_*.rs 42 个用例，24 通过/18 失败），首次端到端走三层引擎（正则+NER+词典）并用 baseline 做严格断言。之前的 Rust 单引擎测试 317 通过/14 失败状态不变。
+
+## 重要说明：全管道测试（2026-04-05 新增）
+
+之前的 Rust 集成测试只调用 `RegexEngine::detect()` 单个引擎，从未触发 NER 模型，导致 baseline 中所有 NER 类（PersonName/OrgName/Address/Title）的 soft 断言即便全部漏检也不报错。本次新增的 `full_pipeline_*.rs` 5 个测试文件复现了前端 `useAutoDesensitize.ts:1058-1112` 的三层引擎合并逻辑，NER 引擎真实加载 ONNX 模型并参与检测，soft/hard 断言一视同仁。
+
+全管道测试结果（42 用例）：
+- full_pipeline_basic: 2 通过 / 8 失败（sample.* 和 batch 基线数据问题占多数）
+- full_pipeline_txt: 0 通过 / 3 失败（NER 短名字 + Title 不支持）
+- full_pipeline_csv: 5 通过 / 2 失败（UkPhone 空格格式 + NER 短名字）
+- full_pipeline_xlsx: 8 通过 / 3 失败（NER 短名字 + Title 英文不支持 + 语言切换）
+- full_pipeline_docx: 9 通过 / 2 失败（国际护照/IBAN + NER Title）
+
+**核心发现**：NER 引擎加载成功，对"长"中文人名（3-4 字且不在常见姓氏范围的）和复杂地址/组织名识别能力不足；Title 类型完全不支持（需要其他方案）。这是之前 soft 模式掩盖的真实问题，现在暴露出来由产品决定如何应对。
 
 ## 活跃 Bug
 
@@ -14,6 +27,14 @@
 | BUG-018 | P2 | E2E | `test_enabled_types_roundtrip` (test_type_persistence.py) | IPC mock override get_workspace 后 selectWorkspace 未正确触发 store 更新，wsData.workspace.enabled_types 仍为 null | 测试代码 |
 | BUG-019 | P2 | E2E | `test_workspace_list_has_multiple` (test_workspace_advanced.py) | IPC mock 返回 2 个工作区但列表只显示 1 个，竞态或 store 渲染时序问题 | 测试代码 |
 | BUG-020 | P2 | parser::xlsx | `test_encrypted_xlsx_wrong_password` (boundary.rs) | 错误密码解密后文件解析返回 "Cannot detect file format" 而非密码错误提示，错误分类不够精确 | 逻辑错误 |
+| BUG-021 | **P0** | ner_engine | `test_fp_sample_*` ×4, `test_fp_batch_*` ×3, `test_fp_会议纪要`, `test_fp_通知公告`, `test_fp_跨文件一致性_*` ×2 | NER 模型对 2-3 字中文人名漏检（张三、周杰、马超、吴凡、郑华、冯磊、刘伟、陈静、赵明远、孙浩然、张美玲、陈志强、吴志远 等）。模型加载正常，但短人名识别率不足，可能是 `shibing624/bert4ner-base-chinese` 训练数据偏向长名 | NER 能力不足 |
+| BUG-022 | **P0** | ner_engine | `test_fp_IT运维事件报告`, `test_fp_us_compliance_audit`, `test_fp_集团高管通讯录` | NER 模型完全不支持 Title（职位）类型识别。当前模型只有 PER/LOC/ORG 三个标签，没有 Title label。涉及 30 个 Title 漏检（15 中文 + 10 英文 + 5 其他）。**解决方向：(1) 正则规则枚举常见职位后缀（总监/经理/CFO/VP 等），(2) 自定义词典兜底，(3) 换支持 TITLE label 的模型** | NER 能力缺失 |
+| BUG-023 | P1 | ner_engine | `test_fp_sample_*` ×4, `test_fp_batch_02_csv`, `test_fp_batch_03_docx` | NER 模型对完整的中文地址漏检（"北京市朝阳区建国路88号"、"上海市浦东新区陆家嘴环路1000号"、"南京市玄武区中山路18号" 等）。可能是地址含数字段导致 tokenizer 切分异常，或模型未覆盖门牌号格式 | NER 能力不足 |
+| BUG-024 | P1 | ner_engine | `test_fp_sample_docx`, `test_fp_sample_txt` | NER 模型对长组织名"阿里巴巴集团控股有限公司"漏检。可能是"集团控股有限公司"后缀组合未在训练集出现 | NER 能力不足 |
+| BUG-025 | P2 | baseline_data | `test_fp_sample_csv`, `test_fp_sample_xlsx` | sample.csv/xlsx 基线 sidecar 中 PersonName 和 Address 类型的第 2-N 条被错误标记为 `assert: "hard"`（仅第 1 条为 `soft`），自动迁移脚本 bug。PersonName/Address 属于 NER 类型，不应有 hard 断言 | 基线数据错误 |
+| BUG-026 | P2 | baseline_data | `test_fp_boundary_fullwidth` | `boundary/fullwidth_digits.csv` 基线中全角手机号被标为 Phone（正则类），但正则引擎只支持半角数字。应改为 soft 或先做全角→半角归一化再匹配 | 基线数据错误 |
+| BUG-027 | P3 | test_infra | `test_fp_投诉工单记录`, `test_fp_医院患者登记表`, `test_fp_律所案件分析备忘录_劳动争议`, `test_fp_门诊病历摘要`, `test_fp_会议纪要` | `common/mod.rs::parse_sensitive_type` 不识别 `MedicalInsurance`、`IP` 等类型字符串，导致基线条目被跳过（"跳过未知类型" warning）。不影响测试通过但降低基线覆盖率 | 测试基础设施 |
+| BUG-028 | P1 | regex_engine | `test_fp_mixed_bilingual` | 中英混合 xlsx 中 SSN（`523-45-6789` 等 4 个）和 UkPostcode（`W1U 3BW`, `M1 5QA`, `SW1A 2AA`）未识别。可能是语言检测将文件判为 Zh，只加载中文正则引擎未加载英文规则 | 识别遗漏 |
 
 ## 环境问题（非 Bug）
 
