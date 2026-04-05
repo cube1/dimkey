@@ -30,7 +30,7 @@ impl OnnxBackend {
         if !model_path.exists() || !tokenizer_path.exists() || !label_path.exists() {
             // 兼容提示：如果有旧格式 vocab.txt 但没有 tokenizer.json
             if model_path.exists() && model_dir.join("vocab.txt").exists() && !tokenizer_path.exists() {
-                eprintln!("警告: 检测到旧格式 vocab.txt，请使用 scripts/prepare_ner_model.py 重新导出模型");
+                eprintln!("警告: 检测到旧格式 vocab.txt，请使用 ./scripts/use_ner_model.sh multilingual 下载新格式模型");
             }
             return Ok(None);
         }
