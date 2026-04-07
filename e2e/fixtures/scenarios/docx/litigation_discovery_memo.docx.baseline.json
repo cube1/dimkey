@@ -1,0 +1,371 @@
+{
+  "fixture": "scenarios/docx/litigation_discovery_memo.docx",
+  "generated_by": "dimkey-test-design",
+  "generated_at": "2026-04-07",
+  "expected": [
+    {
+      "value": "623-41-8907",
+      "type": "Ssn",
+      "count": 1,
+      "note": "witness SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "578-92-3641",
+      "type": "Ssn",
+      "count": 1,
+      "note": "witness SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "487-15-6329",
+      "type": "Ssn",
+      "count": 1,
+      "note": "witness SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "539-48-2671",
+      "type": "Ssn",
+      "count": 1,
+      "note": "patient SSN in docs",
+      "assert": "hard"
+    },
+    {
+      "value": "(415) 567-2289",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "witness phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(415) 567-2290",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "witness phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(415) 567-2200",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "witness phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(310) 445-7823",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "expert phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(415) 293-8848",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "spouse phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(415) 892-3347",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "court reporter phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(415) 667-4412",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "videographer phone",
+      "assert": "hard"
+    },
+    {
+      "value": "+44 20 7123 4567",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "UK expert phone",
+      "assert": "hard"
+    },
+    {
+      "value": "+44 7845 123456",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "UK assistant phone",
+      "assert": "hard"
+    },
+    {
+      "value": "+44 20 7946 0321",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "UK notary phone",
+      "assert": "hard"
+    },
+    {
+      "value": "h.porter@pcmedical.org",
+      "type": "Email",
+      "count": 2,
+      "note": "witness email (2x)",
+      "assert": "hard"
+    },
+    {
+      "value": "l.chow@pcmedical.org",
+      "type": "Email",
+      "count": 1,
+      "note": "witness email",
+      "assert": "hard"
+    },
+    {
+      "value": "m.reynolds@pcmedical.org",
+      "type": "Email",
+      "count": 1,
+      "note": "witness email",
+      "assert": "hard"
+    },
+    {
+      "value": "a.tanaka@uclahealth.org",
+      "type": "Email",
+      "count": 1,
+      "note": "expert email",
+      "assert": "hard"
+    },
+    {
+      "value": "k.wells@yahoo.com",
+      "type": "Email",
+      "count": 1,
+      "note": "spouse email",
+      "assert": "hard"
+    },
+    {
+      "value": "r.eastwood@imperial.ac.uk",
+      "type": "Email",
+      "count": 1,
+      "note": "UK expert email",
+      "assert": "hard"
+    },
+    {
+      "value": "w.grayson@pcmedical.org",
+      "type": "Email",
+      "count": 1,
+      "note": "CMO email",
+      "assert": "hard"
+    },
+    {
+      "value": "e.markova@imperial.ac.uk",
+      "type": "Email",
+      "count": 1,
+      "note": "UK assistant email",
+      "assert": "hard"
+    },
+    {
+      "value": "a.cruz@sfcourtreporters.com",
+      "type": "Email",
+      "count": 1,
+      "note": "court reporter email",
+      "assert": "hard"
+    },
+    {
+      "value": "j.liu@legalvideo.com",
+      "type": "Email",
+      "count": 1,
+      "note": "videographer email",
+      "assert": "hard"
+    },
+    {
+      "value": "e.saunders@uknotary.co.uk",
+      "type": "Email",
+      "count": 1,
+      "note": "UK notary email",
+      "assert": "hard"
+    },
+    {
+      "value": "GB82 WEST 1234 5698 7654 32",
+      "type": "Iban",
+      "count": 1,
+      "note": "expert wire transfer",
+      "assert": "hard"
+    },
+    {
+      "value": "PA8901234",
+      "type": "Passport",
+      "count": 1,
+      "note": "expert passport in table",
+      "assert": "hard"
+    },
+    {
+      "value": "AB987654",
+      "type": "Passport",
+      "count": 2,
+      "note": "expert passport (table + text)",
+      "assert": "hard"
+    },
+    {
+      "value": "D891-2345-6789",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "nurse DL as ID",
+      "assert": "hard"
+    },
+    {
+      "value": "EASTW753068RE9AZ",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "UK expert DVLA license",
+      "assert": "hard"
+    },
+    {
+      "value": "94108",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "witness address zip",
+      "assert": "hard"
+    },
+    {
+      "value": "94109",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "witness address zip",
+      "assert": "hard"
+    },
+    {
+      "value": "94115",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "witness address zip",
+      "assert": "hard"
+    },
+    {
+      "value": "90095",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "expert address zip",
+      "assert": "hard"
+    },
+    {
+      "value": "94103",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "spouse address zip",
+      "assert": "hard"
+    },
+    {
+      "value": "SW7 2AZ",
+      "type": "UkPostcode",
+      "count": 1,
+      "note": "UK expert address postcode",
+      "assert": "hard"
+    },
+    {
+      "value": "Helen Porter",
+      "type": "PersonName",
+      "count": 4,
+      "note": "NER treating physician",
+      "assert": "soft"
+    },
+    {
+      "value": "Linda Chow",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER nurse",
+      "assert": "soft"
+    },
+    {
+      "value": "Mark Reynolds",
+      "type": "PersonName",
+      "count": 2,
+      "note": "NER administrator",
+      "assert": "soft"
+    },
+    {
+      "value": "Akira Tanaka",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER expert",
+      "assert": "soft"
+    },
+    {
+      "value": "Katherine Wells",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER spouse",
+      "assert": "soft"
+    },
+    {
+      "value": "Richard Eastwood",
+      "type": "PersonName",
+      "count": 3,
+      "note": "NER UK expert",
+      "assert": "soft"
+    },
+    {
+      "value": "James Anderson",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER patient ref",
+      "assert": "soft"
+    },
+    {
+      "value": "David Park",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER attorney",
+      "assert": "soft"
+    },
+    {
+      "value": "Sarah Mitchell",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER attorney",
+      "assert": "soft"
+    },
+    {
+      "value": "William Grayson",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER CMO",
+      "assert": "soft"
+    },
+    {
+      "value": "Elena Markova",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER UK assistant",
+      "assert": "soft"
+    },
+    {
+      "value": "Angela Cruz",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER court reporter",
+      "assert": "soft"
+    },
+    {
+      "value": "Jason Liu",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER videographer",
+      "assert": "soft"
+    },
+    {
+      "value": "Emily Saunders",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER UK notary",
+      "assert": "soft"
+    },
+    {
+      "value": "450 Sutter Street, Suite 800, San Francisco, CA",
+      "type": "Address",
+      "count": 1,
+      "note": "NER witness address",
+      "assert": "soft"
+    },
+    {
+      "value": "Exhibition Road, South Kensington, London",
+      "type": "Address",
+      "count": 1,
+      "note": "NER UK address",
+      "assert": "soft"
+    }
+  ]
+}

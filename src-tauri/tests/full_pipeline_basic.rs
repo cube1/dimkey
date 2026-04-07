@@ -67,3 +67,13 @@ fn test_fp_batch_02_csv() {
 fn test_fp_batch_03_docx() {
     assert_full_pipeline_baseline(&fixture_path("batch/batch_03.docx"), Language::Zh);
 }
+
+// --- C49: 英文法律边界测试 ---
+
+#[test]
+fn test_fp_english_legal_edge_cases() {
+    assert_full_pipeline_baseline(
+        &fixture_path("boundary/english_legal_edge_cases.txt"),
+        Language::En,
+    );
+}

@@ -60,3 +60,13 @@ fn test_fp_us_compliance_audit() {
 fn test_fp_跨文件一致性_入职信息() {
     assert_full_pipeline_baseline(&test_data_path("跨文件一致性_入职信息.xlsx"), Language::Zh);
 }
+
+// --- C44: 英文律所客户登记表 ---
+
+#[test]
+fn test_fp_law_firm_client_intake() {
+    assert_full_pipeline_baseline(
+        &test_data_path("law_firm_client_intake.xlsx"),
+        Language::En,
+    );
+}

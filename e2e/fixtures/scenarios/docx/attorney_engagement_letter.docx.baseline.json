@@ -1,0 +1,217 @@
+{
+  "fixture": "scenarios/docx/attorney_engagement_letter.docx",
+  "generated_by": "dimkey-test-design",
+  "generated_at": "2026-04-07",
+  "expected": [
+    {
+      "value": "539-48-2671",
+      "type": "Ssn",
+      "count": 2,
+      "note": "client SSN (appears twice)",
+      "assert": "hard"
+    },
+    {
+      "value": "(415) 782-3300",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "firm phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(415) 782-3301",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "firm fax",
+      "assert": "hard"
+    },
+    {
+      "value": "(415) 293-8847",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(650) 555-0198",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client work phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(415) 331-9920",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "opposing counsel phone",
+      "assert": "hard"
+    },
+    {
+      "value": "intake@mitchellchenpark.com",
+      "type": "Email",
+      "count": 1,
+      "note": "firm email",
+      "assert": "hard"
+    },
+    {
+      "value": "j.anderson@gmail.com",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "janderson@techventure.com",
+      "type": "Email",
+      "count": 1,
+      "note": "client work email",
+      "assert": "hard"
+    },
+    {
+      "value": "r.harrison@harrisonlaw.com",
+      "type": "Email",
+      "count": 1,
+      "note": "opposing counsel email",
+      "assert": "hard"
+    },
+    {
+      "value": "4539 1488 0343 6467",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Visa card for billing",
+      "assert": "hard"
+    },
+    {
+      "value": "GB29 NWBK 6016 1331 9268 19",
+      "type": "Iban",
+      "count": 1,
+      "note": "IOLTA trust account",
+      "assert": "hard"
+    },
+    {
+      "value": "D450-3921-8876",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "California DL",
+      "assert": "hard"
+    },
+    {
+      "value": "94115",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "firm zip",
+      "assert": "hard"
+    },
+    {
+      "value": "94103",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "client zip",
+      "assert": "hard"
+    },
+    {
+      "value": "94104",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "opposing counsel zip",
+      "assert": "hard"
+    },
+    {
+      "value": "James Anderson",
+      "type": "PersonName",
+      "count": 4,
+      "note": "NER client name (multiple mentions)",
+      "assert": "soft"
+    },
+    {
+      "value": "Sarah Mitchell",
+      "type": "PersonName",
+      "count": 3,
+      "note": "NER attorney name",
+      "assert": "soft"
+    },
+    {
+      "value": "David Park",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER attorney name",
+      "assert": "soft"
+    },
+    {
+      "value": "Rebecca Harrison",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER opposing counsel",
+      "assert": "soft"
+    },
+    {
+      "value": "Senior Partner",
+      "type": "Title",
+      "count": 3,
+      "note": "NER title",
+      "assert": "soft"
+    },
+    {
+      "value": "Associate Attorney",
+      "type": "Title",
+      "count": 1,
+      "note": "NER title",
+      "assert": "soft"
+    },
+    {
+      "value": "Managing Partner",
+      "type": "Title",
+      "count": 1,
+      "note": "NER title",
+      "assert": "soft"
+    },
+    {
+      "value": "Mitchell, Chen & Park LLP",
+      "type": "OrgName",
+      "count": 3,
+      "note": "NER firm name",
+      "assert": "soft"
+    },
+    {
+      "value": "Pacific Coast Medical Center",
+      "type": "OrgName",
+      "count": 2,
+      "note": "NER defendant",
+      "assert": "soft"
+    },
+    {
+      "value": "Harrison & Associates LLP",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER opposing firm",
+      "assert": "soft"
+    },
+    {
+      "value": "TechVenture Capital Partners",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER employer",
+      "assert": "soft"
+    },
+    {
+      "value": "2500 Broadway Avenue, Suite 3100",
+      "type": "Address",
+      "count": 1,
+      "note": "NER firm address",
+      "assert": "soft"
+    },
+    {
+      "value": "1420 Market Street, Apt 5B",
+      "type": "Address",
+      "count": 1,
+      "note": "NER client address",
+      "assert": "soft"
+    },
+    {
+      "value": "580 California Street, Suite 2000, San Francisco, CA",
+      "type": "Address",
+      "count": 1,
+      "note": "NER opposing address",
+      "assert": "soft"
+    }
+  ]
+}

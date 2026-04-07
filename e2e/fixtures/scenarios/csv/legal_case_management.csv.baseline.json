@@ -1,0 +1,525 @@
+{
+  "fixture": "scenarios/csv/legal_case_management.csv",
+  "generated_by": "dimkey-test-design",
+  "generated_at": "2026-04-07",
+  "expected": [
+    {
+      "value": "412-56-7893",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "738-21-4560",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "295-84-1637",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "564-39-8712",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "821-47-3056",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "673-18-4295",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "156-72-9843",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "487-63-2108",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "342-95-7681",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "915-28-6034",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "(202) 445-8821",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client phone US",
+      "assert": "hard"
+    },
+    {
+      "value": "(312) 778-3344",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client phone US",
+      "assert": "hard"
+    },
+    {
+      "value": "(617) 902-5567",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "opposing counsel phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(415) 663-2210",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client phone US",
+      "assert": "hard"
+    },
+    {
+      "value": "(650) 555-0198",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "opposing counsel phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(713) 445-9932",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client phone US",
+      "assert": "hard"
+    },
+    {
+      "value": "(281) 334-7721",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "opposing counsel phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(206) 887-4412",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client phone US",
+      "assert": "hard"
+    },
+    {
+      "value": "(503) 221-6654",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "opposing counsel phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(305) 992-3387",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client phone US",
+      "assert": "hard"
+    },
+    {
+      "value": "(954) 776-6100",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "opposing counsel phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(646) 223-8890",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client phone US",
+      "assert": "hard"
+    },
+    {
+      "value": "(212) 867-5309",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "opposing counsel phone",
+      "assert": "hard"
+    },
+    {
+      "value": "+44 7700 900123",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "opposing counsel UK",
+      "assert": "hard"
+    },
+    {
+      "value": "+44 7456 321987",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "client phone UK",
+      "assert": "hard"
+    },
+    {
+      "value": "+44 20 7946 0958",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "opposing counsel UK",
+      "assert": "hard"
+    },
+    {
+      "value": "+44 7911 654321",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "client phone UK",
+      "assert": "hard"
+    },
+    {
+      "value": "+44 20 3134 5678",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "opposing counsel UK",
+      "assert": "hard"
+    },
+    {
+      "value": "+44 7800 112233",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "client phone UK",
+      "assert": "hard"
+    },
+    {
+      "value": "+44 20 7327 1000",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "opposing counsel UK",
+      "assert": "hard"
+    },
+    {
+      "value": "m.davies@lawmail.com",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "j.reed@outlook.com",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "o.thornton@barristers.co.uk",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "b.cross@protonmail.com",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "c.blake@gmail.com",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "a.petrov@solicitors.co.uk",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "l.chen@lawfirm.com",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "n.brooks@icloud.com",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "s.hamilton@chambers.uk",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "c.yang@nylaw.com",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "t.whitfield@gmail.com",
+      "type": "Email",
+      "count": 1,
+      "note": "witness email",
+      "assert": "hard"
+    },
+    {
+      "value": "s.novak@yahoo.com",
+      "type": "Email",
+      "count": 1,
+      "note": "witness email",
+      "assert": "hard"
+    },
+    {
+      "value": "e.chambers@bt.com",
+      "type": "Email",
+      "count": 1,
+      "note": "witness email",
+      "assert": "hard"
+    },
+    {
+      "value": "r.huang@stanford.edu",
+      "type": "Email",
+      "count": 1,
+      "note": "witness email",
+      "assert": "hard"
+    },
+    {
+      "value": "m.webb@energy.gov",
+      "type": "Email",
+      "count": 1,
+      "note": "witness email",
+      "assert": "hard"
+    },
+    {
+      "value": "n.orlova@hsbc.com",
+      "type": "Email",
+      "count": 1,
+      "note": "witness email",
+      "assert": "hard"
+    },
+    {
+      "value": "d.kowalski@uw.edu",
+      "type": "Email",
+      "count": 1,
+      "note": "witness email",
+      "assert": "hard"
+    },
+    {
+      "value": "i.vargas@cruise.com",
+      "type": "Email",
+      "count": 1,
+      "note": "witness email",
+      "assert": "hard"
+    },
+    {
+      "value": "g.ashworth@lloyds.com",
+      "type": "Email",
+      "count": 1,
+      "note": "witness email",
+      "assert": "hard"
+    },
+    {
+      "value": "d.foster@realestate.com",
+      "type": "Email",
+      "count": 1,
+      "note": "witness email",
+      "assert": "hard"
+    },
+    {
+      "value": "D450-3921-8876",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "US driver's license",
+      "assert": "hard"
+    },
+    {
+      "value": "E234-5678-9012",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "US driver's license",
+      "assert": "hard"
+    },
+    {
+      "value": "F789-0123-4567",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "US driver's license",
+      "assert": "hard"
+    },
+    {
+      "value": "H321-6543-2109",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "US driver's license",
+      "assert": "hard"
+    },
+    {
+      "value": "K987-6543-2100",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "US driver's license",
+      "assert": "hard"
+    },
+    {
+      "value": "ASHWO607152AB1CZ",
+      "type": "DriversLicense",
+      "count": 1,
+      "note": "UK DVLA license",
+      "assert": "hard"
+    },
+    {
+      "value": "AB123456",
+      "type": "Passport",
+      "count": 1,
+      "note": "UK passport",
+      "assert": "hard"
+    },
+    {
+      "value": "GA1234567",
+      "type": "Passport",
+      "count": 1,
+      "note": "US passport",
+      "assert": "hard"
+    },
+    {
+      "value": "GC9876543",
+      "type": "Passport",
+      "count": 1,
+      "note": "UK passport",
+      "assert": "hard"
+    },
+    {
+      "value": "PA4567890",
+      "type": "Passport",
+      "count": 1,
+      "note": "US passport",
+      "assert": "hard"
+    },
+    {
+      "value": "Margaret Davies",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Jonathan Reed",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Olivia Thornton",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Benjamin Cross",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Charlotte Blake",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Alexander Petrov",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Laura Chen",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Nathan Brooks",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Sophie Hamilton",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Christopher Yang",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Apex Global Holdings LLC",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER opposing party",
+      "assert": "soft"
+    },
+    {
+      "value": "Pinnacle Insurance Group",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER opposing party",
+      "assert": "soft"
+    },
+    {
+      "value": "British Airways PLC",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER opposing party",
+      "assert": "soft"
+    },
+    {
+      "value": "Lloyd's of London",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER opposing party",
+      "assert": "soft"
+    }
+  ]
+}

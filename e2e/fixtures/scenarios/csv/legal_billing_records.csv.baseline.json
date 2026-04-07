@@ -1,0 +1,483 @@
+{
+  "fixture": "scenarios/csv/legal_billing_records.csv",
+  "generated_by": "dimkey-test-design",
+  "generated_at": "2026-04-07",
+  "expected": [
+    {
+      "value": "4539 1488 0343 6467",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Visa",
+      "assert": "hard"
+    },
+    {
+      "value": "5412 1043 3218 1966",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Mastercard",
+      "assert": "hard"
+    },
+    {
+      "value": "4916 0013 3890 8380",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Visa",
+      "assert": "hard"
+    },
+    {
+      "value": "5234 6379 4026 5420",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Mastercard",
+      "assert": "hard"
+    },
+    {
+      "value": "4024 3511 6155 9407",
+      "type": "CreditCard",
+      "count": 1,
+      "note": "Visa",
+      "assert": "hard"
+    },
+    {
+      "value": "GB76 BARC 2026 1799 8843 21",
+      "type": "Iban",
+      "count": 1,
+      "note": "Barclays",
+      "assert": "hard"
+    },
+    {
+      "value": "GB33 HSBC 4012 7765 4321 09",
+      "type": "Iban",
+      "count": 1,
+      "note": "HSBC",
+      "assert": "hard"
+    },
+    {
+      "value": "GB47 LOYD 3099 1234 5678 90",
+      "type": "Iban",
+      "count": 1,
+      "note": "Lloyds",
+      "assert": "hard"
+    },
+    {
+      "value": "GB91 CITI 1850 0812 3456 78",
+      "type": "Iban",
+      "count": 1,
+      "note": "Citi",
+      "assert": "hard"
+    },
+    {
+      "value": "GB64 RBOS 8312 4500 9876 54",
+      "type": "Iban",
+      "count": 1,
+      "note": "RBS",
+      "assert": "hard"
+    },
+    {
+      "value": "(415) 293-8847",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "billing phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(212) 555-0147",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "billing phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(305) 442-9631",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "billing phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(617) 738-2201",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "billing phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(206) 887-4412",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "billing phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(305) 992-3387",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "billing phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(646) 223-8890",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "billing phone",
+      "assert": "hard"
+    },
+    {
+      "value": "+44 7456 321987",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "UK billing phone",
+      "assert": "hard"
+    },
+    {
+      "value": "+44 7911 654321",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "UK billing phone",
+      "assert": "hard"
+    },
+    {
+      "value": "+44 7800 112233",
+      "type": "UkPhone",
+      "count": 1,
+      "note": "UK billing phone",
+      "assert": "hard"
+    },
+    {
+      "value": "j.anderson@gmail.com",
+      "type": "Email",
+      "count": 1,
+      "note": "billing email",
+      "assert": "hard"
+    },
+    {
+      "value": "emily.watson@outlook.com",
+      "type": "Email",
+      "count": 1,
+      "note": "billing email",
+      "assert": "hard"
+    },
+    {
+      "value": "mtorres@yahoo.com",
+      "type": "Email",
+      "count": 1,
+      "note": "billing email",
+      "assert": "hard"
+    },
+    {
+      "value": "cobrien@protonmail.com",
+      "type": "Email",
+      "count": 1,
+      "note": "billing email",
+      "assert": "hard"
+    },
+    {
+      "value": "o.thornton@barristers.co.uk",
+      "type": "Email",
+      "count": 1,
+      "note": "billing email",
+      "assert": "hard"
+    },
+    {
+      "value": "n.orlova@hsbc.com",
+      "type": "Email",
+      "count": 1,
+      "note": "billing email",
+      "assert": "hard"
+    },
+    {
+      "value": "l.chen@lawfirm.com",
+      "type": "Email",
+      "count": 1,
+      "note": "billing email",
+      "assert": "hard"
+    },
+    {
+      "value": "n.brooks@icloud.com",
+      "type": "Email",
+      "count": 1,
+      "note": "billing email",
+      "assert": "hard"
+    },
+    {
+      "value": "s.hamilton@chambers.uk",
+      "type": "Email",
+      "count": 1,
+      "note": "billing email",
+      "assert": "hard"
+    },
+    {
+      "value": "c.yang@nylaw.com",
+      "type": "Email",
+      "count": 1,
+      "note": "billing email",
+      "assert": "hard"
+    },
+    {
+      "value": "EC4M 7EG",
+      "type": "UkPostcode",
+      "count": 1,
+      "note": "London postcode",
+      "assert": "hard"
+    },
+    {
+      "value": "E14 5HP",
+      "type": "UkPostcode",
+      "count": 1,
+      "note": "Canary Wharf postcode",
+      "assert": "hard"
+    },
+    {
+      "value": "EC4Y 7EX",
+      "type": "UkPostcode",
+      "count": 1,
+      "note": "Temple postcode",
+      "assert": "hard"
+    },
+    {
+      "value": "94103",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "SF zip",
+      "assert": "hard"
+    },
+    {
+      "value": "10118",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "NYC zip",
+      "assert": "hard"
+    },
+    {
+      "value": "33166",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "Doral zip",
+      "assert": "hard"
+    },
+    {
+      "value": "02116",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "Boston zip",
+      "assert": "hard"
+    },
+    {
+      "value": "98104",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "Seattle zip",
+      "assert": "hard"
+    },
+    {
+      "value": "33131",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "Miami zip",
+      "assert": "hard"
+    },
+    {
+      "value": "10005",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "Wall St zip",
+      "assert": "hard"
+    },
+    {
+      "value": "James Anderson",
+      "type": "PersonName",
+      "count": 2,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Emily Watson",
+      "type": "PersonName",
+      "count": 2,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Michael Torres",
+      "type": "PersonName",
+      "count": 2,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Catherine O'Brien",
+      "type": "PersonName",
+      "count": 2,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Olivia Thornton",
+      "type": "PersonName",
+      "count": 2,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Natasha Orlova",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER contact name",
+      "assert": "soft"
+    },
+    {
+      "value": "Laura Chen",
+      "type": "PersonName",
+      "count": 2,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Nathan Brooks",
+      "type": "PersonName",
+      "count": 2,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Sophie Hamilton",
+      "type": "PersonName",
+      "count": 2,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Christopher Yang",
+      "type": "PersonName",
+      "count": 2,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Watson & Co Consulting",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER org",
+      "assert": "soft"
+    },
+    {
+      "value": "Torres Family Trust",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER org",
+      "assert": "soft"
+    },
+    {
+      "value": "O'Brien Ventures Ltd",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER org",
+      "assert": "soft"
+    },
+    {
+      "value": "Thornton Chambers",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER org",
+      "assert": "soft"
+    },
+    {
+      "value": "Petrov & Orlova Solicitors",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER org",
+      "assert": "soft"
+    },
+    {
+      "value": "Northwest Healthcare Systems",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER org",
+      "assert": "soft"
+    },
+    {
+      "value": "Hamilton Chambers",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER org",
+      "assert": "soft"
+    },
+    {
+      "value": "Yang Legal Group PLLC",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER org",
+      "assert": "soft"
+    },
+    {
+      "value": "CEO",
+      "type": "Title",
+      "count": 1,
+      "note": "NER title",
+      "assert": "soft"
+    },
+    {
+      "value": "Director",
+      "type": "Title",
+      "count": 1,
+      "note": "NER title",
+      "assert": "soft"
+    },
+    {
+      "value": "Trustee",
+      "type": "Title",
+      "count": 1,
+      "note": "NER title",
+      "assert": "soft"
+    },
+    {
+      "value": "Managing Director",
+      "type": "Title",
+      "count": 1,
+      "note": "NER title",
+      "assert": "soft"
+    },
+    {
+      "value": "Barrister",
+      "type": "Title",
+      "count": 1,
+      "note": "NER title",
+      "assert": "soft"
+    },
+    {
+      "value": "Finance Manager",
+      "type": "Title",
+      "count": 1,
+      "note": "NER title",
+      "assert": "soft"
+    },
+    {
+      "value": "General Counsel",
+      "type": "Title",
+      "count": 1,
+      "note": "NER title",
+      "assert": "soft"
+    },
+    {
+      "value": "Attorney",
+      "type": "Title",
+      "count": 1,
+      "note": "NER title",
+      "assert": "soft"
+    },
+    {
+      "value": "Senior Barrister",
+      "type": "Title",
+      "count": 1,
+      "note": "NER title",
+      "assert": "soft"
+    },
+    {
+      "value": "Founding Partner",
+      "type": "Title",
+      "count": 1,
+      "note": "NER title",
+      "assert": "soft"
+    }
+  ]
+}

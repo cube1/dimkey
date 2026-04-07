@@ -68,3 +68,23 @@ fn test_fp_international_vendor_contacts() {
         Language::En,
     );
 }
+
+// --- C46: 英文委托代理协议书 ---
+
+#[test]
+fn test_fp_attorney_engagement_letter() {
+    assert_full_pipeline_baseline(
+        &test_data_path("attorney_engagement_letter.docx"),
+        Language::En,
+    );
+}
+
+// --- C47: 英文诉讼发现备忘录 ---
+
+#[test]
+fn test_fp_litigation_discovery_memo() {
+    assert_full_pipeline_baseline(
+        &test_data_path("litigation_discovery_memo.docx"),
+        Language::En,
+    );
+}

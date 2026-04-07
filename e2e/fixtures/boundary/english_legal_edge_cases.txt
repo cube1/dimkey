@@ -1,0 +1,87 @@
+CONFIDENTIAL — LAW FIRM INTERNAL TEST DOCUMENT
+Edge Cases for English PII Detection in Legal Context
+=====================================================
+
+SECTION 1: SSN embedded in natural legal prose
+-----------------------------------------------
+The plaintiff, whose Social Security Number is 539-48-2671, filed the complaint
+on January 15, 2026. Co-plaintiff SSN: 539-48-2672. The defendant's employee
+records show SSN 482-73-1956 was associated with the account in question.
+
+Note: Case reference numbers like 28 U.S.C. §1332 and Rule 26(a)(1)(A)(iv)
+should NOT be detected as sensitive data. Nor should docket number 2:26-cv-04587.
+
+SECTION 2: US phone number format variations
+---------------------------------------------
+Primary:    (415) 293-8847
+Dot format: 415.293.8847
+Dash only:  415-293-8847
+With +1:    +1 (617) 738-2201
+Compact:    +1-312-997-4455
+Spaced:     713 621 3378
+
+SECTION 3: UK phone vs US phone mixed
+--------------------------------------
+US Attorney:  (202) 445-8821
+UK Barrister: +44 7700 900456
+UK Landline:  +44 20 7946 0958
+US Paralegal: (650) 555-0198
+UK Mobile:    +44 7456 789012
+UK Freephone: 0800 123 4567
+
+SECTION 4: Credit card format variations
+-----------------------------------------
+Visa (spaced):      4539 1488 0343 6467
+Mastercard (dashed): 5412-1043-3218-1966
+Visa (no separator): 4916001338908380
+Amex (spaced):      3782 822463 10005
+
+SECTION 5: IBAN multi-country
+------------------------------
+UK:      GB29 NWBK 6016 1331 9268 19
+Germany: DE89 3704 0044 0532 0130 00
+France:  FR76 3000 6000 0112 3456 7890 189
+Spain:   ES91 2100 0418 4502 0005 1332
+
+SECTION 6: Passport number diversity
+--------------------------------------
+US Passport:  C12345678
+UK Passport:  AB987654
+Canadian:     GA1234567
+EU Generic:   XF6789012
+
+SECTION 7: Driver's license formats
+-------------------------------------
+California:   D450-3921-8876
+New York:     K987-6543-2100
+UK DVLA:      ASHWO607152AB1CZ
+
+SECTION 8: Mixed PII in legal paragraph
+-----------------------------------------
+Pursuant to the settlement agreement dated March 1, 2026, defendant Pacific Coast
+Medical Center shall remit $250,000.00 to the IOLTA trust account of Mitchell,
+Chen & Park LLP (IBAN: GB82 WEST 1234 5698 7654 32). The settlement funds shall
+be disbursed as follows: $175,000 to plaintiff James Anderson (SSN: 539-48-2671,
+phone: (415) 293-8847, email: j.anderson@gmail.com), residing at 1420 Market
+Street, Apt 5B, San Francisco, CA 94103; and $75,000 to the Firm for attorney's
+fees per the engagement letter. Credit card on file for costs: 4539 1488 0343 6467.
+
+SECTION 9: Similar-looking non-PII in legal context
+----------------------------------------------------
+These should NOT trigger false positives:
+- Case number: 2026-04587 (looks like partial SSN but is not)
+- Statute: 42 U.S.C. § 1983 (numbers in legal citation)
+- Court room: 14-B (short alphanumeric)
+- Exhibit label: EX-A-2026-001 (formatted like case ID)
+- Dollar amount: $1,234,567.89 (large number with separators)
+- Date range: 01/15/2026 - 03/28/2026 (date, not SSN)
+- Page reference: pp. 145-67 (hyphenated number)
+- Bates number: DEF00012345 (document production numbering)
+
+SECTION 10: ZIP code edge cases
+---------------------------------
+Standard 5-digit:  94103
+ZIP+4 format:      94103-2845
+Leading zero:      02116
+All same digits should not match: 00000
+DC zip:            20006

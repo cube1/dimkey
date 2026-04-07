@@ -1,0 +1,427 @@
+{
+  "fixture": "scenarios/xlsx/law_firm_client_intake.xlsx",
+  "generated_by": "dimkey-test-design",
+  "generated_at": "2026-04-07",
+  "expected": [
+    {
+      "value": "539-48-2671",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "482-73-1956",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "671-34-8820",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "328-95-4107",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "754-61-3289",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "413-87-6542",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "896-23-5174",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "265-48-9301",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "147-62-8835",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "583-19-7064",
+      "type": "Ssn",
+      "count": 1,
+      "note": "client SSN",
+      "assert": "hard"
+    },
+    {
+      "value": "(415) 293-8847",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(212) 555-0147",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(305) 442-9631",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(617) 738-2201",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(312) 997-4455",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(713) 621-3378",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(206) 334-8812",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(202) 555-0193",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(503) 228-7741",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client phone",
+      "assert": "hard"
+    },
+    {
+      "value": "(480) 966-2234",
+      "type": "UsPhone",
+      "count": 1,
+      "note": "client phone",
+      "assert": "hard"
+    },
+    {
+      "value": "j.anderson@gmail.com",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "emily.watson@outlook.com",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "mtorres@yahoo.com",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "cobrien@protonmail.com",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "w.hughes@icloud.com",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "jramirez@hotmail.com",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "daniel.kim@live.com",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "p.sullivan@gmail.com",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "rnakamura@comcast.net",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "a.martinez@aol.com",
+      "type": "Email",
+      "count": 1,
+      "note": "client email",
+      "assert": "hard"
+    },
+    {
+      "value": "94103",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "mailing zip",
+      "assert": "hard"
+    },
+    {
+      "value": "10118",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "mailing zip",
+      "assert": "hard"
+    },
+    {
+      "value": "33166",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "mailing zip",
+      "assert": "hard"
+    },
+    {
+      "value": "02116",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "mailing zip",
+      "assert": "hard"
+    },
+    {
+      "value": "60606",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "mailing zip",
+      "assert": "hard"
+    },
+    {
+      "value": "77002",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "mailing zip",
+      "assert": "hard"
+    },
+    {
+      "value": "98104",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "mailing zip",
+      "assert": "hard"
+    },
+    {
+      "value": "20006",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "mailing zip",
+      "assert": "hard"
+    },
+    {
+      "value": "97209",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "mailing zip",
+      "assert": "hard"
+    },
+    {
+      "value": "85016",
+      "type": "ZipCode",
+      "count": 1,
+      "note": "mailing zip",
+      "assert": "hard"
+    },
+    {
+      "value": "James Anderson",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Emily Watson",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Michael Torres",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Catherine O'Brien",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "William Hughes",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Jessica Ramirez",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Daniel Kim",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Patricia Sullivan",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Richard Nakamura",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Angela Martinez",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER client name",
+      "assert": "soft"
+    },
+    {
+      "value": "Sarah Mitchell",
+      "type": "PersonName",
+      "count": 3,
+      "note": "NER attorney name",
+      "assert": "soft"
+    },
+    {
+      "value": "Robert Chen",
+      "type": "PersonName",
+      "count": 3,
+      "note": "NER attorney name",
+      "assert": "soft"
+    },
+    {
+      "value": "David Park",
+      "type": "PersonName",
+      "count": 2,
+      "note": "NER attorney name",
+      "assert": "soft"
+    },
+    {
+      "value": "Lisa Yamamoto",
+      "type": "PersonName",
+      "count": 2,
+      "note": "NER attorney name",
+      "assert": "soft"
+    },
+    {
+      "value": "Senior Partner",
+      "type": "Title",
+      "count": 3,
+      "note": "NER title",
+      "assert": "soft"
+    },
+    {
+      "value": "Managing Partner",
+      "type": "Title",
+      "count": 3,
+      "note": "NER title",
+      "assert": "soft"
+    },
+    {
+      "value": "Associate Attorney",
+      "type": "Title",
+      "count": 2,
+      "note": "NER title",
+      "assert": "soft"
+    },
+    {
+      "value": "Of Counsel",
+      "type": "Title",
+      "count": 2,
+      "note": "NER title",
+      "assert": "soft"
+    },
+    {
+      "value": "1420 Market Street, Apt 5B, San Francisco, CA",
+      "type": "Address",
+      "count": 1,
+      "note": "NER address",
+      "assert": "soft"
+    },
+    {
+      "value": "350 Fifth Avenue, Suite 4200, New York, NY",
+      "type": "Address",
+      "count": 1,
+      "note": "NER address",
+      "assert": "soft"
+    }
+  ]
+}

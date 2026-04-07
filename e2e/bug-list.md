@@ -1,7 +1,7 @@
 # Bug 清单
 
-> 更新时间: 2026-04-05（第 9 次执行）
-> 来源: 新增全管道集成测试（full_pipeline_*.rs 42 个用例，24 通过/18 失败），首次端到端走三层引擎（正则+NER+词典）并用 baseline 做严格断言。之前的 Rust 单引擎测试 317 通过/14 失败状态不变。
+> 更新时间: 2026-04-07（第 10 次执行）
+> 来源: 英文模型验证 — 跑全量非中文测试（11 个 Rust 测试文件，111 个用例，77 通过/34 失败）。新增 desensitize_legal_english.rs（12 用例，9 通过/3 失败）、restore_roundtrip_english.rs（6 用例，全通过）。已有英文 Bug 基本不变，新增 IBAN docx 场景漏检。
 
 ## 重要说明：全管道测试（2026-04-05 新增）
 
@@ -35,6 +35,7 @@
 | BUG-026 | P2 | baseline_data | `test_fp_boundary_fullwidth` | `boundary/fullwidth_digits.csv` 基线中全角手机号被标为 Phone（正则类），但正则引擎只支持半角数字。应改为 soft 或先做全角→半角归一化再匹配 | 基线数据错误 |
 | BUG-027 | P3 | test_infra | `test_fp_投诉工单记录`, `test_fp_医院患者登记表`, `test_fp_律所案件分析备忘录_劳动争议`, `test_fp_门诊病历摘要`, `test_fp_会议纪要` | `common/mod.rs::parse_sensitive_type` 不识别 `MedicalInsurance`、`IP` 等类型字符串，导致基线条目被跳过（"跳过未知类型" warning）。不影响测试通过但降低基线覆盖率 | 测试基础设施 |
 | BUG-028 | P1 | regex_engine | `test_fp_mixed_bilingual` | 中英混合 xlsx 中 SSN（`523-45-6789` 等 4 个）和 UkPostcode（`W1U 3BW`, `M1 5QA`, `SW1A 2AA`）未识别。可能是语言检测将文件判为 Zh，只加载中文正则引擎未加载英文规则 | 识别遗漏 |
+| BUG-029 | P1 | regex_engine | `test_docx_attorney_engagement_letter_*` ×2, `test_docx_litigation_discovery_memo_baseline` (desensitize_legal_english.rs) | docx 中 IBAN 未识别：`GB29 NWBK 6016 1331 9268 19`、`GB82 WEST 1234 5698 7654 32`。可能是 docx 解析后 IBAN 跨段落/空格被吞，或正则未覆盖 GB 开头的 IBAN 带空格格式 | 识别遗漏 |
 
 ## 环境问题（非 Bug）
 

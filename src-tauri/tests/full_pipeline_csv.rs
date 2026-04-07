@@ -39,3 +39,23 @@ fn test_fp_english_employee() {
 fn test_fp_uk_customer_records() {
     assert_full_pipeline_baseline(&test_data_path("uk_customer_records.csv"), Language::En);
 }
+
+// --- C45: 英文案件管理台账 ---
+
+#[test]
+fn test_fp_legal_case_management() {
+    assert_full_pipeline_baseline(
+        &test_data_path("legal_case_management.csv"),
+        Language::En,
+    );
+}
+
+// --- C48: 英文法律费用账单 ---
+
+#[test]
+fn test_fp_legal_billing_records() {
+    assert_full_pipeline_baseline(
+        &test_data_path("legal_billing_records.csv"),
+        Language::En,
+    );
+}

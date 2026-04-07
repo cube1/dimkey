@@ -1,0 +1,55 @@
+{
+  "fixture": "boundary/english_legal_edge_cases.txt",
+  "generated_by": "dimkey-test-design",
+  "generated_at": "2026-04-07",
+  "expected": [
+    {"value": "539-48-2671", "type": "Ssn", "count": 2, "note": "SSN in prose (section 1 + section 8)", "assert": "hard"},
+    {"value": "539-48-2672", "type": "Ssn", "count": 1, "note": "co-plaintiff SSN, similar prefix", "assert": "hard"},
+    {"value": "482-73-1956", "type": "Ssn", "count": 1, "note": "defendant employee SSN", "assert": "hard"},
+
+    {"value": "(415) 293-8847", "type": "UsPhone", "count": 2, "note": "standard format + section 8", "assert": "hard"},
+    {"value": "415.293.8847", "type": "UsPhone", "count": 1, "note": "dot-separated format", "assert": "hard"},
+    {"value": "415-293-8847", "type": "UsPhone", "count": 1, "note": "dash-only format", "assert": "hard"},
+    {"value": "+1 (617) 738-2201", "type": "UsPhone", "count": 1, "note": "with country code", "assert": "hard"},
+    {"value": "+1-312-997-4455", "type": "UsPhone", "count": 1, "note": "compact +1 format", "assert": "hard"},
+    {"value": "713 621 3378", "type": "UsPhone", "count": 1, "note": "space-separated", "assert": "hard"},
+    {"value": "(202) 445-8821", "type": "UsPhone", "count": 1, "note": "US attorney phone", "assert": "hard"},
+    {"value": "(650) 555-0198", "type": "UsPhone", "count": 1, "note": "US paralegal phone", "assert": "hard"},
+
+    {"value": "+44 7700 900456", "type": "UkPhone", "count": 1, "note": "UK mobile", "assert": "hard"},
+    {"value": "+44 20 7946 0958", "type": "UkPhone", "count": 1, "note": "UK landline", "assert": "hard"},
+    {"value": "+44 7456 789012", "type": "UkPhone", "count": 1, "note": "UK mobile", "assert": "hard"},
+    {"value": "0800 123 4567", "type": "UkPhone", "count": 1, "note": "UK freephone", "assert": "hard"},
+
+    {"value": "4539 1488 0343 6467", "type": "CreditCard", "count": 2, "note": "Visa spaced (2x)", "assert": "hard"},
+    {"value": "5412-1043-3218-1966", "type": "CreditCard", "count": 1, "note": "Mastercard dashed", "assert": "hard"},
+    {"value": "4916001338908380", "type": "CreditCard", "count": 1, "note": "Visa no separator — edge case", "assert": "hard"},
+
+    {"value": "GB29 NWBK 6016 1331 9268 19", "type": "Iban", "count": 1, "note": "UK IBAN", "assert": "hard"},
+    {"value": "DE89 3704 0044 0532 0130 00", "type": "Iban", "count": 1, "note": "German IBAN", "assert": "hard"},
+    {"value": "FR76 3000 6000 0112 3456 7890 189", "type": "Iban", "count": 1, "note": "French IBAN (longer)", "assert": "hard"},
+    {"value": "ES91 2100 0418 4502 0005 1332", "type": "Iban", "count": 1, "note": "Spanish IBAN", "assert": "hard"},
+    {"value": "GB82 WEST 1234 5698 7654 32", "type": "Iban", "count": 1, "note": "UK IBAN in paragraph", "assert": "hard"},
+
+    {"value": "C12345678", "type": "Passport", "count": 1, "note": "US passport", "assert": "hard"},
+    {"value": "AB987654", "type": "Passport", "count": 1, "note": "UK passport", "assert": "hard"},
+    {"value": "GA1234567", "type": "Passport", "count": 1, "note": "Canadian passport", "assert": "hard"},
+    {"value": "XF6789012", "type": "Passport", "count": 1, "note": "EU generic passport", "assert": "hard"},
+
+    {"value": "D450-3921-8876", "type": "DriversLicense", "count": 1, "note": "California DL", "assert": "hard"},
+    {"value": "K987-6543-2100", "type": "DriversLicense", "count": 1, "note": "New York DL", "assert": "hard"},
+    {"value": "ASHWO607152AB1CZ", "type": "DriversLicense", "count": 1, "note": "UK DVLA license", "assert": "hard"},
+
+    {"value": "j.anderson@gmail.com", "type": "Email", "count": 1, "note": "email in paragraph", "assert": "hard"},
+
+    {"value": "94103", "type": "ZipCode", "count": 2, "note": "standard zip (2x)", "assert": "hard"},
+    {"value": "94103-2845", "type": "ZipCode", "count": 1, "note": "ZIP+4 format", "assert": "hard"},
+    {"value": "02116", "type": "ZipCode", "count": 1, "note": "leading zero zip", "assert": "hard"},
+    {"value": "20006", "type": "ZipCode", "count": 1, "note": "DC zip", "assert": "hard"},
+
+    {"value": "James Anderson", "type": "PersonName", "count": 2, "note": "NER plaintiff name", "assert": "soft"},
+    {"value": "Pacific Coast Medical Center", "type": "OrgName", "count": 1, "note": "NER defendant org", "assert": "soft"},
+    {"value": "Mitchell, Chen & Park LLP", "type": "OrgName", "count": 1, "note": "NER law firm", "assert": "soft"},
+    {"value": "1420 Market Street, Apt 5B, San Francisco, CA", "type": "Address", "count": 1, "note": "NER address", "assert": "soft"}
+  ]
+}

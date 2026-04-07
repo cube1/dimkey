@@ -1,0 +1,11 @@
+Invoice No,Client Name,Client Org,Billing Contact,Contact Title,Phone,Email,Payment Method,Card / IBAN,Billing Address,Postcode / Zip,Amount (USD),Status
+INV-2026-0101,James Anderson,,James Anderson,CEO,(415) 293-8847,j.anderson@gmail.com,Credit Card,4539 1488 0343 6467,"1420 Market Street, Apt 5B, San Francisco, CA",94103,15000.00,Paid
+INV-2026-0102,Emily Watson,Watson & Co Consulting,Emily Watson,Director,(212) 555-0147,emily.watson@outlook.com,Credit Card,5412 1043 3218 1966,"350 Fifth Avenue, Suite 4200, New York, NY",10118,8500.00,Paid
+INV-2026-0103,Michael Torres,Torres Family Trust,Michael Torres,Trustee,(305) 442-9631,mtorres@yahoo.com,Wire Transfer,GB76 BARC 2026 1799 8843 21,"8700 NW 36th Street, Suite 310, Doral, FL",33166,22000.00,Pending
+INV-2026-0104,Catherine O'Brien,O'Brien Ventures Ltd,Catherine O'Brien,Managing Director,(617) 738-2201,cobrien@protonmail.com,Wire Transfer,GB33 HSBC 4012 7765 4321 09,"200 Clarendon Street, 52nd Floor, Boston, MA",02116,45000.00,Paid
+INV-2026-0105,Olivia Thornton,Thornton Chambers,Olivia Thornton,Barrister,+44 7456 321987,o.thornton@barristers.co.uk,Wire Transfer,GB47 LOYD 3099 1234 5678 90,"15 Old Bailey, London",EC4M 7EG,18750.00,Pending
+INV-2026-0106,Alexander Petrov,Petrov & Orlova Solicitors,Natasha Orlova,Finance Manager,+44 7911 654321,n.orlova@hsbc.com,Wire Transfer,GB91 CITI 1850 0812 3456 78,"1 Churchill Place, Canary Wharf, London",E14 5HP,31200.00,Overdue
+INV-2026-0107,Laura Chen,Northwest Healthcare Systems,Laura Chen,General Counsel,(206) 887-4412,l.chen@lawfirm.com,Credit Card,4916 0013 3890 8380,"999 Third Avenue, Suite 4600, Seattle, WA",98104,12800.00,Paid
+INV-2026-0108,Nathan Brooks,,Nathan Brooks,Attorney,(305) 992-3387,n.brooks@icloud.com,Credit Card,5234 6379 4026 5420,"800 Brickell Avenue, Suite 900, Miami, FL",33131,9600.00,Paid
+INV-2026-0109,Sophie Hamilton,Hamilton Chambers,Sophie Hamilton,Senior Barrister,+44 7800 112233,s.hamilton@chambers.uk,Wire Transfer,GB64 RBOS 8312 4500 9876 54,"4 Paper Buildings, Temple, London",EC4Y 7EX,27500.00,Paid
+INV-2026-0110,Christopher Yang,Yang Legal Group PLLC,Christopher Yang,Founding Partner,(646) 223-8890,c.yang@nylaw.com,Credit Card,4024 3511 6155 9407,"40 Wall Street, 28th Floor, New York, NY",10005,19400.00,Pending
