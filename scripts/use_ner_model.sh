@@ -15,7 +15,7 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CACHE_DIR="$REPO_ROOT/.ner_cache/$NAME"
 ACTIVE_DIR="$REPO_ROOT/src-tauri/resources/ner"
 
-REQUIRED_FILES=("model.onnx" "tokenizer.json" "id2label.json")
+REQUIRED_FILES=("model.onnx" "tokenizer.json" "id2label.json" "model_config.json")
 
 cache_valid() {
   [ -d "$CACHE_DIR" ] || return 1
@@ -43,6 +43,7 @@ rsync -a --delete \
   --include "model.onnx" \
   --include "tokenizer.json" \
   --include "id2label.json" \
+  --include "model_config.json" \
   --include ".gitkeep" \
   --exclude "*" \
   "$CACHE_DIR/" "$ACTIVE_DIR/"

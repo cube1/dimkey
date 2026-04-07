@@ -28,6 +28,10 @@ MODELS = {
         # 直接从 xlm-roberta-base 借用 tokenizer.json（共享词表）
         "tokenizer_source": "xlm-roberta-base",
     },
+    "distilbert-ner": {
+        "hf_id": "dslim/distilbert-NER",
+        "tokenizer_source": "self",
+    },
 }
 
 
@@ -87,6 +91,40 @@ def export_model(name: str):
         json.dumps(id2label, indent=2, ensure_ascii=False)
     )
     print(f"[{name}] 标签映射已写入: {target_dir / 'id2label.json'}")
+
+    # model_config.json — 自动生成模型配置
+    # 检测标注方案
+    labels = list(id2label.values())
+    has_b_prefix = any(l.startswith("B-") for l in labels)
+    tagging_scheme = "bio" if has_b_prefix else "ionly"
+
+    # 提取实体标签（去掉 B-/I- 前缀，去重）
+    entity_labels = set()
+    for l in labels:
+        if l.startswith("B-") or l.startswith("I-"):
+            entity_labels.add(l[2:])
+
+    # 默认标签映射
+    default_map = {
+        "PER": "PersonName", "PERSON": "PersonName",
+        "ORG": "OrgName", "ORGANIZATION": "OrgName",
+        "LOC": "Address", "LOCATION": "Address", "GPE": "Address",
+        "TITLE": "Title",
+    }
+
+    label_map = {}
+    for entity in sorted(entity_labels):
+        label_map[entity] = default_map.get(entity)
+
+    model_config = {
+        "name": name,
+        "tagging_scheme": tagging_scheme,
+        "label_map": label_map,
+    }
+    (target_dir / "model_config.json").write_text(
+        json.dumps(model_config, indent=2, ensure_ascii=False)
+    )
+    print(f"[{name}] 模型配置已写入: {target_dir / 'model_config.json'}")
 
     print(f"[{name}] 清理临时目录...")
     shutil.rmtree(export_tmp, ignore_errors=True)
