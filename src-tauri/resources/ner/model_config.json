@@ -1,0 +1,10 @@
+{
+  "name": "multilingual",
+  "tagging_scheme": "bio",
+  "label_map": {
+    "DATE": null,
+    "LOC": "Address",
+    "ORG": "OrgName",
+    "PER": "PersonName"
+  }
+}
