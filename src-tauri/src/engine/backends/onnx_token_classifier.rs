@@ -497,17 +497,17 @@ mod tests {
     }
 
     #[test]
-    fn test_detect_chinese_person_and_location() {
+    fn test_detect_person_and_location() {
         let dir = model_dir();
         if !dir.join("model.onnx").exists() {
             println!("跳过：模型文件不存在");
             return;
         }
         let mut backend = OnnxTokenClassifier::try_load(&dir).unwrap().unwrap();
-        let entities = backend.detect_text("张三在北京市海淀区工作").unwrap();
+        let entities = backend.detect_text("Sarah Connor lives in Los Angeles").unwrap();
         let labels: Vec<&str> = entities.iter().map(|e| e.label.as_str()).collect();
         let texts: Vec<&str> = entities.iter().map(|e| e.text.as_str()).collect();
-        println!("中文识别结果: {:?}", entities.iter().map(|e| (&e.text, &e.label, e.confidence)).collect::<Vec<_>>());
+        println!("识别结果: {:?}", entities.iter().map(|e| (&e.text, &e.label, e.confidence)).collect::<Vec<_>>());
         assert!(labels.contains(&"PER"), "应识别出人名，实际: {:?}", texts);
         assert!(labels.contains(&"LOC"), "应识别出地名，实际: {:?}", texts);
     }
@@ -530,18 +530,18 @@ mod tests {
     }
 
     #[test]
-    fn test_detect_mixed_language() {
+    fn test_detect_legal_document_entities() {
         let dir = model_dir();
         if !dir.join("model.onnx").exists() {
             println!("跳过：模型文件不存在");
             return;
         }
         let mut backend = OnnxTokenClassifier::try_load(&dir).unwrap().unwrap();
-        let entities = backend.detect_text("李明在Google北京办公室工作").unwrap();
+        let entities = backend.detect_text("Attorney James Wilson filed a motion in the Southern District of New York on behalf of Microsoft Corporation").unwrap();
         let labels: Vec<&str> = entities.iter().map(|e| e.label.as_str()).collect();
-        let texts: Vec<&str> = entities.iter().map(|e| e.text.as_str()).collect();
-        println!("中英混排识别结果: {:?}", entities.iter().map(|e| (&e.text, &e.label, e.confidence)).collect::<Vec<_>>());
-        assert!(!entities.is_empty(), "中英混排文本应识别出实体，实际为空");
+        println!("法律文档识别结果: {:?}", entities.iter().map(|e| (&e.text, &e.label, e.confidence)).collect::<Vec<_>>());
+        assert!(labels.contains(&"PER"), "应识别出人名");
+        assert!(labels.contains(&"ORG") || labels.contains(&"LOC"), "应识别出机构名或地名");
     }
 
     #[test]
@@ -552,7 +552,7 @@ mod tests {
             return;
         }
         let mut backend = OnnxTokenClassifier::try_load(&dir).unwrap().unwrap();
-        let entities = backend.detect_text("李明在腾讯科技有限公司担任高级工程师").unwrap();
+        let entities = backend.detect_text("Mark Zuckerberg is the CEO of Meta Platforms Inc").unwrap();
         let labels: Vec<&str> = entities.iter().map(|e| e.label.as_str()).collect();
         let texts: Vec<&str> = entities.iter().map(|e| e.text.as_str()).collect();
         println!("识别结果: {:?}", entities.iter().map(|e| (&e.text, &e.label)).collect::<Vec<_>>());
@@ -561,13 +561,13 @@ mod tests {
     }
 
     #[test]
-    fn test_detect_isolated_cells() {
+    fn test_detect_multiple_entities() {
         let dir = model_dir();
         if !dir.join("model.onnx").exists() {
             return;
         }
         let mut backend = OnnxTokenClassifier::try_load(&dir).unwrap().unwrap();
-        let sentence = "张三在北京市朝阳区的腾讯科技有限公司工作";
+        let sentence = "Elon Musk founded SpaceX in Los Angeles";
         let entities = backend.detect_text(sentence).unwrap();
         let labels: Vec<&str> = entities.iter().map(|e| e.label.as_str()).collect();
         assert!(labels.contains(&"PER"), "应识别出人名");
@@ -583,8 +583,7 @@ mod tests {
         }
         let mut backend = OnnxTokenClassifier::try_load(&dir).unwrap().unwrap();
 
-        // 验证中文文本的字符偏移量正确性
-        let text = "张三在北京工作";
+        let text = "John Smith works in London";
         let entities = backend.detect_text(text).unwrap();
         for entity in &entities {
             let chars: Vec<char> = text.chars().collect();
@@ -602,7 +601,7 @@ mod tests {
             return;
         }
         let mut backend = OnnxTokenClassifier::try_load(&dir).unwrap().unwrap();
-        let entities = backend.detect_text("张三在北京市海淀区工作").unwrap();
+        let entities = backend.detect_text("John Smith works at Google in New York").unwrap();
         for entity in &entities {
             assert!(entity.confidence > 0.0 && entity.confidence <= 1.0,
                 "置信度应在 (0, 1] 范围内，实际: {}", entity.confidence);

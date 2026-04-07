@@ -1,9 +1,9 @@
 {
-  "name": "multilingual",
+  "name": "distilbert-ner",
   "tagging_scheme": "bio",
   "label_map": {
-    "DATE": null,
     "LOC": "Address",
+    "MISC": null,
     "ORG": "OrgName",
     "PER": "PersonName"
   }
