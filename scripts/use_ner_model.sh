@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #
 # 切换当前激活的 NER 模型
-# 用法: ./scripts/use_ner_model.sh <chinese|multilingual>
+# 用法: ./scripts/use_ner_model.sh <chinese|multilingual|distilbert-ner>
 #
 set -euo pipefail
 
 if [ $# -ne 1 ]; then
-  echo "用法: $0 <chinese|multilingual>"
+  echo "用法: $0 <chinese|multilingual|distilbert-ner>"
   exit 1
 fi
 

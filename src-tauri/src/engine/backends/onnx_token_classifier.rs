@@ -52,7 +52,7 @@ impl OnnxTokenClassifier {
         if !model_path.exists() || !tokenizer_path.exists() || !label_path.exists() {
             // 兼容提示：如果有旧格式 vocab.txt 但没有 tokenizer.json
             if model_path.exists() && model_dir.join("vocab.txt").exists() && !tokenizer_path.exists() {
-                eprintln!("警告: 检测到旧格式 vocab.txt，请使用 ./scripts/use_ner_model.sh multilingual 下载新格式模型");
+                eprintln!("警告: 检测到旧格式 vocab.txt，请使用 ./scripts/use_ner_model.sh <model-name> 下载新格式模型");
             }
             return Ok(None);
         }
@@ -109,6 +109,8 @@ impl OnnxTokenClassifier {
                 if let Some(name) = sensitive_name {
                     if let Some(st) = Self::parse_sensitive_type(name) {
                         lm.insert(entity.clone(), st);
+                    } else {
+                        eprintln!("警告: 未知 SensitiveType: {}", name);
                     }
                 }
             }
@@ -125,7 +127,7 @@ impl OnnxTokenClassifier {
     }
 
     /// 将敏感类型名称字符串解析为 SensitiveType 枚举
-    pub fn parse_sensitive_type(name: &str) -> Option<SensitiveType> {
+    fn parse_sensitive_type(name: &str) -> Option<SensitiveType> {
         match name {
             "PersonName" => Some(SensitiveType::PersonName),
             "OrgName" => Some(SensitiveType::OrgName),
@@ -150,7 +152,7 @@ impl OnnxTokenClassifier {
     }
 
     /// 从 id2label 推断标注方案
-    pub fn infer_tagging_scheme(id2label: &[String]) -> TaggingScheme {
+    fn infer_tagging_scheme(id2label: &[String]) -> TaggingScheme {
         for label in id2label {
             if label.starts_with("B-") {
                 return TaggingScheme::Bio;
@@ -160,7 +162,7 @@ impl OnnxTokenClassifier {
     }
 
     /// 从 id2label 构建默认标签映射表（向后兼容）
-    pub fn build_default_label_map(id2label: &[String]) -> HashMap<String, SensitiveType> {
+    fn build_default_label_map(id2label: &[String]) -> HashMap<String, SensitiveType> {
         let mut map = HashMap::new();
         for label in id2label {
             let entity = if label.starts_with("B-") || label.starts_with("I-") {

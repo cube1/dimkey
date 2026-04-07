@@ -3,6 +3,7 @@ use uuid::Uuid;
 use crate::models::sensitive::{SensitiveItem, SensitiveType, DetectSource, FileContent};
 
 /// 后端输出的原始实体（统一中间格式）
+#[derive(Clone)]
 pub struct RawEntity {
     /// 实体文本
     pub text: String,
@@ -147,19 +148,6 @@ mod tests {
         fn is_loaded(&self) -> bool { true }
         fn label_map(&self) -> &HashMap<String, SensitiveType> {
             &self.label_map
-        }
-    }
-
-    // RawEntity 需要 Clone 用于测试
-    impl Clone for RawEntity {
-        fn clone(&self) -> Self {
-            Self {
-                text: self.text.clone(),
-                label: self.label.clone(),
-                start: self.start,
-                end: self.end,
-                confidence: self.confidence,
-            }
         }
     }
 

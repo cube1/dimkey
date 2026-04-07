@@ -73,7 +73,7 @@ def export_model(name: str):
         tok.save_pretrained(target_dir)
         # 清理 BERT 保存的多余文件，只保留 tokenizer.json
         for f in target_dir.iterdir():
-            if f.name not in {"model.onnx", "tokenizer.json", "id2label.json"}:
+            if f.name not in {"model.onnx", "tokenizer.json", "id2label.json", "model_config.json"}:
                 f.unlink()
         if not (target_dir / "tokenizer.json").exists():
             raise SystemExit(f"[{name}] tokenizer.json 生成失败")
