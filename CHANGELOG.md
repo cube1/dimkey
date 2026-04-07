@@ -1,5 +1,24 @@
 # 更新日志
 
+## [v0.6.0] — 2026-04-07
+
+**下载：** [官网下载](https://dimkey.com/#download)
+
+### 新功能
+- **集成 distilbert-NER 英文模型**（MIT 许可，92% F1），面向英文律师场景优化
+- **导出脚本支持 distilbert-ner 模型**，自动生成 `model_config.json` 配置
+
+### 重构
+- **NER 模型层抽象重构** — `OnnxBackend` 重构为 `OnnxTokenClassifier`，支持 Bio/IOnly 两种标注方案，通过 `model_config.json` 配置驱动标签映射
+- **NerBackend trait 扩展** — 新增 `label_map()` 方法，`NerEngine` 新增 `from_backend()` 简化初始化
+
+### 修复
+- 私有化内部辅助方法，补充未知 SensitiveType 警告日志
+
+### 其他
+- 补充英文律师场景测试用例和 e2e fixture
+- 为现有 NER 模型补充 `model_config.json`
+
 ## [v0.5.2] — 2026-04-05
 
 **下载：** [官网下载](https://dimkey.com/#download)
