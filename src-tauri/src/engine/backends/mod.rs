@@ -1,1 +1,1 @@
-pub mod onnx_backend;
+pub mod onnx_token_classifier;

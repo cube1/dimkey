@@ -25,7 +25,7 @@ use commands::alias_group::{
 use commands::language::{AppLanguage, set_language, get_language};
 use analytics::{get_analytics_enabled, set_analytics_enabled};
 use engine::ner_engine::NerEngine;
-use engine::backends::onnx_backend::OnnxBackend;
+use engine::backends::onnx_token_classifier::OnnxTokenClassifier;
 use pdfium_render::prelude::*;
 
 /// NER 引擎全局状态（Arc<Mutex> 包裹以支持 spawn_blocking）
@@ -72,11 +72,10 @@ pub fn run() {
                 std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("resources").join("ner")
             };
             println!("NER 模型目录: {:?}", ner_dir);
-            let ner_engine = match OnnxBackend::try_load(&ner_dir) {
+            let ner_engine = match OnnxTokenClassifier::try_load(&ner_dir) {
                 Ok(Some(backend)) => {
-                    let label_map = backend.build_label_map();
                     println!("NER 引擎已加载 (ONNX)");
-                    NerEngine::new(Box::new(backend), label_map)
+                    NerEngine::from_backend(Box::new(backend))
                 }
                 Ok(None) => {
                     println!("NER 引擎未加载模型，降级运行");

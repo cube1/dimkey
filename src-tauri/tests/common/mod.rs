@@ -6,7 +6,7 @@ use std::sync::Mutex;
 use dimkey_lib::commands::desensitize::{sensitive_type_to_key, string_to_sensitive_type};
 use dimkey_lib::desensitizer::{generalize, mask, replace};
 use dimkey_lib::desensitizer::replace::ReplaceState;
-use dimkey_lib::engine::backends::onnx_backend::OnnxBackend;
+use dimkey_lib::engine::backends::onnx_token_classifier::OnnxTokenClassifier;
 use dimkey_lib::engine::dict_engine::DictEngine;
 use dimkey_lib::engine::ner_engine::NerEngine;
 use dimkey_lib::engine::regex_engine::RegexEngine;
@@ -29,11 +29,10 @@ fn get_ner_engine() -> &'static Mutex<NerEngine> {
         let ner_dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .join("resources")
             .join("ner");
-        let engine = match OnnxBackend::try_load(&ner_dir) {
+        let engine = match OnnxTokenClassifier::try_load(&ner_dir) {
             Ok(Some(backend)) => {
-                let label_map = backend.build_label_map();
                 eprintln!("[test] NER 引擎已加载 (ONNX)");
-                NerEngine::new(Box::new(backend), label_map)
+                NerEngine::from_backend(Box::new(backend))
             }
             Ok(None) => {
                 eprintln!("[test] ⚠️ NER 模型文件不存在，降级运行");
