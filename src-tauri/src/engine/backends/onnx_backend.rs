@@ -16,6 +16,8 @@ pub struct OnnxBackend {
     id2label: Vec<String>,
     /// ONNX 模型是否需要 token_type_ids 输入
     needs_token_type_ids: bool,
+    /// 标签映射表：后端原始标签 → SensitiveType
+    label_map: HashMap<String, SensitiveType>,
 }
 
 impl OnnxBackend {
@@ -67,14 +69,16 @@ impl OnnxBackend {
         let needs_token_type_ids = session.inputs().iter()
             .any(|input| input.name() == "token_type_ids");
 
-        Ok(Some(Self { session, tokenizer, id2label, needs_token_type_ids }))
+        // 从 id2label 构建标签映射表
+        let label_map = Self::build_label_map_from(&id2label);
+
+        Ok(Some(Self { session, tokenizer, id2label, needs_token_type_ids, label_map }))
     }
 
-    /// 从 id2label 自动构建标签映射表
-    /// 提取 BIO 标签中的实体类型（去掉 B-/I- 前缀），映射到 SensitiveType
-    pub fn build_label_map(&self) -> HashMap<String, SensitiveType> {
+    /// 从 id2label 列表构建标签映射表（静态方法，供 try_load 使用）
+    fn build_label_map_from(id2label: &[String]) -> HashMap<String, SensitiveType> {
         let mut map = HashMap::new();
-        for label in &self.id2label {
+        for label in id2label {
             let entity = if label.starts_with("B-") || label.starts_with("I-") {
                 &label[2..]
             } else {
@@ -93,6 +97,12 @@ impl OnnxBackend {
             map.insert(entity.to_string(), sensitive_type);
         }
         map
+    }
+
+    /// 从 id2label 自动构建标签映射表
+    /// 提取 BIO 标签中的实体类型（去掉 B-/I- 前缀），映射到 SensitiveType
+    pub fn build_label_map(&self) -> HashMap<String, SensitiveType> {
+        Self::build_label_map_from(&self.id2label)
     }
 
     /// 将字节偏移量转换为字符偏移量
@@ -255,6 +265,10 @@ impl NerBackend for OnnxBackend {
 
     fn is_loaded(&self) -> bool {
         true
+    }
+
+    fn label_map(&self) -> &HashMap<String, SensitiveType> {
+        &self.label_map
     }
 }
 

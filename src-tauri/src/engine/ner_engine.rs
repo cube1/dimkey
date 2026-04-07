@@ -22,6 +22,8 @@ pub trait NerBackend: Send {
     fn detect_text(&mut self, text: &str) -> Result<Vec<RawEntity>, String>;
     /// 模型是否已加载
     fn is_loaded(&self) -> bool;
+    /// 返回标签映射表（后端原始标签 → SensitiveType）
+    fn label_map(&self) -> &HashMap<String, SensitiveType>;
 }
 
 /// NER 引擎统一入口
@@ -36,6 +38,15 @@ pub struct NerEngine {
 impl NerEngine {
     /// 创建带后端的引擎实例
     pub fn new(backend: Box<dyn NerBackend>, label_map: HashMap<String, SensitiveType>) -> Self {
+        Self {
+            backend: Some(backend),
+            label_map,
+        }
+    }
+
+    /// 从后端创建引擎实例（label_map 从后端获取）
+    pub fn from_backend(backend: Box<dyn NerBackend>) -> Self {
+        let label_map = backend.label_map().clone();
         Self {
             backend: Some(backend),
             label_map,
@@ -126,6 +137,7 @@ mod tests {
     /// 测试用的 Mock 后端
     struct MockBackend {
         entities: Vec<RawEntity>,
+        label_map: HashMap<String, SensitiveType>,
     }
 
     impl NerBackend for MockBackend {
@@ -133,6 +145,9 @@ mod tests {
             Ok(self.entities.clone())
         }
         fn is_loaded(&self) -> bool { true }
+        fn label_map(&self) -> &HashMap<String, SensitiveType> {
+            &self.label_map
+        }
     }
 
     // RawEntity 需要 Clone 用于测试
@@ -169,30 +184,19 @@ mod tests {
 
     #[test]
     fn test_mock_backend_mapping() {
-        let mock = MockBackend {
-            entities: vec![
-                RawEntity {
-                    text: "张三".to_string(),
-                    label: "PER".to_string(),
-                    start: 0,
-                    end: 2,
-                    confidence: 0.9,
-                },
-                RawEntity {
-                    text: "北京".to_string(),
-                    label: "LOC".to_string(),
-                    start: 3,
-                    end: 5,
-                    confidence: 0.85,
-                },
-            ],
-        };
-
         let mut label_map = HashMap::new();
         label_map.insert("PER".to_string(), SensitiveType::PersonName);
         label_map.insert("LOC".to_string(), SensitiveType::Address);
 
-        let mut engine = NerEngine::new(Box::new(mock), label_map);
+        let mock = MockBackend {
+            entities: vec![
+                RawEntity { text: "张三".to_string(), label: "PER".to_string(), start: 0, end: 2, confidence: 0.9 },
+                RawEntity { text: "北京".to_string(), label: "LOC".to_string(), start: 3, end: 5, confidence: 0.85 },
+            ],
+            label_map: label_map.clone(),
+        };
+
+        let mut engine = NerEngine::from_backend(Box::new(mock));
 
         let content = FileContent::Spreadsheet {
             file_name: "test.csv".to_string(),
@@ -219,19 +223,12 @@ mod tests {
     fn test_unknown_label_skipped() {
         let mock = MockBackend {
             entities: vec![
-                RawEntity {
-                    text: "某某".to_string(),
-                    label: "UNKNOWN".to_string(),
-                    start: 0,
-                    end: 2,
-                    confidence: 0.5,
-                },
+                RawEntity { text: "某某".to_string(), label: "UNKNOWN".to_string(), start: 0, end: 2, confidence: 0.5 },
             ],
+            label_map: HashMap::new(),
         };
 
-        let label_map = HashMap::new(); // 空映射，所有标签都不认识
-
-        let mut engine = NerEngine::new(Box::new(mock), label_map);
+        let mut engine = NerEngine::from_backend(Box::new(mock));
         let content = FileContent::Document {
             file_name: "test.docx".to_string(),
             file_type: crate::models::sensitive::FileType::Docx,
