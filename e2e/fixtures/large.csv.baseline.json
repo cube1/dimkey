@@ -121,42 +121,42 @@
       "type": "PersonName",
       "count": 1,
       "note": "NER（抽样前3）",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "何兰明",
       "type": "PersonName",
       "count": 1,
       "note": "NER（抽样前3）",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "何兰杰",
       "type": "PersonName",
       "count": 1,
       "note": "NER（抽样前3）",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "上海市某区某路104号",
       "type": "Address",
       "count": 1,
       "note": "NER（抽样前3）",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "上海市某区某路132号",
       "type": "Address",
       "count": 1,
       "note": "NER（抽样前3）",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "上海市某区某路150号",
       "type": "Address",
       "count": 1,
       "note": "NER（抽样前3）",
-      "assert": "soft"
+      "assert": "hard"
     }
   ]
 }

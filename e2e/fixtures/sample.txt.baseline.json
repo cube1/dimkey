@@ -7,7 +7,7 @@
       "type": "PersonName",
       "count": 1,
       "note": "NER 识别",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "13800138000",
@@ -35,14 +35,14 @@
       "type": "Address",
       "count": 1,
       "note": "NER 识别",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "李四",
       "type": "PersonName",
       "count": 1,
       "note": "NER 识别",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "13912345678",
@@ -70,14 +70,14 @@
       "type": "Address",
       "count": 1,
       "note": "NER 识别",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "阿里巴巴集团控股有限公司",
       "type": "OrgName",
       "count": 1,
       "note": "NER 识别",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "91330100799655058B",

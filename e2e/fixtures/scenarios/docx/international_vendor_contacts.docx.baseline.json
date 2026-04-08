@@ -175,28 +175,99 @@
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Klaus Weber",
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Marie Dupont",
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Michael Torres",
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
+    },
+    {
+      "value": "45 Moorgate, London EC2R 6AR",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Maximilianstraße 35, 80539 München",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "12 Rue de Rivoli, 75001 Paris",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "525 Market Street, Suite 3100, San Francisco, CA",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "100 King Street West, Toronto, ON M5X 1A1",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Senior Account Manager",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Geschäftsführer",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Directrice Commerciale",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "VP of Sales",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Director of Partnerships",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
     }
-  ]
+  ],
+  "generated_at": "2026-04-08"
 }

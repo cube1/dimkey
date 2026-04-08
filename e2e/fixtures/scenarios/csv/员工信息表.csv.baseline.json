@@ -1,6 +1,5 @@
 {
   "fixture": "scenarios/csv/员工信息表.csv",
-  "generated_from": "Sheet2迁移",
   "expected": [
     {
       "value": "13800138001",
@@ -225,6 +224,176 @@
       "count": 1,
       "note": "正则",
       "assert": "hard"
+    },
+    {
+      "value": "张三",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "李四",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "王五",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "赵六",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "陈七",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "刘八",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "孙九",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "周十",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "北京星辰科技有限公司",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "上海云帆信息技术有限公司",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "深圳前海智联科技有限公司",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "成都天府数据服务有限公司",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "杭州湖畔网络科技有限公司",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "武汉光谷创新信息技术有限公司",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "合肥量子智能科技有限公司",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "重庆山城大数据有限公司",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "北京市海淀区中关村大街1号院2号楼301室",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "上海市浦东新区张江高科技园区碧波路690号",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "广东省深圳市南山区科技园南区高新南一道008号",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "四川省成都市武侯区天府大道北段1700号",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "浙江省杭州市西湖区文三路90号东部软件园",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "湖北省武汉市洪山区光谷大道77号金融港B11栋",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "安徽省合肥市蜀山区望江西路800号创新产业园A区",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "重庆市渝中区解放碑民权路28号英利国际金融中心",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
     }
-  ]
+  ],
+  "generated_by": "dimkey-test-design",
+  "generated_at": "2026-04-08"
 }

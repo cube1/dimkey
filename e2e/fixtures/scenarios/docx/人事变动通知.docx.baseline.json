@@ -1,6 +1,5 @@
 {
   "fixture": "scenarios/docx/人事变动通知.docx",
-  "generated_from": "Sheet2迁移",
   "expected": [
     {
       "value": "14700001111",
@@ -106,6 +105,85 @@
       "count": 1,
       "note": "正则",
       "assert": "hard"
+    },
+    {
+      "value": "吴芳",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "郑刚",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "陈七",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "刘八",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "许婷婷",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "孙九",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "北京星辰科技有限公司",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "黑龙江省哈尔滨市南岗区西大直街92号",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "山东省济南市历下区泉城路180号齐鲁国际大厦",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "杭州市西湖区文三路90号东部软件园A座5楼",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "高级开发工程师",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
     }
-  ]
+  ],
+  "generated_by": "dimkey-test-design",
+  "generated_at": "2026-04-08"
 }

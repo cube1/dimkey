@@ -1,7 +1,7 @@
 {
   "fixture": "scenarios/xlsx/law_firm_client_intake.xlsx",
   "generated_by": "dimkey-test-design",
-  "generated_at": "2026-04-07",
+  "generated_at": "2026-04-08",
   "expected": [
     {
       "value": "539-48-2671",
@@ -288,140 +288,168 @@
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Emily Watson",
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Michael Torres",
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Catherine O'Brien",
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "William Hughes",
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Jessica Ramirez",
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Daniel Kim",
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Patricia Sullivan",
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Richard Nakamura",
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Angela Martinez",
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Sarah Mitchell",
       "type": "PersonName",
       "count": 3,
       "note": "NER attorney name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Robert Chen",
       "type": "PersonName",
       "count": 3,
       "note": "NER attorney name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "David Park",
       "type": "PersonName",
       "count": 2,
       "note": "NER attorney name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Lisa Yamamoto",
       "type": "PersonName",
       "count": 2,
       "note": "NER attorney name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Senior Partner",
       "type": "Title",
       "count": 3,
       "note": "NER title",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Managing Partner",
       "type": "Title",
       "count": 3,
       "note": "NER title",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Associate Attorney",
       "type": "Title",
       "count": 2,
       "note": "NER title",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Of Counsel",
       "type": "Title",
       "count": 2,
       "note": "NER title",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "1420 Market Street, Apt 5B, San Francisco, CA",
       "type": "Address",
       "count": 1,
       "note": "NER address",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "350 Fifth Avenue, Suite 4200, New York, NY",
       "type": "Address",
       "count": 1,
       "note": "NER address",
-      "assert": "soft"
+      "assert": "hard"
+    },
+    {
+      "value": "Senior Partner",
+      "type": "Title",
+      "count": 3,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Managing Partner",
+      "type": "Title",
+      "count": 3,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Associate Attorney",
+      "type": "Title",
+      "count": 2,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Of Counsel",
+      "type": "Title",
+      "count": 2,
+      "note": "NER",
+      "assert": "hard"
     }
   ]
 }

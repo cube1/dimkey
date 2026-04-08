@@ -7,7 +7,7 @@
       "type": "PersonName",
       "count": 1,
       "note": "NER（表头'姓名'列）",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "李四",
@@ -147,7 +147,7 @@
       "type": "Address",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "上海市浦东新区陆家嘴环路1000号",

@@ -1,6 +1,5 @@
 {
   "fixture": "scenarios/xlsx/银行贷款申请表.xlsx",
-  "generated_from": "Sheet2迁移",
   "expected": [
     {
       "value": "18610012345",
@@ -211,6 +210,134 @@
       "count": 1,
       "note": "正则",
       "assert": "hard"
+    },
+    {
+      "value": "唐俊杰",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "唐建国",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "梁美玲",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "吴秀英",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "方志诚",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "赖明辉",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "沈雨薇",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "沈大明",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "谢国强",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "周丹",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "北京字节跳动科技有限公司",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "南京网易有限公司",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "广州市越秀区融信金融服务有限公司",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "北京市海淀区知春路甲48号盈都大厦C座601",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "广州市海珠区新港中路356号金逸华庭3栋1801",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "南昌市东湖区八一大道369号万达星城B区7栋1602",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "南京市鼓楼区中山北路405号恒基中心21楼",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "广州市天河区天河北路233号中信广场公寓16楼B座",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
     }
-  ]
+  ],
+  "generated_by": "dimkey-test-design",
+  "generated_at": "2026-04-08"
 }

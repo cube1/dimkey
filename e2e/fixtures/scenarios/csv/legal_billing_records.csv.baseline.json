@@ -1,7 +1,7 @@
 {
   "fixture": "scenarios/csv/legal_billing_records.csv",
   "generated_by": "dimkey-test-design",
-  "generated_at": "2026-04-07",
+  "generated_at": "2026-04-08",
   "expected": [
     {
       "value": "4539 1488 0343 6467",
@@ -288,196 +288,336 @@
       "type": "PersonName",
       "count": 2,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Emily Watson",
       "type": "PersonName",
       "count": 2,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Michael Torres",
       "type": "PersonName",
       "count": 2,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Catherine O'Brien",
       "type": "PersonName",
       "count": 2,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Olivia Thornton",
       "type": "PersonName",
       "count": 2,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Natasha Orlova",
       "type": "PersonName",
       "count": 1,
       "note": "NER contact name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Laura Chen",
       "type": "PersonName",
       "count": 2,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Nathan Brooks",
       "type": "PersonName",
       "count": 2,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Sophie Hamilton",
       "type": "PersonName",
       "count": 2,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Christopher Yang",
       "type": "PersonName",
       "count": 2,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Watson & Co Consulting",
       "type": "OrgName",
       "count": 1,
       "note": "NER org",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Torres Family Trust",
       "type": "OrgName",
       "count": 1,
       "note": "NER org",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "O'Brien Ventures Ltd",
       "type": "OrgName",
       "count": 1,
       "note": "NER org",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Thornton Chambers",
       "type": "OrgName",
       "count": 1,
       "note": "NER org",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Petrov & Orlova Solicitors",
       "type": "OrgName",
       "count": 1,
       "note": "NER org",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Northwest Healthcare Systems",
       "type": "OrgName",
       "count": 1,
       "note": "NER org",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Hamilton Chambers",
       "type": "OrgName",
       "count": 1,
       "note": "NER org",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Yang Legal Group PLLC",
       "type": "OrgName",
       "count": 1,
       "note": "NER org",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "CEO",
       "type": "Title",
       "count": 1,
       "note": "NER title",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Director",
       "type": "Title",
       "count": 1,
       "note": "NER title",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Trustee",
       "type": "Title",
       "count": 1,
       "note": "NER title",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Managing Director",
       "type": "Title",
       "count": 1,
       "note": "NER title",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Barrister",
       "type": "Title",
       "count": 1,
       "note": "NER title",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Finance Manager",
       "type": "Title",
       "count": 1,
       "note": "NER title",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "General Counsel",
       "type": "Title",
       "count": 1,
       "note": "NER title",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Attorney",
       "type": "Title",
       "count": 1,
       "note": "NER title",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Senior Barrister",
       "type": "Title",
       "count": 1,
       "note": "NER title",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Founding Partner",
       "type": "Title",
       "count": 1,
       "note": "NER title",
-      "assert": "soft"
+      "assert": "hard"
+    },
+    {
+      "value": "1420 Market Street, Apt 5B, San Francisco, CA",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "350 Fifth Avenue, Suite 4200, New York, NY",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "8700 NW 36th Street, Suite 310, Doral, FL",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "200 Clarendon Street, 52nd Floor, Boston, MA",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "15 Old Bailey, London",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "1 Churchill Place, Canary Wharf, London",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "999 Third Avenue, Suite 4600, Seattle, WA",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "800 Brickell Avenue, Suite 900, Miami, FL",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "4 Paper Buildings, Temple, London",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "40 Wall Street, 28th Floor, New York, NY",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "CEO",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Director",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Trustee",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Managing Director",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Barrister",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Finance Manager",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "General Counsel",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Attorney",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Senior Barrister",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Founding Partner",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
     }
   ]
 }

@@ -1,6 +1,5 @@
 {
   "fixture": "scenarios/xlsx/边界测试用例.xlsx",
-  "generated_from": "Sheet2迁移",
   "expected": [
     {
       "value": "13800138001",
@@ -92,6 +91,43 @@
       "count": 1,
       "note": "正则",
       "assert": "hard"
+    },
+    {
+      "value": "张三",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "北京星辰科技有限公司",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "北京市海淀区中关村大街1号院2号楼301室",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "深圳市南山区科技园",
+      "type": "Address",
+      "count": 2,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "杭州市西湖区翠苑街道翠苑一区23幢401",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
     }
-  ]
+  ],
+  "generated_by": "dimkey-test-design",
+  "generated_at": "2026-04-08"
 }

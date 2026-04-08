@@ -1,6 +1,5 @@
 {
   "fixture": "scenarios/xlsx/混合敏感信息场景.xlsx",
-  "generated_from": "Sheet2迁移",
   "expected": [
     {
       "value": "13800138001",
@@ -127,6 +126,127 @@
       "count": 1,
       "note": "正则",
       "assert": "hard"
+    },
+    {
+      "value": "张三",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "李四",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "王五",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "陈七",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "马晓红",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "林建国",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "黄丽萍",
+      "type": "PersonName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "北京星辰科技有限公司",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "上海云帆信息技术有限公司",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "深圳前海智联科技有限公司",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "杭州湖畔网络科技有限公司",
+      "type": "OrgName",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "北京市海淀区中关村大街1号",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "上海市浦东新区碧波路690号",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "杭州市西湖区文三路90号",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "沈阳市沈河区青年大街185号",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "福州市鼓楼区五四路162号华城国际",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "昆明市盘龙区东风东路36号",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
     }
-  ]
+  ],
+  "generated_by": "dimkey-test-design",
+  "generated_at": "2026-04-08"
 }

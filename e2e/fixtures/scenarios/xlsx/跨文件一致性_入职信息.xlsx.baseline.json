@@ -9,21 +9,21 @@
       "type": "PersonName",
       "count": 1,
       "note": "NER，跨文件共享",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "陈静",
       "type": "PersonName",
       "count": 1,
       "note": "NER，跨文件共享",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "孙浩然",
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "13611223344",

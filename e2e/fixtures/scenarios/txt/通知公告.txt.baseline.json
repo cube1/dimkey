@@ -147,21 +147,43 @@
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "林小燕",
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "吴志远",
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
+    },
+    {
+      "value": "杭州市西湖区文三路478号天苑大厦15层",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "行政总监",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "IT经理",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
     }
-  ]
+  ],
+  "generated_at": "2026-04-08"
 }

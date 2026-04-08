@@ -133,35 +133,78 @@
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "张美玲",
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "陈志强",
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "李伟",
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "黄明辉",
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
+    },
+    {
+      "value": "北京市朝阳区建国路88号SOHO现代城A座12层会议室",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "总经理",
+      "type": "Title",
+      "count": 2,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "财务总监",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "技术总监",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "市场部经理",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "人事主管",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
     }
-  ]
+  ],
+  "generated_at": "2026-04-08"
 }

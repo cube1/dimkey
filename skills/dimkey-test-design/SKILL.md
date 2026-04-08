@@ -59,8 +59,10 @@ Step 6: 输出汇报，等待用户审核
 
 | 模式 | 适用类型 | 含义 |
 |------|----------|------|
-| hard | Phone, IdCard, Email, BankCard, CreditCode, Landline, LicensePlate, IpAddress, SSN, CreditCard, UsPhone, UkPhone, Passport, IBAN, ZipCode, UkPostcode, DriversLicense | 正则类，必须命中 |
-| soft | PersonName, OrgName, Address, Title | NER 类，未命中只 warning |
+| hard | Phone, IdCard, Email, BankCard, CreditCode, Landline, LicensePlate, IpAddress, SSN, CreditCard, UsPhone, UkPhone, Passport, IBAN, ZipCode, UkPostcode, DriversLicense | 正则类 |
+| soft | PersonName, OrgName, Address, Title | NER 类 |
+
+**注意**: generator 和 sidecar 中保留 soft/hard 标记用于区分敏感类型来源（正则 vs NER），但 **full_pipeline 测试中所有断言统一按 hard 处理**——无论标记为 soft 还是 hard，未命中即失败。soft 标记仅作为元数据保留，不影响测试行为。
 
 ## Fixture 文件
 
@@ -97,8 +99,9 @@ e2e/fixtures/boundary/  # 边界/编码/异常场景（不按格式归类）
 
 **关键原则**：
 - Sidecar 是基线数据的**单一数据源**，fixture 和 sidecar 必须同时生成
-- `assert: "hard"` → 正则类，测试必须命中，否则 fail
-- `assert: "soft"` → NER 类，未命中只打 warning
+- `assert: "hard"` → 正则类
+- `assert: "soft"` → NER 类
+- **测试行为**: full_pipeline 测试中 soft 和 hard 均为必须命中，未命中即 fail。soft/hard 仅标记来源类型
 - `count` → 该值在文件中出现的次数
 - Sheet2 从 sidecar 聚合生成，不再是数据源
 

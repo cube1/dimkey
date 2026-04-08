@@ -1,7 +1,7 @@
 {
   "fixture": "scenarios/docx/litigation_discovery_memo.docx",
   "generated_by": "dimkey-test-design",
-  "generated_at": "2026-04-07",
+  "generated_at": "2026-04-08",
   "expected": [
     {
       "value": "623-41-8907",
@@ -260,112 +260,168 @@
       "type": "PersonName",
       "count": 4,
       "note": "NER treating physician",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Linda Chow",
       "type": "PersonName",
       "count": 1,
       "note": "NER nurse",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Mark Reynolds",
       "type": "PersonName",
       "count": 2,
       "note": "NER administrator",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Akira Tanaka",
       "type": "PersonName",
       "count": 1,
       "note": "NER expert",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Katherine Wells",
       "type": "PersonName",
       "count": 1,
       "note": "NER spouse",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Richard Eastwood",
       "type": "PersonName",
       "count": 3,
       "note": "NER UK expert",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "James Anderson",
       "type": "PersonName",
       "count": 1,
       "note": "NER patient ref",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "David Park",
       "type": "PersonName",
       "count": 1,
       "note": "NER attorney",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Sarah Mitchell",
       "type": "PersonName",
       "count": 1,
       "note": "NER attorney",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "William Grayson",
       "type": "PersonName",
       "count": 1,
       "note": "NER CMO",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Elena Markova",
       "type": "PersonName",
       "count": 1,
       "note": "NER UK assistant",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Angela Cruz",
       "type": "PersonName",
       "count": 1,
       "note": "NER court reporter",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Jason Liu",
       "type": "PersonName",
       "count": 1,
       "note": "NER videographer",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Emily Saunders",
       "type": "PersonName",
       "count": 1,
       "note": "NER UK notary",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "450 Sutter Street, Suite 800, San Francisco, CA",
       "type": "Address",
       "count": 1,
       "note": "NER witness address",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Exhibition Road, South Kensington, London",
       "type": "Address",
       "count": 1,
       "note": "NER UK address",
-      "assert": "soft"
+      "assert": "hard"
+    },
+    {
+      "value": "Treating Physician",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Attending Nurse",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Hospital Administrator",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Expert Witness",
+      "type": "Title",
+      "count": 2,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Fact Witness",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Chief Medical Officer",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Associate Attorney",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Senior Partner",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
     }
   ]
 }

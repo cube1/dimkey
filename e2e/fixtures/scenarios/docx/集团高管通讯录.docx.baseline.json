@@ -315,147 +315,281 @@
       "type": "Title",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "集团总裁兼首席运营官",
       "type": "Title",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "集团副总裁兼首席财务官",
       "type": "Title",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "集团副总裁兼首席技术官",
       "type": "Title",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "科技事业部总经理",
       "type": "Title",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "金融事业部总经理",
       "type": "Title",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "地产事业部总经理",
       "type": "Title",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "教育事业部总经理",
       "type": "Title",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "医疗健康事业部总经理",
       "type": "Title",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "人力资源总监",
       "type": "Title",
       "count": 1,
       "note": "NER,表格",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "首席法律顾问",
       "type": "Title",
       "count": 1,
       "note": "NER,表格",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "审计总监",
       "type": "Title",
       "count": 1,
       "note": "NER,表格",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "战略发展总监",
       "type": "Title",
       "count": 1,
       "note": "NER,表格",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "公关总监",
       "type": "Title",
       "count": 1,
       "note": "NER,表格",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "首席信息官",
       "type": "Title",
       "count": 1,
       "note": "NER,表格",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "王建国",
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "李明远",
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "张慧芳",
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "陈大伟",
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "赵鹏飞",
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "孙丽华",
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
+    },
+    {
+      "value": "北京市朝阳区建国门外大街甲6号中环世贸中心D座38层",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "上海市浦东新区陆家嘴环路1000号恒生银行大厦",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "深圳市福田区益田路6009号新世界中心",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "杭州市西湖区文三路478号华星时代广场",
+      "type": "Address",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "集团董事长兼首席执行官",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "集团总裁兼首席运营官",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "集团副总裁兼首席财务官",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "集团副总裁兼首席技术官",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "科技事业部总经理",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "金融事业部总经理",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "地产事业部总经理",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "教育事业部总经理",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "医疗健康事业部总经理",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "人力资源总监",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "首席法律顾问",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "审计总监",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "战略发展总监",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "公关总监",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "首席信息官",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
     }
-  ]
+  ],
+  "generated_at": "2026-04-08"
 }

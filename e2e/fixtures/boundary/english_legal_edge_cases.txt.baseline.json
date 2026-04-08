@@ -47,9 +47,9 @@
     {"value": "02116", "type": "ZipCode", "count": 1, "note": "leading zero zip", "assert": "hard"},
     {"value": "20006", "type": "ZipCode", "count": 1, "note": "DC zip", "assert": "hard"},
 
-    {"value": "James Anderson", "type": "PersonName", "count": 2, "note": "NER plaintiff name", "assert": "soft"},
-    {"value": "Pacific Coast Medical Center", "type": "OrgName", "count": 1, "note": "NER defendant org", "assert": "soft"},
-    {"value": "Mitchell, Chen & Park LLP", "type": "OrgName", "count": 1, "note": "NER law firm", "assert": "soft"},
-    {"value": "1420 Market Street, Apt 5B, San Francisco, CA", "type": "Address", "count": 1, "note": "NER address", "assert": "soft"}
+    {"value": "James Anderson", "type": "PersonName", "count": 2, "note": "NER plaintiff name", "assert": "hard"},
+    {"value": "Pacific Coast Medical Center", "type": "OrgName", "count": 1, "note": "NER defendant org", "assert": "hard"},
+    {"value": "Mitchell, Chen & Park LLP", "type": "OrgName", "count": 1, "note": "NER law firm", "assert": "hard"},
+    {"value": "1420 Market Street, Apt 5B, San Francisco, CA", "type": "Address", "count": 1, "note": "NER address", "assert": "hard"}
   ]
 }

@@ -31,9 +31,11 @@ description: Dimkey 测试执行与结果回写。支持多维度过滤（全量
 
 ### Rust
 
+核心管道用例（C 系列）统一走 `full_pipeline_*.rs`（三层引擎：Regex + NER + Dict），baseline 断言全部按 hard 处理（无论标记 soft 还是 hard，未命中即失败）。
+
 ```bash
 cd src-tauri && cargo test --no-fail-fast                          # 全量
-cd src-tauri && cargo test --test desensitize_csv --no-fail-fast   # 按模块
+cd src-tauri && cargo test --test full_pipeline_csv --no-fail-fast # 按模块（端到端）
 cd src-tauri && cargo test test_function_name -- --nocapture       # 单个
 ```
 

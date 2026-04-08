@@ -428,98 +428,98 @@
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Jonathan Reed",
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Olivia Thornton",
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Benjamin Cross",
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Charlotte Blake",
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Alexander Petrov",
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Laura Chen",
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Nathan Brooks",
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Sophie Hamilton",
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Christopher Yang",
       "type": "PersonName",
       "count": 1,
       "note": "NER client name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Apex Global Holdings LLC",
       "type": "OrgName",
       "count": 1,
       "note": "NER opposing party",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Pinnacle Insurance Group",
       "type": "OrgName",
       "count": 1,
       "note": "NER opposing party",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "British Airways PLC",
       "type": "OrgName",
       "count": 1,
       "note": "NER opposing party",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Lloyd's of London",
       "type": "OrgName",
       "count": 1,
       "note": "NER opposing party",
-      "assert": "soft"
+      "assert": "hard"
     }
   ]
 }

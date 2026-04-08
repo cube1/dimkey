@@ -49,14 +49,14 @@
       "type": "Phone",
       "count": 1,
       "note": "全角数字-可能需归一化",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "１５８２２２２３３３３",
       "type": "Phone",
       "count": 1,
       "note": "全角数字-可能需归一化",
-      "assert": "soft"
+      "assert": "hard"
     }
   ]
 }

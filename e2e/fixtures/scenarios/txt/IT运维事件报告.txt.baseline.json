@@ -196,70 +196,106 @@
       "type": "Title",
       "count": 2,
       "note": "NER,出现2次",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "技术总监",
       "type": "Title",
       "count": 2,
       "note": "NER,出现2次",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "高级数据库管理员",
       "type": "Title",
       "count": 2,
       "note": "NER,出现2次",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "前端技术经理",
       "type": "Title",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "首席技术官",
       "type": "Title",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "陈志远",
       "type": "PersonName",
       "count": 2,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "刘阳",
       "type": "PersonName",
       "count": 2,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "赵明华",
       "type": "PersonName",
       "count": 2,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "孙文博",
       "type": "PersonName",
       "count": 2,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "王建国",
       "type": "PersonName",
       "count": 1,
       "note": "NER",
-      "assert": "soft"
+      "assert": "hard"
+    },
+    {
+      "value": "运维总监",
+      "type": "Title",
+      "count": 3,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "技术总监",
+      "type": "Title",
+      "count": 2,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "高级数据库管理员",
+      "type": "Title",
+      "count": 2,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "前端技术经理",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "首席技术官",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
     }
-  ]
+  ],
+  "generated_at": "2026-04-08"
 }

@@ -1,7 +1,7 @@
 {
   "fixture": "scenarios/docx/attorney_engagement_letter.docx",
   "generated_by": "dimkey-test-design",
-  "generated_at": "2026-04-07",
+  "generated_at": "2026-04-08",
   "expected": [
     {
       "value": "539-48-2671",
@@ -120,98 +120,119 @@
       "type": "PersonName",
       "count": 4,
       "note": "NER client name (multiple mentions)",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Sarah Mitchell",
       "type": "PersonName",
       "count": 3,
       "note": "NER attorney name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "David Park",
       "type": "PersonName",
       "count": 1,
       "note": "NER attorney name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Rebecca Harrison",
       "type": "PersonName",
       "count": 1,
       "note": "NER opposing counsel",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Senior Partner",
       "type": "Title",
       "count": 3,
       "note": "NER title",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Associate Attorney",
       "type": "Title",
       "count": 1,
       "note": "NER title",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Managing Partner",
       "type": "Title",
       "count": 1,
       "note": "NER title",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Mitchell, Chen & Park LLP",
       "type": "OrgName",
       "count": 3,
       "note": "NER firm name",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Pacific Coast Medical Center",
       "type": "OrgName",
       "count": 2,
       "note": "NER defendant",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "Harrison & Associates LLP",
       "type": "OrgName",
       "count": 1,
       "note": "NER opposing firm",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "TechVenture Capital Partners",
       "type": "OrgName",
       "count": 1,
       "note": "NER employer",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "2500 Broadway Avenue, Suite 3100",
       "type": "Address",
       "count": 1,
       "note": "NER firm address",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "1420 Market Street, Apt 5B",
       "type": "Address",
       "count": 1,
       "note": "NER client address",
-      "assert": "soft"
+      "assert": "hard"
     },
     {
       "value": "580 California Street, Suite 2000, San Francisco, CA",
       "type": "Address",
       "count": 1,
       "note": "NER opposing address",
-      "assert": "soft"
+      "assert": "hard"
+    },
+    {
+      "value": "Senior Partner",
+      "type": "Title",
+      "count": 3,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Associate Attorney",
+      "type": "Title",
+      "count": 2,
+      "note": "NER",
+      "assert": "hard"
+    },
+    {
+      "value": "Managing Partner",
+      "type": "Title",
+      "count": 1,
+      "note": "NER",
+      "assert": "hard"
     }
   ]
 }
