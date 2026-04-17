@@ -35,12 +35,23 @@ const STATUS_CONFIG: Record<QueueFile["status"], {
     bgClass: "bg-rose-50",
     borderClass: "border-rose-200",
   },
+  aborted: {
+    icon: Circle,
+    colorClass: "text-slate-400",
+    bgClass: "bg-slate-100",
+    borderClass: "border-slate-200",
+  },
 };
 
 export function FileQueueTabs() {
   const { t } = useTranslation();
   const fileQueue = useWorkspaceStore((s) => s.fileQueue);
   const activeQueueIndex = useWorkspaceStore((s) => s.activeQueueIndex);
+  const batchSession = useWorkspaceStore((s) => s.batchSession);
+  const setCurrentResult = useWorkspaceStore((s) => s.setCurrentResult);
+  const setCurrentFileContent = useWorkspaceStore((s) => s.setCurrentFileContent);
+  const setCurrentRecordId = useWorkspaceStore((s) => s.setCurrentRecordId);
+  const setCenterView = useWorkspaceStore((s) => s.setCenterView);
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeTabRef = useRef<HTMLButtonElement>(null);
 
@@ -53,12 +64,24 @@ export function FileQueueTabs() {
   if (fileQueue.length <= 1) return null;
 
   const handleTabClick = (file: QueueFile) => {
+    const isAutoMode = batchSession?.mode === "auto";
     switch (file.status) {
       case "confirmed":
-        toast(t("fileQueue.exported"), { icon: "✓" });
+        if (isAutoMode && file.result && file.recordId) {
+          setCurrentFileContent(file.result.content, file.filePath);
+          setCurrentResult(file.result);
+          setCurrentRecordId(file.recordId);
+          setCenterView("comparison");
+          toast(t("fileQueue.batchMode.viewOnly"), { icon: "👁" });
+        } else {
+          toast(t("fileQueue.exported"), { icon: "✓" });
+        }
         break;
       case "failed":
         toast.error(file.errorMessage || t("fileQueue.failed"));
+        break;
+      case "aborted":
+        toast(t("fileQueue.batchMode.abort"), { icon: "ℹ️" });
         break;
       case "pending":
         toast(t("fileQueue.waitOrder"), { icon: "ℹ️" });
@@ -92,7 +115,7 @@ export function FileQueueTabs() {
                   border transition-all whitespace-nowrap shrink-0
                   ${config.bgClass} ${config.borderClass}
                   ${isActive ? "ring-1 ring-primary-300 shadow-sm" : ""}
-                  ${file.status === "pending" ? "opacity-60 cursor-default" : "cursor-pointer hover:shadow-xs"}
+                  ${file.status === "pending" || file.status === "aborted" ? "opacity-60" : "cursor-pointer hover:shadow-xs"}
                 `}
               >
                 <Icon className={`w-3.5 h-3.5 ${config.colorClass} ${file.status === "processing" ? "animate-spin" : ""}`} />
