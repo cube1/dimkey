@@ -83,6 +83,7 @@ export function WorkspaceLayout() {
   const fileQueue = useWorkspaceStore((s) => s.fileQueue);
   const activeQueueIndex = useWorkspaceStore((s) => s.activeQueueIndex);
   const isBatchMode = useWorkspaceStore((s) => s.isBatchMode);
+  const batchSession = useWorkspaceStore((s) => s.batchSession);
 
   const { processFile } = useAutoDesensitize();
 
@@ -377,6 +378,18 @@ export function WorkspaceLayout() {
 
   /** 工具栏右侧操作按钮 */
   const renderToolbarActions = () => {
+    // 全自动模式处理中：隐藏导出按钮（进度条自己管理中止）
+    if (batchSession?.mode === "auto") {
+      if (batchSession.phase === "running") return null;
+      // 已完成 + 进入 comparison（抽查）：只读徽标，无导出
+      if (batchSession.phase === "finished" && centerView === "comparison") {
+        return (
+          <span className="text-xs text-slate-400 px-2" data-testid="viewonly-badge">
+            {t("fileQueue.batchMode.viewOnly")}
+          </span>
+        );
+      }
+    }
     if (centerView === "comparison" && (currentResult || (isTemplateMode && currentFileContent))) {
       const batchMode = isBatchMode();
       const isLastFile = batchMode && !fileQueue.some((f, i) => i > activeQueueIndex && f.status === "pending");
