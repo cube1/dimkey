@@ -10,7 +10,7 @@
 | BUG-014 | P1 | parser::csv | `test_gbk_csv_*` ×4 (encoding_boundary.rs) | GBK 编码 CSV 解析失败，csv crate 仅支持 UTF-8，未做编码自动检测/转换 | 功能缺失 |
 | BUG-015 | P2 | regex_engine | `test_fp_uk_customer_records` (full_pipeline_csv.rs) | UkPhone `+44 161 496 0000`（含空格格式）未被正则识别，正则要求连续数字或 `-` 分隔 | 识别遗漏 |
 | BUG-016 | P2 | regex_engine | `test_fp_us_compliance_audit` (full_pipeline_xlsx.rs) | US DriversLicense `S012-3456-7890` 未识别（首字母 S 不在正则范围），识别 9/10 | 识别遗漏 |
-| BUG-017 | P1 | regex_engine | `test_fp_international_vendor_contacts` (full_pipeline_docx.rs) | Passport 号码完全未识别（0/3），国际驾照格式缺失 | 功能缺失 |
+| BUG-017 | P1 | regex_engine | `test_fp_international_vendor_contacts` (full_pipeline_docx.rs) | Passport 号码完全未识别（0/3），国际驾照格式缺失。**部分修复**：已扩展正则支持 `GA 1234567`（字母+空格+数字）与 `12AB34567`（数字字母混合）两种格式；纯 9 位数字格式 `533410987` 仍不识别（误报风险太高需要上下文） | 识别遗漏（部分修复） |
 | BUG-020 | P2 | parser::xlsx | `test_encrypted_xlsx_wrong_password` (boundary.rs) | 错误密码解密后文件解析返回 "Cannot detect file format" 而非密码错误提示 | 逻辑错误 |
 | BUG-021 | **P0** | ner_engine | 46 个 full_pipeline 测试 | **英文 distilbert-ner 模型对中文人名全面漏检**。2-4 字中文人名（张三、王建国、刘晓燕等）识别率接近 0%。这不是 bug 而是模型能力边界——英文模型不认中文 | NER 模型能力 |
 | BUG-022 | **P0** | ner_engine | `test_fp_IT运维事件报告`, `test_fp_集团高管通讯录`, `test_fp_会议纪要` 等 | NER 模型完全不支持 Title（职位）类型识别。当前模型只有 PER/LOC/ORG 标签，没有 Title label。涉及 50+ 个 Title 漏检 | NER 能力缺失 |
@@ -19,7 +19,7 @@
 | BUG-026 | P2 | regex_engine | `test_fp_boundary_fullwidth` (full_pipeline_basic.rs) | 全角手机号（１３９１２３４５６７８）未识别，正则引擎只支持半角数字，需全角→半角归一化 | 识别遗漏 |
 | BUG-027 | P3 | test_infra | `test_fp_门诊病历摘要`, `test_fp_会议纪要` 等 | `common/mod.rs::parse_sensitive_type` 不识别 `MedicalInsurance`、`IP` 等类型字符串，导致基线条目被跳过 | 测试基础设施 |
 | BUG-028 | P1 | regex_engine | `test_fp_mixed_bilingual` (full_pipeline_xlsx.rs) | 中英混合 xlsx 中 SSN 和 UkPostcode 未识别，可能是语言检测将文件判为 Zh 只加载中文正则 | 识别遗漏 |
-| BUG-029 | P1 | regex_engine | `test_fp_attorney_engagement_letter`, `test_fp_litigation_discovery_memo` (full_pipeline_docx.rs) | docx 中 IBAN 未识别（GB29 NWBK... 带空格格式） | 识别遗漏 |
+| BUG-029 | P1 | parser::docx | `test_fp_attorney_engagement_letter`, `test_fp_litigation_discovery_memo` (full_pipeline_docx.rs) | docx 中 IBAN 未识别（GB29 NWBK... 带空格格式）。**根因调整**：孤立正则测试证明 `GB29 NWBK 6016 1331 9268 19` 等带空格 IBAN 当前正则能正确匹配；docx 场景失败应非正则 bug，疑为 docx 解析器产生了非标准空白（如 U+00A0 不间断空格）或 NER 降级掩盖。待 NER 模型可用后复现定位 | 待复现 |
 | BUG-030 | P1 | ner_engine | `test_fp_english_employee`, `test_fp_english_legal_edge_cases` 等英文场景 | **英文模型对英文 PersonName/OrgName/Address 也部分漏检**。如 'Pacific Coast Medical Center'、'Mitchell, Chen & Park LLP'、'1420 Market Street...' 未识别。可能是 distilbert-ner 模型精度不足或 tokenizer 对长实体切分问题 | NER 能力不足 |
 | BUG-031 | P1 | full_pipeline | `test_all_types_enabled_detects_all` (type_filtering.rs) | **新增**：全类型启用检测用例失败，24 个硬断言项未命中（全部为 NER 类型：PersonName/OrgName/Address），与 BUG-021/023/024 同根因 | NER 模型能力 |
 
@@ -51,3 +51,4 @@
 | BUG-018 | 2026-04-08 | E2E | `test_enabled_types_roundtrip` | 降级为 ENV-003 环境问题，非代码 Bug |
 | BUG-019 | 2026-04-08 | E2E | `test_workspace_list_has_multiple` | 降级为 ENV-003 环境问题，非代码 Bug |
 | BUG-025 | 2026-04-08 | baseline_data | `test_fp_sample_csv/xlsx` | 已通过全量 soft→hard 统一解决，不再区分 soft/hard |
+| BUG-032 | 2026-04-17 | desensitizer::generalize | `test_en_generalize_title_director_not_executive`, `test_en_generalize_title_no_substring_pollution` | `generalize_en_title` 改用 token 精确匹配（按非字母数字分割）+ 短语匹配优先级高于单词，消除 "cto" 子串污染；新增 2 个回归测试通过 |

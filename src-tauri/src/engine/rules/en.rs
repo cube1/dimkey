@@ -35,9 +35,21 @@ pub fn rules() -> Vec<RegexRule> {
             sensitive_type: SensitiveType::UkPhone,
             boundary: BoundaryCheck::NotDigit,
         },
-        // 6. 护照号（1-2个大写字母 + 6-9位数字）
+        // 6. 护照号（1-2个大写字母 + 6-9位数字，如 T83205619、AB987654）
         RegexRule {
             regex: Regex::new(r"[A-Z]{1,2}\d{6,9}").unwrap(),
+            sensitive_type: SensitiveType::Passport,
+            boundary: BoundaryCheck::NotAlphanumeric,
+        },
+        // 6b. 护照号（1-2个大写字母 + 空格 + 6-9位数字，如加拿大 GA 1234567）
+        RegexRule {
+            regex: Regex::new(r"[A-Z]{1,2}\s\d{6,9}").unwrap(),
+            sensitive_type: SensitiveType::Passport,
+            boundary: BoundaryCheck::NotAlphanumeric,
+        },
+        // 6c. 护照号（2数字 + 2字母 + 5数字，如某些欧洲格式 12AB34567）
+        RegexRule {
+            regex: Regex::new(r"\d{2}[A-Z]{2}\d{5}").unwrap(),
             sensitive_type: SensitiveType::Passport,
             boundary: BoundaryCheck::NotAlphanumeric,
         },

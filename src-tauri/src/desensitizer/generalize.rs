@@ -172,19 +172,43 @@ fn generalize_en_address(text: &str) -> String {
 }
 
 /// 英文职位泛化
+///
+/// 匹配策略（修复 BUG-032）：
+/// - 单词关键词（如 "cto"）按 token 精确匹配，避免 "director" 含 "cto" 子串被污染
+/// - 多词短语（如 "vice president"）按子串匹配
+/// - token 判定：按非字母数字字符分割后，lowercase 比较
 fn generalize_en_title(text: &str) -> String {
     let lower = text.to_lowercase();
-    let executive = ["chief", "ceo", "cfo", "cto", "coo", "president", "chairman"];
-    let director = ["director", "vp", "vice president", "head of"];
-    let manager = ["manager", "supervisor", "lead", "team lead"];
-    let tech = ["engineer", "developer", "architect", "programmer", "analyst"];
-    let staff = ["assistant", "coordinator", "specialist", "clerk", "associate"];
+    // 按非字母数字字符分割为 token 列表，用于精确匹配单词关键词
+    let tokens: Vec<&str> = lower
+        .split(|c: char| !c.is_ascii_alphanumeric())
+        .filter(|t| !t.is_empty())
+        .collect();
 
-    for kw in executive { if lower.contains(kw) { return "Senior Executive".to_string(); } }
-    for kw in director { if lower.contains(kw) { return "Director-Level".to_string(); } }
-    for kw in manager { if lower.contains(kw) { return "Management".to_string(); } }
-    for kw in tech { if lower.contains(kw) { return "Technical Staff".to_string(); } }
-    for kw in staff { if lower.contains(kw) { return "Staff".to_string(); } }
+    let executive_words = ["chief", "ceo", "cfo", "cto", "coo", "president", "chairman"];
+    let director_words = ["director", "vp"];
+    let director_phrases = ["vice president", "head of"];
+    let manager_words = ["manager", "supervisor", "lead"];
+    let manager_phrases = ["team lead"];
+    let tech_words = ["engineer", "developer", "architect", "programmer", "analyst"];
+    let staff_words = ["assistant", "coordinator", "specialist", "clerk", "associate"];
+
+    let has_word = |kws: &[&str]| -> bool {
+        kws.iter().any(|kw| tokens.iter().any(|t| *t == *kw))
+    };
+    let has_phrase = |phrases: &[&str]| -> bool {
+        phrases.iter().any(|p| lower.contains(p))
+    };
+
+    // 短语优先级高于单词：先判断多词短语，避免 "Vice President" 被 executive 的 "president" 抢走
+    if has_phrase(&director_phrases) { return "Director-Level".to_string(); }
+    if has_phrase(&manager_phrases) { return "Management".to_string(); }
+
+    if has_word(&executive_words) { return "Senior Executive".to_string(); }
+    if has_word(&director_words) { return "Director-Level".to_string(); }
+    if has_word(&manager_words) { return "Management".to_string(); }
+    if has_word(&tech_words) { return "Technical Staff".to_string(); }
+    if has_word(&staff_words) { return "Staff".to_string(); }
 
     "Employee".to_string()
 }
