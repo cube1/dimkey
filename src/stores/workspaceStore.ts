@@ -18,6 +18,7 @@ import type {
   ColumnRule,
   PasswordModalState,
   QueueFile,
+  BatchSession,
   AliasGroup,
 } from "../types";
 import { getSensitiveTypeKey } from "../types";
@@ -69,6 +70,8 @@ interface WorkspaceState {
   // --- 批量文件队列 ---
   fileQueue: QueueFile[];
   activeQueueIndex: number;
+  /** 批量处理会话（null 表示无批量或逐个确认模式未启动） */
+  batchSession: BatchSession | null;
 
   // --- 密码弹窗 ---
   passwordModal: PasswordModalState;
@@ -151,6 +154,15 @@ interface WorkspaceState {
   /** 推进到下一个文件并标记为 processing，返回该文件；无更多文件时返回 null */
   advanceToNextFile: () => QueueFile | null;
 
+  // --- 批量自动模式 ---
+  startBatchAuto: (outputDir: string) => void;
+  abortBatchAuto: () => void;
+  finishBatchAuto: () => void;
+  /** 更新队列文件的部分字段（用于回写 result/outputPath 等） */
+  updateQueueFileResult: (id: string, patch: Partial<QueueFile>) => void;
+  /** 清除批量会话（回到 dropzone） */
+  clearBatchSession: () => void;
+
   // --- 刷新当前工作区 ---
   refreshActiveWorkspace: () => Promise<void>;
 }
@@ -178,6 +190,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   activeSheetIndex: 0,
   fileQueue: [],
   activeQueueIndex: -1,
+  batchSession: null,
   aliasGroups: [],
   aliasLinkMode: false,
   aliasLinkMembers: [],
@@ -222,6 +235,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
         activeSheetIndex: 0,
         fileQueue: [],
         activeQueueIndex: -1,
+        batchSession: null,
         aliasGroups: data.workspace.alias_groups ?? [],
       });
     } catch (e) {
@@ -271,6 +285,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
           restoreResult: null,
           fileQueue: [],
           activeQueueIndex: -1,
+          batchSession: null,
         });
       }
       await get().loadWorkspaces();
@@ -537,7 +552,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     return null;
   },
 
-  clearFileQueue: () => set({ fileQueue: [], activeQueueIndex: -1 }),
+  clearFileQueue: () => set({ fileQueue: [], activeQueueIndex: -1, batchSession: null }),
 
   isBatchMode: () => get().fileQueue.length > 1,
 
@@ -561,6 +576,34 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     }
     return null;
   },
+
+  startBatchAuto: (outputDir) => set({
+    batchSession: {
+      mode: "auto",
+      outputDir,
+      startedAt: Date.now(),
+      aborted: false,
+      phase: "running",
+    },
+  }),
+
+  abortBatchAuto: () => set((s) => ({
+    batchSession: s.batchSession ? { ...s.batchSession, aborted: true } : null,
+  })),
+
+  finishBatchAuto: () => set((s) => ({
+    batchSession: s.batchSession ? { ...s.batchSession, phase: "finished" } : null,
+  })),
+
+  updateQueueFileResult: (id, patch) => set((s) => ({
+    fileQueue: s.fileQueue.map((f) => (f.id === id ? { ...f, ...patch } : f)),
+  })),
+
+  clearBatchSession: () => set({
+    fileQueue: [],
+    activeQueueIndex: -1,
+    batchSession: null,
+  }),
 
   refreshActiveWorkspace: async () => {
     const id = get().activeWorkspaceId;
