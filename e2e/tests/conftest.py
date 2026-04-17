@@ -87,8 +87,15 @@ def page(browser):
                         'save_config': null,
                         'save_dict': null,
                         'check_file_exists': true,
+                        'plugin:dialog|open': (args) => {
+                            if (args?.options?.directory) return '/tmp/e2e-output';
+                            return null;
+                        },
                     };
-                    if (cmd in defaults) return defaults[cmd];
+                    if (cmd in defaults) {
+                        const val = defaults[cmd];
+                        return typeof val === 'function' ? val(args) : val;
+                    }
                     console.warn('[E2E mock] unhandled invoke:', cmd, args);
                     return null;
                 },
