@@ -7,14 +7,312 @@ import type {
   FileContent,
   SensitiveItem,
   DesensitizeResult,
+  Strategy,
   StrategyConfig,
   ProcessingRecord,
   ColumnInference,
   ColumnRule,
+  DictEntry,
+  WhitelistEntry,
+  ConsistencyMapping,
+  AliasGroup,
+  ReplaceStyle,
 } from "../types";
 import { parseEncryptedError, isWrongPasswordError } from "../types";
 
 export type { AutoDesensitizeStep } from "../types";
+
+// ============================================================
+// 共享脱敏流水线 — 供单文件与批量全自动模式复用
+// ============================================================
+
+/**
+ * 脱敏流水线输入参数（全部显式传入，不依赖 React store）
+ */
+export interface PipelineOptions {
+  workspaceId: string;
+  strategies: Record<string, Strategy>;
+  dictEntries: DictEntry[];
+  enabledTypes: string[];
+  replaceStyle: ReplaceStyle;
+  consistencyMappings: ConsistencyMapping[];
+  language: "zh" | "en";
+  aliasGroups: AliasGroup[];
+  whitelist: WhitelistEntry[];
+  password?: string;
+  /** 工作区模式，默认 "Desensitize"。TemplateReplace 时仅做检测，不调 apply_desensitize 也不保存记录 */
+  mode?: "Desensitize" | "TemplateReplace";
+}
+
+/**
+ * 脱敏流水线返回结果
+ *
+ * 当 `sensitiveItems` 为空（未检测到任何敏感项）或后续为模版模式时，
+ * `desensitizeResult`/`record` 可能为 null —— 调用方据此决定 UI 流程。
+ *
+ * 额外字段（可选）供调用方执行 UI/store 副作用：
+ * - columnInferences: regex 列推断（仅表格类型）
+ * - nerColumnInferences: NER 列推断合并后的结果（仅表格类型且有 NER 结果）
+ * - nerOnlyCount: NER 独有发现数量（用于 toast 提示）
+ */
+export interface PipelineResult {
+  content: FileContent;
+  sensitiveItems: SensitiveItem[];
+  rawSensitiveItems: SensitiveItem[];
+  desensitizeResult: DesensitizeResult | null;
+  record: ProcessingRecord | null;
+  durationMs: number;
+  columnInferences?: ColumnInference[] | null;
+  nerColumnInferences?: ColumnInference[] | null;
+  nerOnlyCount?: number;
+}
+
+/** 构建策略配置列表（根据 items 中出现的类型 + workspace 默认策略） */
+function buildStrategyConfigs(
+  items: SensitiveItem[],
+  strategiesMap: Record<string, Strategy>,
+): StrategyConfig[] {
+  return items
+    .reduce<string[]>((acc, item) => {
+      const key = typeof item.sensitive_type === "string"
+        ? item.sensitive_type
+        : "Custom";
+      if (!acc.includes(key)) acc.push(key);
+      return acc;
+    }, [])
+    .map((key) => ({
+      sensitive_type: key === "Custom"
+        ? { Custom: "Custom" }
+        : (key as SensitiveItem["sensitive_type"]),
+      strategy: strategiesMap[key] || { Mask: { keep_prefix: 1, keep_suffix: 1 } },
+      consistent: true,
+    }));
+}
+
+/** 合并去重（regex 优先，dict/ner 不覆盖已有项） */
+function mergeItemsNoOverlap(
+  base: SensitiveItem[],
+  extra: SensitiveItem[],
+): SensitiveItem[] {
+  const merged = [...base];
+  for (const di of extra) {
+    const overlap = merged.some(
+      (ex) =>
+        ex.sheet_index === di.sheet_index &&
+        ex.row === di.row &&
+        ex.col === di.col &&
+        ex.start < di.end &&
+        di.start < ex.end
+    );
+    if (!overlap) merged.push(di);
+  }
+  return merged;
+}
+
+/** 白名单过滤 */
+function applyWhitelist(
+  items: SensitiveItem[],
+  whitelist: WhitelistEntry[],
+): SensitiveItem[] {
+  if (whitelist.length === 0) return items;
+  return items.filter((item) =>
+    !whitelist.some((w) =>
+      w.match_mode === "Exact"
+        ? item.text === w.text
+        : item.text.toLowerCase() === w.text.toLowerCase()
+    )
+  );
+}
+
+/** 按 enabledTypes 过滤 */
+function applyEnabledTypes(
+  items: SensitiveItem[],
+  enabledTypes: string[],
+): SensitiveItem[] {
+  return items.filter((item) => {
+    const key = typeof item.sensitive_type === "string"
+      ? item.sensitive_type
+      : "Custom";
+    return enabledTypes.includes(key);
+  });
+}
+
+/**
+ * 纯非 React 的共享脱敏流水线函数
+ *
+ * 步骤：import → detect(regex/ner/dict + 表格列推断) → merge/dedupe →
+ *       whitelist 过滤 → enabledTypes 过滤 → apply_desensitize → 保存处理记录
+ *
+ * 不触碰 useWorkspaceStore 或 React 状态；所有输入显式传参，所有错误向上抛出。
+ *
+ * 注意：当检测到 0 条敏感项时，返回的 `desensitizeResult` 为空 Result、
+ * `record` 为 null —— 调用方需据此决定 UI 流程（例如是否切到对比视图）。
+ */
+export async function runDesensitizePipeline(
+  filePath: string,
+  options: PipelineOptions,
+): Promise<PipelineResult> {
+  const {
+    workspaceId,
+    strategies,
+    dictEntries,
+    enabledTypes,
+    whitelist,
+    password,
+  } = options;
+
+  const started = Date.now();
+  const name = filePath.split(/[/\\]/).pop() || filePath;
+
+  // 1. 解析文件
+  const content = password
+    ? await invoke<FileContent>("import_file_with_password", { filePath, password })
+    : await invoke<FileContent>("import_file", { filePath });
+
+  // 2. 识别敏感信息（regex + dict + NER 三路并行，表格类型附带列推断）
+  const isSpreadsheet = content.type === "Spreadsheet";
+
+  const detectPromises: [
+    Promise<PromiseSettledResult<SensitiveItem[]>[]>,
+    Promise<ColumnInference[] | null>,
+  ] = [
+    Promise.allSettled([
+      invoke<SensitiveItem[]>("detect_by_regex", { content, enabledTypes }),
+      dictEntries.length > 0
+        ? invoke<SensitiveItem[]>("detect_by_dict", { content, dictEntries })
+        : Promise.resolve([] as SensitiveItem[]),
+      invoke<SensitiveItem[]>("detect_by_ner", { content }),
+    ]),
+    isSpreadsheet
+      ? invoke<ColumnInference[]>("detect_columns", { content, sampleSize: 100 })
+          .catch(() => null)
+      : Promise.resolve(null),
+  ];
+
+  const [scanResults, columnInferences] = await Promise.all(detectPromises);
+
+  const [regexResult, dictResult, nerResult] = scanResults;
+
+  // regex 失败视为致命错误
+  if (regexResult.status === "rejected") {
+    throw regexResult.reason;
+  }
+  const regexItems = regexResult.value;
+  const dictItems = dictResult.status === "fulfilled" ? dictResult.value : [];
+  const nerItems = nerResult.status === "fulfilled" ? nerResult.value : [];
+
+  // NER 列推断（表格类型）
+  let nerColumnInferences: ColumnInference[] | null = null;
+  if (isSpreadsheet && nerItems.length > 0 && content.type === "Spreadsheet") {
+    const nerColInferences = buildNerColumnInferences(nerItems, content);
+    if (nerColInferences.length > 0) {
+      const regexColInferences = columnInferences || [];
+      nerColumnInferences = mergeColumnInferences(regexColInferences, nerColInferences);
+    }
+  }
+
+  // 合并去重
+  let mergedItems = mergeItemsNoOverlap(regexItems, [...dictItems, ...nerItems]);
+
+  // 白名单过滤
+  mergedItems = applyWhitelist(mergedItems, whitelist);
+
+  // enabledTypes 过滤（dict/ner 亦需过滤；regex 已在后端过滤）
+  mergedItems = applyEnabledTypes(mergedItems, enabledTypes);
+
+  // 统计 NER 独有发现数量
+  const nerOnlyCount = nerItems.filter(
+    (ni) =>
+      !regexItems.some(
+        (ex) =>
+          ex.sheet_index === ni.sheet_index &&
+          ex.row === ni.row &&
+          ex.col === ni.col &&
+          ex.start < ni.end &&
+          ni.start < ex.end
+      ) &&
+      !dictItems.some(
+        (ex) =>
+          ex.sheet_index === ni.sheet_index &&
+          ex.row === ni.row &&
+          ex.col === ni.col &&
+          ex.start < ni.end &&
+          ni.start < ex.end
+      )
+  ).length;
+
+  // 空识别结果：返回空 result（caller 据此决定 UI）
+  if (mergedItems.length === 0) {
+    return {
+      content,
+      sensitiveItems: [],
+      rawSensitiveItems: [],
+      desensitizeResult: {
+        content,
+        mappings: [],
+        summary: { total: 0, by_type: {} },
+      },
+      record: null,
+      durationMs: Date.now() - started,
+      columnInferences,
+      nerColumnInferences,
+      nerOnlyCount,
+    };
+  }
+
+  // 模版模式：仅做检测，不执行 apply_desensitize，不写入处理记录
+  if (options.mode === "TemplateReplace") {
+    return {
+      content,
+      sensitiveItems: mergedItems,
+      rawSensitiveItems: mergedItems,
+      desensitizeResult: null,
+      record: null,
+      durationMs: Date.now() - started,
+      columnInferences,
+      nerColumnInferences,
+      nerOnlyCount,
+    };
+  }
+
+  // 3. 构建策略配置并执行脱敏
+  const strategyConfigs = buildStrategyConfigs(mergedItems, strategies);
+  const desensitizeResult = await invoke<DesensitizeResult>("apply_desensitize", {
+    content,
+    items: mergedItems,
+    strategies: strategyConfigs,
+    workspaceId,
+  });
+
+  // 4. 保存处理记录
+  const record: ProcessingRecord = {
+    id: generateRecordId(),
+    file_name: name,
+    file_path: filePath,
+    file_type: content.file_type,
+    processed_at: new Date().toISOString(),
+    mappings: desensitizeResult.mappings,
+    sensitive_count: desensitizeResult.summary.total,
+    status: "Completed",
+  };
+
+  await invoke("add_processing_record", {
+    workspaceId,
+    record,
+  });
+
+  return {
+    content,
+    sensitiveItems: mergedItems,
+    rawSensitiveItems: mergedItems,
+    desensitizeResult,
+    record,
+    durationMs: Date.now() - started,
+    columnInferences,
+    nerColumnInferences,
+    nerOnlyCount,
+  };
+}
 
 /**
  * 从 NER 扫描结果中聚合列级类型推断
@@ -139,215 +437,82 @@ export function useAutoDesensitize() {
     const name = filePath.split(/[/\\]/).pop() || filePath;
 
     try {
-      // 1. 解析文件
+      // 1. 解析
       store.setProcessingStep("parsing", name);
       store.setCenterView("processing");
-      const content = password
-        ? await invoke<FileContent>("import_file_with_password", { filePath, password })
-        : await invoke<FileContent>("import_file", { filePath });
+
+      // 2. 调用共享流水线（纯函数，不触碰 store）
+      store.setProcessingStep("detecting");
+      const pipeline = await runDesensitizePipeline(filePath, {
+        workspaceId: ws.id,
+        strategies: ws.strategies,
+        dictEntries: ws.dict_entries,
+        enabledTypes,
+        replaceStyle: ws.replace_style || "Fake",
+        consistencyMappings: ws.consistency_mappings || [],
+        language: "zh",
+        aliasGroups: ws.alias_groups || [],
+        whitelist: ws.whitelist || [],
+        password,
+        mode: ws.mode || "Desensitize",
+      });
+
       // 解密成功时关闭密码弹窗
       if (password) {
         store.setPasswordModal(null);
       }
+
+      const { content, sensitiveItems, columnInferences, nerColumnInferences, nerOnlyCount } = pipeline;
       store.setCurrentFileContent(content, filePath);
-
-      // 2. 识别敏感信息（regex + dict + NER 三路并行）
-      //    regex 扫描传入 enabledTypes，扫描前就过滤
-      //    表格类型额外并行调用 detect_columns（不阻断主流程）
-      store.setProcessingStep("detecting");
-
-      const isSpreadsheet = content.type === "Spreadsheet";
-
-      const detectPromises: [
-        Promise<PromiseSettledResult<SensitiveItem[]>[]>,
-        Promise<ColumnInference[] | null>,
-      ] = [
-        Promise.allSettled([
-          invoke<SensitiveItem[]>("detect_by_regex", { content, enabledTypes }),
-          ws.dict_entries.length > 0
-            ? invoke<SensitiveItem[]>("detect_by_dict", { content, dictEntries: ws.dict_entries })
-            : Promise.resolve([] as SensitiveItem[]),
-          invoke<SensitiveItem[]>("detect_by_ner", { content }),
-        ]),
-        isSpreadsheet
-          ? invoke<ColumnInference[]>("detect_columns", { content, sampleSize: 100 })
-              .catch(() => null)
-          : Promise.resolve(null),
-      ];
-
-      const [scanResults, columnInferences] = await Promise.all(detectPromises);
 
       // 保存列推断结果到 store（用于 ComparisonView 列头展示）
       if (columnInferences) {
         store.setColumnInferences(columnInferences);
         store.setIsColumnMode(true);
       }
-
-      const [regexResult, dictResult, nerResult] = scanResults;
-
-      // regex 失败视为致命错误
-      if (regexResult.status === "rejected") {
-        throw regexResult.reason;
-      }
-      const regexItems = regexResult.value;
-      const dictItems = dictResult.status === "fulfilled" ? dictResult.value : [];
-      const nerItems = nerResult.status === "fulfilled" ? nerResult.value : [];
-
-      // NER 列推断聚合：从 NER 结果中推断列级类型，填补 regex 的空缺
-      if (isSpreadsheet && nerItems.length > 0 && content.type === "Spreadsheet") {
-        const nerColInferences = buildNerColumnInferences(
-          nerItems,
-          content,
-        );
-        if (nerColInferences.length > 0) {
-          const regexColInferences = columnInferences || [];
-          const merged = mergeColumnInferences(regexColInferences, nerColInferences);
-          store.setColumnInferences(merged);
-          store.setIsColumnMode(true);
-        }
+      if (nerColumnInferences) {
+        store.setColumnInferences(nerColumnInferences);
+        store.setIsColumnMode(true);
       }
 
-      // 合并去重：Regex 优先，Dict/NER 不覆盖已有项（同 sheet 同位置才算重叠）
-      const mergedItems = [...regexItems];
-      for (const di of [...dictItems, ...nerItems]) {
-        const overlap = mergedItems.some(
-          (ex) =>
-            ex.sheet_index === di.sheet_index &&
-            ex.row === di.row &&
-            ex.col === di.col &&
-            ex.start < di.end &&
-            di.start < ex.end
-        );
-        if (!overlap) mergedItems.push(di);
-      }
-
-      // 白名单过滤
-      const whitelist = ws.whitelist || [];
-      if (whitelist.length > 0) {
-        const afterWhitelist = mergedItems.filter((item) =>
-          !whitelist.some((w) =>
-            w.match_mode === "Exact"
-              ? item.text === w.text
-              : item.text.toLowerCase() === w.text.toLowerCase()
-          )
-        );
-        mergedItems.length = 0;
-        mergedItems.push(...afterWhitelist);
-      }
-
-      // Dict/NER 结果也需按 enabledTypes 过滤（regex 已在后端过滤）
-      const filteredItems = mergedItems.filter((item) => {
-        const key = typeof item.sensitive_type === "string"
-          ? item.sensitive_type
-          : "Custom";
-        return enabledTypes.includes(key);
-      });
-
-      mergedItems.length = 0;
-      mergedItems.push(...filteredItems);
-
-      // 统计 NER 独有发现数量
-      const nerOnlyCount = nerItems.filter(
-        (ni) =>
-          !regexItems.some(
-            (ex) =>
-              ex.sheet_index === ni.sheet_index &&
-              ex.row === ni.row &&
-              ex.col === ni.col &&
-              ex.start < ni.end &&
-              ni.start < ex.end
-          ) &&
-          !dictItems.some(
-            (ex) =>
-              ex.sheet_index === ni.sheet_index &&
-              ex.row === ni.row &&
-              ex.col === ni.col &&
-              ex.start < ni.end &&
-              ni.start < ex.end
-          )
-      ).length;
-      if (nerOnlyCount > 0) {
+      if (nerOnlyCount && nerOnlyCount > 0) {
         toast.success(i18n.t("hook.nerFound", { count: nerOnlyCount }));
       }
 
-      if (mergedItems.length === 0) {
-        // 无敏感数据，仍进入对比视图（允许手动标记）
+      // 空识别结果：仍进入对比视图允许手动标记
+      if (sensitiveItems.length === 0) {
         store.setCurrentSensitiveItems([]);
-        const emptyResult: DesensitizeResult = {
-          content: content,
-          mappings: [],
-          summary: { total: 0, by_type: {} },
-        };
-        store.setCurrentResult(emptyResult);
+        if (pipeline.desensitizeResult) {
+          store.setCurrentResult(pipeline.desensitizeResult);
+        }
         store.setCenterView("comparison");
         store.setProcessingStep("done");
         toast(i18n.t("hook.noSensitiveManual"), { icon: "ℹ️" });
         return;
       }
 
-      // 保存识别到的敏感项到 store（rawSensitiveItems 保存全量，不受 enabledTypes 过滤）
-      store.setRawSensitiveItems(mergedItems);
-      store.setCurrentSensitiveItems(mergedItems);
+      // 保存识别到的敏感项到 store
+      store.setRawSensitiveItems(pipeline.rawSensitiveItems);
+      store.setCurrentSensitiveItems(sensitiveItems);
 
       const isTemplateMode = ws.mode === "TemplateReplace";
 
       if (isTemplateMode) {
-        // 模版模式：只做检测，前端根据词典映射实时渲染预览，导出时才调后端
-        store.setCurrentSensitiveItems(mergedItems);
+        // 模版模式：仅检测，前端根据词典映射实时渲染预览
         store.setCenterView("comparison");
         store.setProcessingStep("done");
         return;
       }
 
-      // 脱敏模式：现有逻辑不变（从 "3. 构建策略配置" 开始）
-
-      // 3. 构建策略配置并执行脱敏
+      // 脱敏模式：pipeline 已执行 apply_desensitize 并保存记录
       store.setProcessingStep("desensitizing");
-      const strategies: StrategyConfig[] = mergedItems
-        .reduce<string[]>((acc, item) => {
-          const key = typeof item.sensitive_type === "string"
-            ? item.sensitive_type
-            : "Custom";
-          if (!acc.includes(key)) acc.push(key);
-          return acc;
-        }, [])
-        .map((key) => ({
-          sensitive_type: key === "Custom"
-            ? { Custom: "Custom" }
-            : (key as SensitiveItem["sensitive_type"]),
-          strategy: ws.strategies[key] || { Mask: { keep_prefix: 1, keep_suffix: 1 } },
-          consistent: true,
-        }));
-
-      const result = await invoke<DesensitizeResult>("apply_desensitize", {
-        content,
-        items: mergedItems,
-        strategies,
-        workspaceId: ws.id,
-      });
-
-      // 4. 保存处理记录
       store.setProcessingStep("saving");
-      const record: ProcessingRecord = {
-        id: generateRecordId(),
-        file_name: name,
-        file_path: filePath,
-        file_type: content.file_type,
-        processed_at: new Date().toISOString(),
-        mappings: result.mappings,
-        sensitive_count: result.summary.total,
-        status: "Completed",
-      };
 
-      await invoke("add_processing_record", {
-        workspaceId: ws.id,
-        record,
-      });
-
-      // 5. 更新 store 并切换到对比视图
-      store.setCurrentRecordId(record.id);
-      store.setCurrentResult(result);
-      await store.refreshActiveWorkspace();
+      if (pipeline.record && pipeline.desensitizeResult) {
+        store.setCurrentRecordId(pipeline.record.id);
+        store.setCurrentResult(pipeline.desensitizeResult);
+        await store.refreshActiveWorkspace();
+      }
       store.setCenterView("comparison");
       store.setProcessingStep("done");
 

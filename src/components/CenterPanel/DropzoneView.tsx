@@ -120,7 +120,14 @@ export function DropzoneView() {
 
   const handleImportFiles = useCallback(
     async (paths: string[]) => {
-      if (isBatchMode() && hasUnfinishedFiles()) {
+      // 全自动进行中：拒绝新文件
+      const bsNow = useWorkspaceStore.getState().batchSession;
+      if (bsNow?.phase === "running") {
+        toast.error(t("fileQueue.batchMode.dropRejected"));
+        return;
+      }
+      // 老的 fileQueue 仍有未完成 → 拒绝
+      if (isBatchMode() && hasUnfinishedFiles() && !bsNow) {
         toast.error(t("dropzone.waitQueue"));
         return;
       }
@@ -152,17 +159,18 @@ export function DropzoneView() {
         toast(t("dropzone.maxQueue", { max: MAX_QUEUE_SIZE }), { icon: "ℹ️" });
       }
 
-      const queue: QueueFile[] = filesToProcess.map((p, i) => ({
+      // 全部 pending，等模式选择器决定后续流程
+      const queue: QueueFile[] = filesToProcess.map((p) => ({
         id: crypto.randomUUID(),
         filePath: p,
         fileName: p.split(/[/\\]/).pop() || p,
-        status: i === 0 ? "processing" : "pending",
+        status: "pending",
       }));
 
       initFileQueue(queue);
-      await processFile(filesToProcess[0]);
+      // 此处不再直接调 processFile；由 CenterPanel 根据 fileQueue.length > 1 展示 BatchModeSelector
     },
-    [handleImportFile, processFile, isBatchMode, hasUnfinishedFiles, initFileQueue]
+    [handleImportFile, isBatchMode, hasUnfinishedFiles, initFileQueue, t],
   );
 
   // 监听 Tauri 拖放事件

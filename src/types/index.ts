@@ -475,12 +475,39 @@ export interface QueueFile {
   id: string;
   filePath: string;
   fileName: string;
-  status: "pending" | "processing" | "confirmed" | "failed";
+  status: "pending" | "processing" | "confirmed" | "failed" | "aborted";
   errorMessage?: string;
+  // --- 全自动模式结果字段（处理完成后回写） ---
+  /** 识别到的敏感项数量 */
+  sensitiveCount?: number;
+  /** 全自动模式下的实际导出路径 */
+  outputPath?: string;
+  /** 处理结果（用于抽查时重载到对比视图） */
+  result?: DesensitizeResult;
+  /** 处理记录 ID */
+  recordId?: string;
+  /** 单文件耗时（毫秒，用于剩余时间预估） */
+  durationMs?: number;
+}
+
+/** 批量处理模式 */
+export type BatchMode = "sequential" | "auto";
+
+/** 批量处理会话（仅全自动模式使用） */
+export interface BatchSession {
+  mode: BatchMode;
+  /** 全自动模式的统一输出目录；sequential 模式为 null */
+  outputDir: string | null;
+  startedAt: number;
+  aborted: boolean;
+  /** idle=未启动 / running=处理中 / finished=全部完成或被中止 */
+  phase: "idle" | "running" | "finished";
 }
 
 /** 批量导入最大文件数 */
 export const MAX_QUEUE_SIZE = 20;
+/** 文件级并发数 */
+export const MAX_CONCURRENCY = 3;
 
 /** 根据敏感类型获取可用策略列表 */
 export function getAllowedStrategies(typeKey: string): StrategyType[] {

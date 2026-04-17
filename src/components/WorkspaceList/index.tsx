@@ -85,7 +85,11 @@ export function WorkspaceList() {
   const handleDelete = async (id: string) => {
     // 队列保护：如果有未完成的批量任务，先确认
     const store = useWorkspaceStore.getState();
-    if (store.isBatchMode() && store.hasUnfinishedFiles()) {
+    if (store.batchSession?.phase === "running") {
+      if (!window.confirm(t("fileQueue.batchMode.deleteConfirm"))) return;
+      store.abortBatchAuto();
+      store.clearFileQueue();
+    } else if (store.isBatchMode() && store.hasUnfinishedFiles()) {
       const unfinished = store.fileQueue.filter(f => f.status === "pending" || f.status === "processing").length;
       const confirmed = window.confirm(t("workspace.confirmDeleteQueue", { count: unfinished }));
       if (!confirmed) return;
@@ -171,7 +175,11 @@ export function WorkspaceList() {
                 key={ws.id}
                 onClick={() => {
                   const store = useWorkspaceStore.getState();
-                  if (store.isBatchMode() && store.hasUnfinishedFiles()) {
+                  if (store.batchSession?.phase === "running") {
+                    if (!window.confirm(t("fileQueue.batchMode.switchConfirm"))) return;
+                    store.abortBatchAuto();
+                    store.clearFileQueue();
+                  } else if (store.isBatchMode() && store.hasUnfinishedFiles()) {
                     const unfinished = store.fileQueue.filter(f => f.status === "pending" || f.status === "processing").length;
                     const confirmed = window.confirm(t("workspace.confirmSwitchQueue", { count: unfinished }));
                     if (!confirmed) return;

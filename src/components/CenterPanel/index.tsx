@@ -7,6 +7,9 @@ import { ProcessingView } from "./ProcessingView";
 import { ComparisonView } from "./ComparisonView";
 import { RestoreView } from "./RestoreView";
 import { FileQueueTabs } from "./FileQueueTabs";
+import { BatchModeSelector } from "./BatchModeSelector";
+import { BatchProgressBar } from "./BatchProgressBar";
+import { BatchResultReport } from "./BatchResultReport";
 import { PasswordModal } from "../PasswordModal";
 import { AliasLinkBar } from "../AliasLinkMode";
 
@@ -14,6 +17,8 @@ export function CenterPanel() {
   const centerView = useWorkspaceStore((s) => s.centerView);
   const passwordModal = useWorkspaceStore((s) => s.passwordModal);
   const setPasswordModal = useWorkspaceStore((s) => s.setPasswordModal);
+  const fileQueue = useWorkspaceStore((s) => s.fileQueue);
+  const batchSession = useWorkspaceStore((s) => s.batchSession);
   const { processFile } = useAutoDesensitize();
 
   const handlePasswordSubmit = useCallback(async (password: string) => {
@@ -37,11 +42,20 @@ export function CenterPanel() {
       ) : (
         <>
           <FileQueueTabs />
-          <AliasLinkBar />
-          {centerView === "dropzone" && <DropzoneView />}
-          {centerView === "processing" && <ProcessingView />}
-          {centerView === "comparison" && <ComparisonView />}
-          {centerView === "restore" && <RestoreView />}
+          <BatchProgressBar />
+          {batchSession?.phase === "finished" && centerView !== "comparison" ? (
+            <BatchResultReport />
+          ) : fileQueue.length > 1 && !batchSession && centerView === "dropzone" ? (
+            <BatchModeSelector />
+          ) : (
+            <>
+              <AliasLinkBar />
+              {centerView === "dropzone" && <DropzoneView />}
+              {centerView === "processing" && <ProcessingView />}
+              {centerView === "comparison" && <ComparisonView />}
+              {centerView === "restore" && <RestoreView />}
+            </>
+          )}
         </>
       )}
       <PasswordModal
