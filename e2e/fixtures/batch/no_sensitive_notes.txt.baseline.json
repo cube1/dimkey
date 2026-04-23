@@ -1,0 +1,7 @@
+{
+  "fixture": "batch/no_sensitive_notes.txt",
+  "generated_by": "dimkey-test-design",
+  "generated_at": "2026-04-17",
+  "note": "无敏感信息的纯文本，用于验证 0 敏感项文件在批处理中标记 confirmed 但不导出",
+  "expected": []
+}
