@@ -22,6 +22,7 @@
 | BUG-029 | P1 | parser::docx | `test_fp_attorney_engagement_letter`, `test_fp_litigation_discovery_memo` (full_pipeline_docx.rs) | docx 中 IBAN 未识别（GB29 NWBK... 带空格格式）。**根因调整**：孤立正则测试证明 `GB29 NWBK 6016 1331 9268 19` 等带空格 IBAN 当前正则能正确匹配；docx 场景失败应非正则 bug，疑为 docx 解析器产生了非标准空白（如 U+00A0 不间断空格）或 NER 降级掩盖。待 NER 模型可用后复现定位 | 待复现 |
 | BUG-030 | P1 | ner_engine | `test_fp_english_employee`, `test_fp_english_legal_edge_cases` 等英文场景 | **英文模型对英文 PersonName/OrgName/Address 也部分漏检**。如 'Pacific Coast Medical Center'、'Mitchell, Chen & Park LLP'、'1420 Market Street...' 未识别。可能是 distilbert-ner 模型精度不足或 tokenizer 对长实体切分问题 | NER 能力不足 |
 | BUG-031 | P1 | full_pipeline | `test_all_types_enabled_detects_all` (type_filtering.rs) | **新增**：全类型启用检测用例失败，24 个硬断言项未命中（全部为 NER 类型：PersonName/OrgName/Address），与 BUG-021/023/024 同根因 | NER 模型能力 |
+| BUG-034  | P2 | E2E | `test_batch_auto_retry_failed` (test_batch_auto.py:120) | **新增**：原测试（fa07796 引入）的 mock 让 `detect_by_regex/ner/dict` 全返空数组，`runDesensitizePipeline` 在 `mergedItems.length===0` 处短路返回 `record=null`，worker 走 0 敏感项 silent confirm 分支，`apply_desensitize` 永远不被调用 → `__E2E_RETRY_COUNT__` 永不递增 → 期望的 2 个 row-failed 永远不会出现。修复：mock 让 detect_by_* 返 1 项敏感，使 pipeline 走到 apply_desensitize 才能触发 throw | 测试逻辑错误 |
 
 ## 环境问题（非 Bug）
 
@@ -52,3 +53,4 @@
 | BUG-019 | 2026-04-08 | E2E | `test_workspace_list_has_multiple` | 降级为 ENV-003 环境问题，非代码 Bug |
 | BUG-025 | 2026-04-08 | baseline_data | `test_fp_sample_csv/xlsx` | 已通过全量 soft→hard 统一解决，不再区分 soft/hard |
 | BUG-032 | 2026-04-17 | desensitizer::generalize | `test_en_generalize_title_director_not_executive`, `test_en_generalize_title_no_substring_pollution` | `generalize_en_title` 改用 token 精确匹配（按非字母数字分割）+ 短语匹配优先级高于单词，消除 "cto" 子串污染；新增 2 个回归测试通过 |
+| BUG-033 | 2026-04-23 | E2E | `test_batch_auto.py` 11 个测试（全部解除阻塞） | 三处测试基础设施 bug 组合修复：(1) `_wait_workspace_ready` 顺序错误——首个 wait 改为 `workspace-list`；(2) `conftest.py` 未设 i18n 语言——追加 `localStorage.setItem('dimkey-lang', 'zh')` 避免回退到 navigator.language=en；(3) 新增 B10/B13 两处 `get_by_text` 命中多元素，换成 `viewonly-badge` testid 和 `batch-result-report` 容器 contains_text。修复后 8 个新用例 B06-B13 全部通过，10/11 绿（剩 retry_failed 是 BUG-034） |

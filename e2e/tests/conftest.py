@@ -28,6 +28,8 @@ def page(browser):
     context.add_init_script("""
         // 跳过匿名统计弹窗
         localStorage.setItem('analytics_consent_shown', '1');
+        // 强制 i18n 使用中文（默认 detection 读取 navigator.language，headless chromium 为 en）
+        localStorage.setItem('dimkey-lang', 'zh');
 
         // Mock Tauri IPC — 仅当不在真实 Tauri WebView 中时
         if (!window.__TAURI_INTERNALS__) {
