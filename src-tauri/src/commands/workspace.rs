@@ -31,8 +31,10 @@ fn get_workspace_path(app_handle: &tauri::AppHandle, id: &str) -> Result<std::pa
 pub(crate) fn read_workspace_data(path: &std::path::Path) -> Result<WorkspaceData, String> {
     let content = fs::read_to_string(path)
         .map_err(|e| format!("读取工作区文件失败: {}", e))?;
-    serde_json::from_str(&content)
-        .map_err(|e| format!("解析工作区数据失败: {}", e))
+    let mut data: WorkspaceData = serde_json::from_str(&content)
+        .map_err(|e| format!("解析工作区数据失败: {}", e))?;
+    migrate_legacy_counters(&mut data.workspace.replace_counters);
+    Ok(data)
 }
 
 /// 写入工作区数据文件
@@ -1103,5 +1105,74 @@ mod tests {
         let matches = replace_all_in_text_with_positions_fuzzy(&mut text, &mappings);
         assert_eq!(matches.len(), 1);
         assert_eq!(text, "hi world");
+    }
+}
+
+/// 迁移老工作区计数器：旧 key（如 "PersonName"）→ 新 key（"PersonName_zh"）。
+///
+/// 老用户绝大多数是中文场景，旧 counter 实际记录的就是中文池消费记录。
+/// 迁移到 `_zh` 后缀键，保持中文序号连续性；不影响英文池（从 0 开始）。
+pub(crate) fn migrate_legacy_counters(counters: &mut HashMap<String, usize>) {
+    for legacy_key in ["PersonName", "OrgName", "Address", "Title"] {
+        if let Some(v) = counters.remove(legacy_key) {
+            counters.entry(format!("{}_zh", legacy_key)).or_insert(v);
+        }
+    }
+}
+
+#[cfg(test)]
+mod migrate_tests {
+    use super::*;
+
+    #[test]
+    fn test_migrate_moves_legacy_keys() {
+        let mut counters = HashMap::new();
+        counters.insert("PersonName".to_string(), 5);
+        counters.insert("OrgName".to_string(), 3);
+        counters.insert("Address".to_string(), 1);
+        counters.insert("Title".to_string(), 2);
+        // 无关 key 不动
+        counters.insert("mou_surname_张".to_string(), 1);
+
+        migrate_legacy_counters(&mut counters);
+
+        assert_eq!(counters.get("PersonName"), None);
+        assert_eq!(counters.get("OrgName"), None);
+        assert_eq!(counters.get("Address"), None);
+        assert_eq!(counters.get("Title"), None);
+        assert_eq!(counters.get("PersonName_zh"), Some(&5));
+        assert_eq!(counters.get("OrgName_zh"), Some(&3));
+        assert_eq!(counters.get("Address_zh"), Some(&1));
+        assert_eq!(counters.get("Title_zh"), Some(&2));
+        // 无关 key 保留
+        assert_eq!(counters.get("mou_surname_张"), Some(&1));
+    }
+
+    #[test]
+    fn test_migrate_idempotent_when_zh_already_set() {
+        let mut counters = HashMap::new();
+        counters.insert("PersonName".to_string(), 5);
+        counters.insert("PersonName_zh".to_string(), 10); // 已迁移过
+        migrate_legacy_counters(&mut counters);
+        // 已存在的 _zh 不被覆盖
+        assert_eq!(counters.get("PersonName_zh"), Some(&10));
+        assert_eq!(counters.get("PersonName"), None);
+    }
+
+    #[test]
+    fn test_migrate_no_legacy_keys_does_nothing() {
+        let mut counters = HashMap::new();
+        counters.insert("PersonName_zh".to_string(), 7);
+        counters.insert("PersonName_en".to_string(), 3);
+        let before = counters.clone();
+        migrate_legacy_counters(&mut counters);
+        assert_eq!(counters, before);
+    }
+
+    #[test]
+    fn test_migrate_empty_counters_no_op() {
+        let mut counters: HashMap<String, usize> = HashMap::new();
+        migrate_legacy_counters(&mut counters);
+        assert!(counters.is_empty());
     }
 }
