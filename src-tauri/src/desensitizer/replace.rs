@@ -155,6 +155,22 @@ const ORG_SUFFIXES: &[&str] = &[
     "集团", "协会", "中心", "公司", "局", "委", "所", "院", "厂",
 ];
 
+/// 英文组织后缀表（与 fake_data/en/org_components.json 的 suffixes 完全对齐）
+const EN_ORG_SUFFIXES: &[&str] = &[
+    "Inc.", "Corp.", "LLC", "Ltd.", "Group", "Holdings",
+    "Partners", "Associates", "International", "Co.",
+];
+
+/// 从英文组织名末尾提取 suffix（按 EN_ORG_SUFFIXES 顺序匹配）；找不到则返回 "Co." 兜底
+fn extract_en_org_suffix(org: &str) -> &'static str {
+    for suffix in EN_ORG_SUFFIXES {
+        if org.ends_with(suffix) {
+            return suffix;
+        }
+    }
+    "Co."
+}
+
 /// 从人名中提取姓氏（优先匹配复姓）
 fn extract_surname(name: &str) -> String {
     let chars: Vec<char> = name.chars().collect();
@@ -527,7 +543,7 @@ impl ReplaceState {
         }
     }
 
-    /// 某式：人名替换（张某、张某二、李某 ... / English 在 Task 6 实现）
+    /// 某式：人名替换（张某、张某二、李某 ... / English: John Doe / Jane Doe 性别轮换）
     pub fn next_mou_name(&mut self, original: &str, lang: Language) -> String {
         match lang {
             Language::Zh => {
@@ -545,12 +561,22 @@ impl ReplaceState {
                 }
             }
             Language::En => {
-                unimplemented!("EN mou_name 在 Task 6 实现")
+                let counter = self.counters.entry("mou_name_en".to_string()).or_insert(0);
+                let n = *counter;
+                *counter += 1;
+                let base = if n % 2 == 0 { "John Doe" } else { "Jane Doe" };
+                // 第 0/1 次：John Doe / Jane Doe；第 2/3 次：John Doe 2 / Jane Doe 2 ...
+                let cycle = n / 2 + 1;
+                if cycle == 1 {
+                    base.to_string()
+                } else {
+                    format!("{} {}", base, cycle)
+                }
             }
         }
     }
 
-    /// 某式：组织名替换（某公司、某法院、某公司二 ... / English 在 Task 6 实现）
+    /// 某式：组织名替换（某公司、某法院、某公司二 ... / English: Acme + suffix，按 suffix 独立计数）
     pub fn next_mou_org(&mut self, original: &str, lang: Language) -> String {
         match lang {
             Language::Zh => {
@@ -565,12 +591,20 @@ impl ReplaceState {
                 }
             }
             Language::En => {
-                unimplemented!("EN mou_org 在 Task 6 实现")
+                let suffix = extract_en_org_suffix(original);
+                let key = format!("mou_org_en_{}", suffix);
+                let count = self.counters.entry(key).or_insert(0);
+                *count += 1;
+                if *count == 1 {
+                    format!("Acme {}", suffix)
+                } else {
+                    format!("Acme {} {}", suffix, *count)
+                }
             }
         }
     }
 
-    /// 某式：地址替换（某地、某地二 ... / English 在 Task 6 实现）
+    /// 某式：地址替换（某地、某地二 ... / English: [REDACTED CITY]）
     pub fn next_mou_address(&mut self, _original: &str, lang: Language) -> String {
         match lang {
             Language::Zh => {
@@ -584,12 +618,19 @@ impl ReplaceState {
                 }
             }
             Language::En => {
-                unimplemented!("EN mou_address 在 Task 6 实现")
+                let key = "mou_address_en".to_string();
+                let count = self.counters.entry(key).or_insert(0);
+                *count += 1;
+                if *count == 1 {
+                    "[REDACTED CITY]".to_string()
+                } else {
+                    format!("[REDACTED CITY] {}", *count)
+                }
             }
         }
     }
 
-    /// 某式：职务替换（某职务、某职务二 ... / English 在 Task 6 实现）
+    /// 某式：职务替换（某职务、某职务二 ... / English: [REDACTED TITLE]）
     pub fn next_mou_title(&mut self, _original: &str, lang: Language) -> String {
         match lang {
             Language::Zh => {
@@ -603,7 +644,14 @@ impl ReplaceState {
                 }
             }
             Language::En => {
-                unimplemented!("EN mou_title 在 Task 6 实现")
+                let key = "mou_title_en".to_string();
+                let count = self.counters.entry(key).or_insert(0);
+                *count += 1;
+                if *count == 1 {
+                    "[REDACTED TITLE]".to_string()
+                } else {
+                    format!("[REDACTED TITLE] {}", *count)
+                }
             }
         }
     }
@@ -666,34 +714,22 @@ pub fn apply_replace(
     match sensitive_type {
         SensitiveType::PersonName => match style {
             ReplaceStyle::Fake => state.next_name(lang),
-            ReplaceStyle::Mou => match lang {
-                Language::Zh => state.next_mou_name(text, lang),
-                Language::En => state.next_name(lang), // Task 6: 临时降级到 Fake，避免触发 unimplemented!
-            },
+            ReplaceStyle::Mou => state.next_mou_name(text, lang),
             ReplaceStyle::Ordinal => state.next_ordinal_name(),
         },
         SensitiveType::OrgName => match style {
             ReplaceStyle::Fake => state.next_org(lang),
-            ReplaceStyle::Mou => match lang {
-                Language::Zh => state.next_mou_org(text, lang),
-                Language::En => state.next_org(lang), // Task 6: 临时降级到 Fake，避免触发 unimplemented!
-            },
+            ReplaceStyle::Mou => state.next_mou_org(text, lang),
             ReplaceStyle::Ordinal => state.next_ordinal_org(text),
         },
         SensitiveType::Title => match style {
             ReplaceStyle::Fake => state.next_title(lang),
-            ReplaceStyle::Mou => match lang {
-                Language::Zh => state.next_mou_title(text, lang),
-                Language::En => state.next_title(lang), // Task 6: 临时降级到 Fake，避免触发 unimplemented!
-            },
+            ReplaceStyle::Mou => state.next_mou_title(text, lang),
             ReplaceStyle::Ordinal => state.next_ordinal_title(),
         },
         SensitiveType::Address => match style {
             ReplaceStyle::Fake => state.next_address(lang),
-            ReplaceStyle::Mou => match lang {
-                Language::Zh => state.next_mou_address(text, lang),
-                Language::En => state.next_address(lang), // Task 6: 临时降级到 Fake，避免触发 unimplemented!
-            },
+            ReplaceStyle::Mou => state.next_mou_address(text, lang),
             ReplaceStyle::Ordinal => state.next_ordinal_address(),
         },
         SensitiveType::Phone => {
@@ -1254,5 +1290,100 @@ mod tests {
         let counters = state.export_counters();
         assert_eq!(counters.get("PersonName_zh"), Some(&5));
         assert_eq!(counters.get("PersonName_en"), Some(&3));
+    }
+
+    // ========== EN Mou 测试 ==========
+
+    #[test]
+    fn test_extract_en_org_suffix() {
+        assert_eq!(extract_en_org_suffix("Apple Inc."), "Inc.");
+        assert_eq!(extract_en_org_suffix("Acme LLC"), "LLC");
+        assert_eq!(extract_en_org_suffix("Smith & Partners"), "Partners");
+        assert_eq!(extract_en_org_suffix("GitHub"), "Co."); // 兜底
+    }
+
+    #[test]
+    fn test_mou_person_name_en() {
+        let mut state = test_state();
+        // 性别轮换 + 序号
+        assert_eq!(
+            state.next_mou_name("John Smith", Language::En),
+            "John Doe"
+        );
+        assert_eq!(
+            state.next_mou_name("Jane Doe", Language::En),
+            "Jane Doe"
+        );
+        assert_eq!(
+            state.next_mou_name("Robert Garcia", Language::En),
+            "John Doe 2"
+        );
+        assert_eq!(
+            state.next_mou_name("Linda Wilson", Language::En),
+            "Jane Doe 2"
+        );
+        assert_eq!(
+            state.next_mou_name("Edward Lee", Language::En),
+            "John Doe 3"
+        );
+    }
+
+    #[test]
+    fn test_mou_org_en_with_suffix() {
+        let mut state = test_state();
+        assert_eq!(
+            state.next_mou_org("Apple Inc.", Language::En),
+            "Acme Inc."
+        );
+        // 同 suffix 第 2 次出现 → 加序号
+        assert_eq!(
+            state.next_mou_org("Microsoft Inc.", Language::En),
+            "Acme Inc. 2"
+        );
+        // 不同 suffix 独立计数
+        assert_eq!(
+            state.next_mou_org("Tesla LLC", Language::En),
+            "Acme LLC"
+        );
+    }
+
+    #[test]
+    fn test_mou_org_en_fallback_no_suffix() {
+        let mut state = test_state();
+        // GitHub 没有标准 suffix → 兜底为 Acme Co.
+        assert_eq!(
+            state.next_mou_org("GitHub", Language::En),
+            "Acme Co."
+        );
+        assert_eq!(
+            state.next_mou_org("Zoom", Language::En),
+            "Acme Co. 2"
+        );
+    }
+
+    #[test]
+    fn test_mou_address_en() {
+        let mut state = test_state();
+        assert_eq!(
+            state.next_mou_address("123 Main St, NY", Language::En),
+            "[REDACTED CITY]"
+        );
+        assert_eq!(
+            state.next_mou_address("456 Oak Ave, LA", Language::En),
+            "[REDACTED CITY] 2"
+        );
+    }
+
+    #[test]
+    fn test_mou_title_en() {
+        let mut state = test_state();
+        assert_eq!(
+            state.next_mou_title("Software Engineer", Language::En),
+            "[REDACTED TITLE]"
+        );
+        assert_eq!(
+            state.next_mou_title("Product Manager", Language::En),
+            "[REDACTED TITLE] 2"
+        );
     }
 }
