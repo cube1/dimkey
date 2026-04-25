@@ -217,18 +217,27 @@ fn calc_id_card_check_digit(id17: &str) -> char {
 pub struct ReplaceState {
     seed: u64,
     counters: HashMap<String, usize>,
-    // 惰性初始化的洗牌索引序列
-    name_indices: Option<Vec<u32>>,
-    org_indices: Option<Vec<u32>>,
-    address_indices: Option<Vec<u32>>,
-    title_indices: Option<Vec<u32>>,
+    // zh 洗牌索引
+    name_indices_zh: Option<Vec<u32>>,
+    org_indices_zh: Option<Vec<u32>>,
+    address_indices_zh: Option<Vec<u32>>,
+    title_indices_zh: Option<Vec<u32>>,
+    // en 洗牌索引
+    name_indices_en: Option<Vec<u32>>,
+    org_indices_en: Option<Vec<u32>>,
+    address_indices_en: Option<Vec<u32>>,
+    title_indices_en: Option<Vec<u32>>,
 }
 
 /// 类型偏移量，确保不同类型使用不同的 RNG 种子
-const NAME_SEED_OFFSET: u64 = 0;
-const ORG_SEED_OFFSET: u64 = 1;
-const ADDRESS_SEED_OFFSET: u64 = 2;
-const TITLE_SEED_OFFSET: u64 = 3;
+const NAME_SEED_OFFSET_ZH: u64 = 0;
+const ORG_SEED_OFFSET_ZH: u64 = 1;
+const ADDRESS_SEED_OFFSET_ZH: u64 = 2;
+const TITLE_SEED_OFFSET_ZH: u64 = 3;
+const NAME_SEED_OFFSET_EN: u64 = 4;
+const ORG_SEED_OFFSET_EN: u64 = 5;
+const ADDRESS_SEED_OFFSET_EN: u64 = 6;
+const TITLE_SEED_OFFSET_EN: u64 = 7;
 
 impl ReplaceState {
     /// 从工作区数据构造
@@ -236,10 +245,14 @@ impl ReplaceState {
         Self {
             seed,
             counters,
-            name_indices: None,
-            org_indices: None,
-            address_indices: None,
-            title_indices: None,
+            name_indices_zh: None,
+            org_indices_zh: None,
+            address_indices_zh: None,
+            title_indices_zh: None,
+            name_indices_en: None,
+            org_indices_en: None,
+            address_indices_en: None,
+            title_indices_en: None,
         }
     }
 
@@ -257,129 +270,158 @@ impl ReplaceState {
     }
 
     /// 取下一个唯一姓名
-    pub fn next_name(&mut self) -> String {
+    pub fn next_name(&mut self, lang: Language) -> String {
         let data = get_fake_data();
-        let surname_count = data.zh.person_names.surnames.len() as u32;
-        let given_count = data.zh.person_names.given_names.len() as u32;
-        let pool_size = surname_count * given_count;
+        match lang {
+            Language::Zh => {
+                let surname_count = data.zh.person_names.surnames.len() as u32;
+                let given_count = data.zh.person_names.given_names.len() as u32;
+                let pool_size = surname_count * given_count;
 
-        let indices = self.name_indices.get_or_insert_with(|| {
-            Self::init_shuffled_indices(self.seed, NAME_SEED_OFFSET, pool_size)
-        });
+                let indices = self.name_indices_zh.get_or_insert_with(|| {
+                    Self::init_shuffled_indices(self.seed, NAME_SEED_OFFSET_ZH, pool_size)
+                });
 
-        let counter = self.counters.entry("PersonName".to_string()).or_insert(0);
-        let idx = indices[*counter % indices.len()] as usize;
-        let wrap = *counter / indices.len();
-        *counter += 1;
+                let counter = self.counters.entry("PersonName_zh".to_string()).or_insert(0);
+                let idx = indices[*counter % indices.len()] as usize;
+                let wrap = *counter / indices.len();
+                *counter += 1;
 
-        let surname_idx = idx / given_count as usize;
-        let given_idx = idx % given_count as usize;
+                let surname_idx = idx / given_count as usize;
+                let given_idx = idx % given_count as usize;
 
-        let name = format!(
-            "{}{}",
-            data.zh.person_names.surnames[surname_idx],
-            data.zh.person_names.given_names[given_idx]
-        );
+                let name = format!(
+                    "{}{}",
+                    data.zh.person_names.surnames[surname_idx],
+                    data.zh.person_names.given_names[given_idx]
+                );
 
-        if wrap > 0 {
-            format!("{}{}", name, wrap)
-        } else {
-            name
+                if wrap > 0 {
+                    format!("{}{}", name, wrap)
+                } else {
+                    name
+                }
+            }
+            Language::En => {
+                // 实现见 Task 5
+                unimplemented!("EN next_name 在 Task 5 实现")
+            }
         }
     }
 
     /// 取下一个唯一机构名
-    pub fn next_org(&mut self) -> String {
+    pub fn next_org(&mut self, lang: Language) -> String {
         let data = get_fake_data();
-        let prefix_count = data.zh.org_components.prefixes.len() as u32;
-        let industry_count = data.zh.org_components.industries.len() as u32;
-        let suffix_count = data.zh.org_components.suffixes.len() as u32;
-        let pool_size = prefix_count * industry_count * suffix_count;
+        match lang {
+            Language::Zh => {
+                let prefix_count = data.zh.org_components.prefixes.len() as u32;
+                let industry_count = data.zh.org_components.industries.len() as u32;
+                let suffix_count = data.zh.org_components.suffixes.len() as u32;
+                let pool_size = prefix_count * industry_count * suffix_count;
 
-        let indices = self.org_indices.get_or_insert_with(|| {
-            Self::init_shuffled_indices(self.seed, ORG_SEED_OFFSET, pool_size)
-        });
+                let indices = self.org_indices_zh.get_or_insert_with(|| {
+                    Self::init_shuffled_indices(self.seed, ORG_SEED_OFFSET_ZH, pool_size)
+                });
 
-        let counter = self.counters.entry("OrgName".to_string()).or_insert(0);
-        let idx = indices[*counter % indices.len()] as usize;
-        let wrap = *counter / indices.len();
-        *counter += 1;
+                let counter = self.counters.entry("OrgName_zh".to_string()).or_insert(0);
+                let idx = indices[*counter % indices.len()] as usize;
+                let wrap = *counter / indices.len();
+                *counter += 1;
 
-        let suffix_idx = idx % suffix_count as usize;
-        let remaining = idx / suffix_count as usize;
-        let industry_idx = remaining % industry_count as usize;
-        let prefix_idx = remaining / industry_count as usize;
+                let suffix_idx = idx % suffix_count as usize;
+                let remaining = idx / suffix_count as usize;
+                let industry_idx = remaining % industry_count as usize;
+                let prefix_idx = remaining / industry_count as usize;
 
-        let org = format!(
-            "{}{}{}",
-            data.zh.org_components.prefixes[prefix_idx],
-            data.zh.org_components.industries[industry_idx],
-            data.zh.org_components.suffixes[suffix_idx]
-        );
+                let org = format!(
+                    "{}{}{}",
+                    data.zh.org_components.prefixes[prefix_idx],
+                    data.zh.org_components.industries[industry_idx],
+                    data.zh.org_components.suffixes[suffix_idx]
+                );
 
-        if wrap > 0 {
-            format!("{}{}", org, wrap)
-        } else {
-            org
+                if wrap > 0 {
+                    format!("{}{}", org, wrap)
+                } else {
+                    org
+                }
+            }
+            Language::En => {
+                unimplemented!("EN next_org 在 Task 5 实现")
+            }
         }
     }
 
     /// 取下一个唯一地址
-    pub fn next_address(&mut self) -> String {
+    pub fn next_address(&mut self, lang: Language) -> String {
         let data = get_fake_data();
-        let district_count = data.zh.address_components.city_districts.len() as u32;
-        let street_count = data.zh.address_components.streets.len() as u32;
-        let number_count = data.zh.address_components.numbers.len() as u32;
-        let pool_size = district_count * street_count * number_count;
+        match lang {
+            Language::Zh => {
+                let district_count = data.zh.address_components.city_districts.len() as u32;
+                let street_count = data.zh.address_components.streets.len() as u32;
+                let number_count = data.zh.address_components.numbers.len() as u32;
+                let pool_size = district_count * street_count * number_count;
 
-        let indices = self.address_indices.get_or_insert_with(|| {
-            Self::init_shuffled_indices(self.seed, ADDRESS_SEED_OFFSET, pool_size)
-        });
+                let indices = self.address_indices_zh.get_or_insert_with(|| {
+                    Self::init_shuffled_indices(self.seed, ADDRESS_SEED_OFFSET_ZH, pool_size)
+                });
 
-        let counter = self.counters.entry("Address".to_string()).or_insert(0);
-        let idx = indices[*counter % indices.len()] as usize;
-        let wrap = *counter / indices.len();
-        *counter += 1;
+                let counter = self.counters.entry("Address_zh".to_string()).or_insert(0);
+                let idx = indices[*counter % indices.len()] as usize;
+                let wrap = *counter / indices.len();
+                *counter += 1;
 
-        let number_idx = idx % number_count as usize;
-        let remaining = idx / number_count as usize;
-        let street_idx = remaining % street_count as usize;
-        let district_idx = remaining / street_count as usize;
+                let number_idx = idx % number_count as usize;
+                let remaining = idx / number_count as usize;
+                let street_idx = remaining % street_count as usize;
+                let district_idx = remaining / street_count as usize;
 
-        let addr = format!(
-            "{}{}{}号",
-            data.zh.address_components.city_districts[district_idx],
-            data.zh.address_components.streets[street_idx],
-            data.zh.address_components.numbers[number_idx]
-        );
+                let addr = format!(
+                    "{}{}{}号",
+                    data.zh.address_components.city_districts[district_idx],
+                    data.zh.address_components.streets[street_idx],
+                    data.zh.address_components.numbers[number_idx]
+                );
 
-        if wrap > 0 {
-            format!("{}{}", addr, wrap)
-        } else {
-            addr
+                if wrap > 0 {
+                    format!("{}{}", addr, wrap)
+                } else {
+                    addr
+                }
+            }
+            Language::En => {
+                unimplemented!("EN next_address 在 Task 5 实现")
+            }
         }
     }
 
     /// 取下一个唯一职位
-    pub fn next_title(&mut self) -> String {
+    pub fn next_title(&mut self, lang: Language) -> String {
         let data = get_fake_data();
-        let pool_size = data.zh.titles.len() as u32;
+        match lang {
+            Language::Zh => {
+                let pool_size = data.zh.titles.len() as u32;
 
-        let indices = self.title_indices.get_or_insert_with(|| {
-            Self::init_shuffled_indices(self.seed, TITLE_SEED_OFFSET, pool_size)
-        });
+                let indices = self.title_indices_zh.get_or_insert_with(|| {
+                    Self::init_shuffled_indices(self.seed, TITLE_SEED_OFFSET_ZH, pool_size)
+                });
 
-        let counter = self.counters.entry("Title".to_string()).or_insert(0);
-        let idx = indices[*counter % indices.len()] as usize;
-        let wrap = *counter / indices.len();
-        *counter += 1;
+                let counter = self.counters.entry("Title_zh".to_string()).or_insert(0);
+                let idx = indices[*counter % indices.len()] as usize;
+                let wrap = *counter / indices.len();
+                *counter += 1;
 
-        let title = data.zh.titles[idx].clone();
+                let title = data.zh.titles[idx].clone();
 
-        if wrap > 0 {
-            format!("{}{}", title, wrap)
-        } else {
-            title
+                if wrap > 0 {
+                    format!("{}{}", title, wrap)
+                } else {
+                    title
+                }
+            }
+            Language::En => {
+                unimplemented!("EN next_title 在 Task 5 实现")
+            }
         }
     }
 
@@ -488,26 +530,28 @@ pub fn apply_replace(
     style: &ReplaceStyle,
 ) -> String {
     let data = get_fake_data();
+    // Task 3: 统一传 Zh 保持和现状等效；EN 路径在 Task 5 替换 unimplemented!() 后再切到 detect_language(text)
+    let lang = Language::Zh;
     let mut rng = rand::thread_rng();
 
     match sensitive_type {
         SensitiveType::PersonName => match style {
-            ReplaceStyle::Fake => state.next_name(),
+            ReplaceStyle::Fake => state.next_name(lang),
             ReplaceStyle::Mou => state.next_mou_name(text),
             ReplaceStyle::Ordinal => state.next_ordinal_name(),
         },
         SensitiveType::OrgName => match style {
-            ReplaceStyle::Fake => state.next_org(),
+            ReplaceStyle::Fake => state.next_org(lang),
             ReplaceStyle::Mou => state.next_mou_org(text),
             ReplaceStyle::Ordinal => state.next_ordinal_org(text),
         },
         SensitiveType::Title => match style {
-            ReplaceStyle::Fake => state.next_title(),
+            ReplaceStyle::Fake => state.next_title(lang),
             ReplaceStyle::Mou => state.next_mou_title(text),
             ReplaceStyle::Ordinal => state.next_ordinal_title(),
         },
         SensitiveType::Address => match style {
-            ReplaceStyle::Fake => state.next_address(),
+            ReplaceStyle::Fake => state.next_address(lang),
             ReplaceStyle::Mou => state.next_mou_address(text),
             ReplaceStyle::Ordinal => state.next_ordinal_address(),
         },
@@ -721,7 +765,7 @@ mod tests {
         let mut state = test_state();
         let mut names: Vec<String> = Vec::new();
         for _ in 0..100 {
-            names.push(state.next_name());
+            names.push(state.next_name(Language::Zh));
         }
         let unique: std::collections::HashSet<&String> = names.iter().collect();
         assert_eq!(unique.len(), 100, "100 个姓名应全部唯一");
@@ -732,7 +776,7 @@ mod tests {
         let mut state = test_state();
         let mut orgs: Vec<String> = Vec::new();
         for _ in 0..100 {
-            orgs.push(state.next_org());
+            orgs.push(state.next_org(Language::Zh));
         }
         let unique: std::collections::HashSet<&String> = orgs.iter().collect();
         assert_eq!(unique.len(), 100, "100 个机构名应全部唯一");
@@ -743,7 +787,7 @@ mod tests {
         let mut state = test_state();
         let mut addrs: Vec<String> = Vec::new();
         for _ in 0..100 {
-            addrs.push(state.next_address());
+            addrs.push(state.next_address(Language::Zh));
         }
         let unique: std::collections::HashSet<&String> = addrs.iter().collect();
         assert_eq!(unique.len(), 100, "100 个地址应全部唯一");
@@ -755,16 +799,16 @@ mod tests {
         let mut state1 = ReplaceState::new(123, HashMap::new());
         let mut state2 = ReplaceState::new(123, HashMap::new());
 
-        let name1 = state1.next_name();
-        let name2 = state2.next_name();
+        let name1 = state1.next_name(Language::Zh);
+        let name2 = state2.next_name(Language::Zh);
         assert_eq!(name1, name2, "相同 seed 应产生相同姓名");
 
-        let org1 = state1.next_org();
-        let org2 = state2.next_org();
+        let org1 = state1.next_org(Language::Zh);
+        let org2 = state2.next_org(Language::Zh);
         assert_eq!(org1, org2, "相同 seed 应产生相同机构名");
 
-        let addr1 = state1.next_address();
-        let addr2 = state2.next_address();
+        let addr1 = state1.next_address(Language::Zh);
+        let addr2 = state2.next_address(Language::Zh);
         assert_eq!(addr1, addr2, "相同 seed 应产生相同地址");
     }
 
@@ -774,16 +818,16 @@ mod tests {
         let mut state_fresh = ReplaceState::new(99, HashMap::new());
         let mut names_first_10: Vec<String> = Vec::new();
         for _ in 0..10 {
-            names_first_10.push(state_fresh.next_name());
+            names_first_10.push(state_fresh.next_name(Language::Zh));
         }
 
         let mut counters = HashMap::new();
-        counters.insert("PersonName".to_string(), 5);
+        counters.insert("PersonName_zh".to_string(), 5);
         let mut state_resumed = ReplaceState::new(99, counters);
 
         // 恢复后产生的应与 fresh 的第 6~10 个相同
         for i in 5..10 {
-            let name = state_resumed.next_name();
+            let name = state_resumed.next_name(Language::Zh);
             assert_eq!(name, names_first_10[i], "恢复后第 {} 个应一致", i);
         }
     }
