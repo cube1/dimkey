@@ -352,10 +352,31 @@ fn test_en_replace_styles_on_ner_types() {
     let mut state3 = ReplaceState::new(42, HashMap::new());
     let ordinal = apply_replace(name, &SensitiveType::PersonName, &mut state3, &ReplaceStyle::Ordinal);
 
-    // 三种风格都应替换原文
+    // 三种风格都应替换原文（保留为 defense-in-depth）
     assert_ne!(fake, name, "Fake 应替换原文");
     assert_ne!(mou, name, "Mou 应替换原文");
     assert_ne!(ordinal, name, "Ordinal 应替换原文");
+
+    // Fake：英文假名（含空格、不含汉字、不是 John Doe 占位）
+    assert!(fake.contains(' '), "Fake 输出应含空格: {}", fake);
+    assert!(
+        fake.chars().all(|c| !('\u{4E00}'..='\u{9FFF}').contains(&c)),
+        "Fake 输出不应含汉字: {}",
+        fake
+    );
+    assert_ne!(fake, "John Doe", "Fake 不应输出 John Doe（那是 Mou）");
+    assert_ne!(fake, "Jane Doe", "Fake 不应输出 Jane Doe（那是 Mou）");
+
+    // Mou：第一个英文 PersonName 应是 "John Doe"
+    assert_eq!(mou, "John Doe", "Mou 第一个英文人名应是 John Doe");
+
+    // Ordinal 在英文上降级为 Fake：含空格、不含汉字、不是 Person A
+    assert!(!ordinal.starts_with("Person "), "Ordinal 在英文上不应输出 Person A: {}", ordinal);
+    assert!(
+        ordinal.chars().all(|c| !('\u{4E00}'..='\u{9FFF}').contains(&c)),
+        "Ordinal 在英文上不应含汉字: {}",
+        ordinal
+    );
 }
 
 // ============================================================

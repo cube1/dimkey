@@ -57,6 +57,23 @@ fn assert_spreadsheet_roundtrip(fixture_rel_path: &str, suffix: &str) {
         fixture_rel_path
     );
 
+    // 脱敏输出不应含汉字（英文 Fake 应走英文池）
+    let desensitized_text: String = match &result.content {
+        FileContent::Spreadsheet { sheets, .. } => sheets
+            .iter()
+            .flat_map(|s| s.rows.iter().flat_map(|r| r.iter().map(|c| c.text.clone())))
+            .collect::<Vec<_>>()
+            .join(" "),
+        FileContent::Document { paragraphs, .. } => {
+            paragraphs.iter().map(|p| p.text.clone()).collect::<Vec<_>>().join(" ")
+        }
+    };
+    assert!(
+        desensitized_text.chars().all(|c| !('\u{4E00}'..='\u{9FFF}').contains(&c)),
+        "英文文档脱敏后不应含汉字: {}",
+        fixture_rel_path
+    );
+
     // 导出到临时文件
     let tmp = tempfile::Builder::new()
         .suffix(suffix)
@@ -117,6 +134,23 @@ fn assert_document_roundtrip(fixture_rel_path: &str, suffix: &str) {
     assert!(
         !result.mappings.is_empty(),
         "脱敏后应有映射记录: {}",
+        fixture_rel_path
+    );
+
+    // 脱敏输出不应含汉字（英文 Fake 应走英文池）
+    let desensitized_text: String = match &result.content {
+        FileContent::Spreadsheet { sheets, .. } => sheets
+            .iter()
+            .flat_map(|s| s.rows.iter().flat_map(|r| r.iter().map(|c| c.text.clone())))
+            .collect::<Vec<_>>()
+            .join(" "),
+        FileContent::Document { paragraphs, .. } => {
+            paragraphs.iter().map(|p| p.text.clone()).collect::<Vec<_>>().join(" ")
+        }
+    };
+    assert!(
+        desensitized_text.chars().all(|c| !('\u{4E00}'..='\u{9FFF}').contains(&c)),
+        "英文文档脱敏后不应含汉字: {}",
         fixture_rel_path
     );
 
