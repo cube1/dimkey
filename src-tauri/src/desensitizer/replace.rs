@@ -1158,12 +1158,11 @@ mod tests {
             "EN 假机构不应含汉字: {}",
             result
         );
-        // 应含某个 EN suffix
-        let en_suffixes = ["Inc.", "Corp.", "LLC", "Ltd.", "Group", "Holdings",
-                           "Partners", "Associates", "International", "Co."];
+        // 应以字典中的某个 EN suffix 结尾（动态读取，避免与字典扩展时同步漂移）
+        let en_suffixes = &get_fake_data().en.org_components.suffixes;
         assert!(
-            en_suffixes.iter().any(|s| result.ends_with(s)),
-            "EN 假机构应以已知 suffix 结尾: {}",
+            en_suffixes.iter().any(|s| result.ends_with(s.as_str())),
+            "EN 假机构应以字典已知 suffix 结尾: {}",
             result
         );
     }
@@ -1222,6 +1221,24 @@ mod tests {
         }
         let unique: std::collections::HashSet<&String> = orgs.iter().collect();
         assert_eq!(unique.len(), 100, "100 个 EN 机构应全部唯一");
+    }
+
+    #[test]
+    fn test_title_en_wrap_suffix() {
+        // EN titles 池只有 30 个，第 31 次调用应触发 wrap，输出末尾加 " 1"
+        let mut state = test_state();
+        let data = get_fake_data();
+        let pool_size = data.en.titles.len();
+        for _ in 0..pool_size {
+            state.next_title(Language::En);
+        }
+        let wrapped = state.next_title(Language::En);
+        assert!(
+            wrapped.ends_with(" 1"),
+            "第 {} 次调用应有 wrap 后缀 ' 1'，实际: {}",
+            pool_size + 1,
+            wrapped
+        );
     }
 
     #[test]
