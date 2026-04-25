@@ -715,22 +715,34 @@ pub fn apply_replace(
         SensitiveType::PersonName => match style {
             ReplaceStyle::Fake => state.next_name(lang),
             ReplaceStyle::Mou => state.next_mou_name(text, lang),
-            ReplaceStyle::Ordinal => state.next_ordinal_name(),
+            ReplaceStyle::Ordinal => match lang {
+                Language::Zh => state.next_ordinal_name(),
+                Language::En => state.next_name(lang),
+            },
         },
         SensitiveType::OrgName => match style {
             ReplaceStyle::Fake => state.next_org(lang),
             ReplaceStyle::Mou => state.next_mou_org(text, lang),
-            ReplaceStyle::Ordinal => state.next_ordinal_org(text),
+            ReplaceStyle::Ordinal => match lang {
+                Language::Zh => state.next_ordinal_org(text),
+                Language::En => state.next_org(lang),
+            },
         },
         SensitiveType::Title => match style {
             ReplaceStyle::Fake => state.next_title(lang),
             ReplaceStyle::Mou => state.next_mou_title(text, lang),
-            ReplaceStyle::Ordinal => state.next_ordinal_title(),
+            ReplaceStyle::Ordinal => match lang {
+                Language::Zh => state.next_ordinal_title(),
+                Language::En => state.next_title(lang),
+            },
         },
         SensitiveType::Address => match style {
             ReplaceStyle::Fake => state.next_address(lang),
             ReplaceStyle::Mou => state.next_mou_address(text, lang),
-            ReplaceStyle::Ordinal => state.next_ordinal_address(),
+            ReplaceStyle::Ordinal => match lang {
+                Language::Zh => state.next_ordinal_address(),
+                Language::En => state.next_address(lang),
+            },
         },
         SensitiveType::Phone => {
             let p = &data.zh.patterns;
@@ -1385,5 +1397,83 @@ mod tests {
             state.next_mou_title("Product Manager", Language::En),
             "[REDACTED TITLE] 2"
         );
+    }
+
+    // ========== Ordinal 英文降级测试 ==========
+
+    #[test]
+    fn test_ordinal_en_person_falls_back_to_fake() {
+        let mut state = test_state();
+        let result = apply_replace(
+            "John Smith",
+            &SensitiveType::PersonName,
+            &mut state,
+            &ReplaceStyle::Ordinal,
+        );
+        // 不应输出 "当事人一"（中文 ordinal 在英文上的牵强映射）
+        assert!(!result.starts_with("当事人"), "EN Ordinal 应降级为 Fake，不应是 当事人X: {}", result);
+        // 应输出英文假名（含空格、纯 ASCII）
+        assert!(result.contains(' '), "应是英文假名: {}", result);
+        assert!(
+            result.chars().all(|c| !('\u{4E00}'..='\u{9FFF}').contains(&c)),
+            "应不含汉字: {}",
+            result
+        );
+    }
+
+    #[test]
+    fn test_ordinal_en_org_falls_back_to_fake() {
+        let mut state = test_state();
+        let result = apply_replace(
+            "Apple Inc.",
+            &SensitiveType::OrgName,
+            &mut state,
+            &ReplaceStyle::Ordinal,
+        );
+        assert!(!result.starts_with("甲"), "EN Ordinal 应降级为 Fake: {}", result);
+        let en_suffixes = &get_fake_data().en.org_components.suffixes;
+        assert!(
+            en_suffixes.iter().any(|s| result.ends_with(s.as_str())),
+            "应是 EN Fake 输出（带 EN suffix）: {}",
+            result
+        );
+    }
+
+    #[test]
+    fn test_ordinal_en_address_falls_back_to_fake() {
+        let mut state = test_state();
+        let result = apply_replace(
+            "123 Main St",
+            &SensitiveType::Address,
+            &mut state,
+            &ReplaceStyle::Ordinal,
+        );
+        assert!(!result.starts_with("地址"), "EN Ordinal 应降级为 Fake: {}", result);
+        assert!(result.contains(','), "应是 EN Fake 输出: {}", result);
+    }
+
+    #[test]
+    fn test_ordinal_en_title_falls_back_to_fake() {
+        let mut state = test_state();
+        let result = apply_replace(
+            "Software Engineer",
+            &SensitiveType::Title,
+            &mut state,
+            &ReplaceStyle::Ordinal,
+        );
+        assert!(!result.starts_with("职务"), "EN Ordinal 应降级为 Fake: {}", result);
+    }
+
+    #[test]
+    fn test_ordinal_zh_still_works() {
+        // 中文 Ordinal 行为不变
+        let mut state = test_state();
+        let result = apply_replace(
+            "张三",
+            &SensitiveType::PersonName,
+            &mut state,
+            &ReplaceStyle::Ordinal,
+        );
+        assert_eq!(result, "当事人一");
     }
 }
