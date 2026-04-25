@@ -16,6 +16,11 @@ const TITLES_JSON: &str = include_str!("../../resources/fake_data/zh/titles.json
 const ADDRESS_COMPONENTS_JSON: &str = include_str!("../../resources/fake_data/zh/address_components.json");
 const PATTERNS_JSON: &str = include_str!("../../resources/fake_data/zh/patterns.json");
 
+const EN_PERSON_NAMES_JSON: &str = include_str!("../../resources/fake_data/en/person_names.json");
+const EN_ORG_COMPONENTS_JSON: &str = include_str!("../../resources/fake_data/en/org_components.json");
+const EN_TITLES_JSON: &str = include_str!("../../resources/fake_data/en/titles.json");
+const EN_ADDRESS_COMPONENTS_JSON: &str = include_str!("../../resources/fake_data/en/address_components.json");
+
 #[derive(Deserialize)]
 struct PersonNames {
     surnames: Vec<String>,
@@ -50,13 +55,47 @@ struct Patterns {
     email_domains: Vec<String>,
 }
 
-/// 所有假数据，启动时解析一次
-struct FakeData {
+#[derive(Deserialize)]
+struct EnPersonNames {
+    first_names: Vec<String>,
+    last_names: Vec<String>,
+}
+
+#[derive(Deserialize)]
+struct EnOrgComponents {
+    prefixes: Vec<String>,
+    industries: Vec<String>,
+    suffixes: Vec<String>,
+}
+
+#[derive(Deserialize)]
+struct EnAddressComponents {
+    cities: Vec<String>,
+    streets: Vec<String>,
+    numbers: Vec<u32>,
+}
+
+/// 中文假数据子集
+struct ZhFakeData {
     person_names: PersonNames,
     org_components: OrgComponents,
     titles: Vec<String>,
     address_components: AddressComponents,
     patterns: Patterns,
+}
+
+/// 英文假数据子集
+struct EnFakeData {
+    person_names: EnPersonNames,
+    org_components: EnOrgComponents,
+    titles: Vec<String>,
+    address_components: EnAddressComponents,
+}
+
+/// 所有假数据，启动时解析一次
+struct FakeData {
+    zh: ZhFakeData,
+    en: EnFakeData,
 }
 
 static FAKE_DATA: OnceLock<FakeData> = OnceLock::new();
@@ -74,11 +113,25 @@ pub fn detect_language(text: &str) -> Language {
 
 fn get_fake_data() -> &'static FakeData {
     FAKE_DATA.get_or_init(|| FakeData {
-        person_names: serde_json::from_str(PERSON_NAMES_JSON).expect("解析 person_names.json 失败"),
-        org_components: serde_json::from_str(ORG_COMPONENTS_JSON).expect("解析 org_components.json 失败"),
-        titles: serde_json::from_str(TITLES_JSON).expect("解析 titles.json 失败"),
-        address_components: serde_json::from_str(ADDRESS_COMPONENTS_JSON).expect("解析 address_components.json 失败"),
-        patterns: serde_json::from_str(PATTERNS_JSON).expect("解析 patterns.json 失败"),
+        zh: ZhFakeData {
+            person_names: serde_json::from_str(PERSON_NAMES_JSON)
+                .expect("解析 zh/person_names.json 失败"),
+            org_components: serde_json::from_str(ORG_COMPONENTS_JSON)
+                .expect("解析 zh/org_components.json 失败"),
+            titles: serde_json::from_str(TITLES_JSON).expect("解析 zh/titles.json 失败"),
+            address_components: serde_json::from_str(ADDRESS_COMPONENTS_JSON)
+                .expect("解析 zh/address_components.json 失败"),
+            patterns: serde_json::from_str(PATTERNS_JSON).expect("解析 zh/patterns.json 失败"),
+        },
+        en: EnFakeData {
+            person_names: serde_json::from_str(EN_PERSON_NAMES_JSON)
+                .expect("解析 en/person_names.json 失败"),
+            org_components: serde_json::from_str(EN_ORG_COMPONENTS_JSON)
+                .expect("解析 en/org_components.json 失败"),
+            titles: serde_json::from_str(EN_TITLES_JSON).expect("解析 en/titles.json 失败"),
+            address_components: serde_json::from_str(EN_ADDRESS_COMPONENTS_JSON)
+                .expect("解析 en/address_components.json 失败"),
+        },
     })
 }
 
@@ -206,8 +259,8 @@ impl ReplaceState {
     /// 取下一个唯一姓名
     pub fn next_name(&mut self) -> String {
         let data = get_fake_data();
-        let surname_count = data.person_names.surnames.len() as u32;
-        let given_count = data.person_names.given_names.len() as u32;
+        let surname_count = data.zh.person_names.surnames.len() as u32;
+        let given_count = data.zh.person_names.given_names.len() as u32;
         let pool_size = surname_count * given_count;
 
         let indices = self.name_indices.get_or_insert_with(|| {
@@ -224,8 +277,8 @@ impl ReplaceState {
 
         let name = format!(
             "{}{}",
-            data.person_names.surnames[surname_idx],
-            data.person_names.given_names[given_idx]
+            data.zh.person_names.surnames[surname_idx],
+            data.zh.person_names.given_names[given_idx]
         );
 
         if wrap > 0 {
@@ -238,9 +291,9 @@ impl ReplaceState {
     /// 取下一个唯一机构名
     pub fn next_org(&mut self) -> String {
         let data = get_fake_data();
-        let prefix_count = data.org_components.prefixes.len() as u32;
-        let industry_count = data.org_components.industries.len() as u32;
-        let suffix_count = data.org_components.suffixes.len() as u32;
+        let prefix_count = data.zh.org_components.prefixes.len() as u32;
+        let industry_count = data.zh.org_components.industries.len() as u32;
+        let suffix_count = data.zh.org_components.suffixes.len() as u32;
         let pool_size = prefix_count * industry_count * suffix_count;
 
         let indices = self.org_indices.get_or_insert_with(|| {
@@ -259,9 +312,9 @@ impl ReplaceState {
 
         let org = format!(
             "{}{}{}",
-            data.org_components.prefixes[prefix_idx],
-            data.org_components.industries[industry_idx],
-            data.org_components.suffixes[suffix_idx]
+            data.zh.org_components.prefixes[prefix_idx],
+            data.zh.org_components.industries[industry_idx],
+            data.zh.org_components.suffixes[suffix_idx]
         );
 
         if wrap > 0 {
@@ -274,9 +327,9 @@ impl ReplaceState {
     /// 取下一个唯一地址
     pub fn next_address(&mut self) -> String {
         let data = get_fake_data();
-        let district_count = data.address_components.city_districts.len() as u32;
-        let street_count = data.address_components.streets.len() as u32;
-        let number_count = data.address_components.numbers.len() as u32;
+        let district_count = data.zh.address_components.city_districts.len() as u32;
+        let street_count = data.zh.address_components.streets.len() as u32;
+        let number_count = data.zh.address_components.numbers.len() as u32;
         let pool_size = district_count * street_count * number_count;
 
         let indices = self.address_indices.get_or_insert_with(|| {
@@ -295,9 +348,9 @@ impl ReplaceState {
 
         let addr = format!(
             "{}{}{}号",
-            data.address_components.city_districts[district_idx],
-            data.address_components.streets[street_idx],
-            data.address_components.numbers[number_idx]
+            data.zh.address_components.city_districts[district_idx],
+            data.zh.address_components.streets[street_idx],
+            data.zh.address_components.numbers[number_idx]
         );
 
         if wrap > 0 {
@@ -310,7 +363,7 @@ impl ReplaceState {
     /// 取下一个唯一职位
     pub fn next_title(&mut self) -> String {
         let data = get_fake_data();
-        let pool_size = data.titles.len() as u32;
+        let pool_size = data.zh.titles.len() as u32;
 
         let indices = self.title_indices.get_or_insert_with(|| {
             Self::init_shuffled_indices(self.seed, TITLE_SEED_OFFSET, pool_size)
@@ -321,7 +374,7 @@ impl ReplaceState {
         let wrap = *counter / indices.len();
         *counter += 1;
 
-        let title = data.titles[idx].clone();
+        let title = data.zh.titles[idx].clone();
 
         if wrap > 0 {
             format!("{}{}", title, wrap)
@@ -459,13 +512,13 @@ pub fn apply_replace(
             ReplaceStyle::Ordinal => state.next_ordinal_address(),
         },
         SensitiveType::Phone => {
-            let p = &data.patterns;
+            let p = &data.zh.patterns;
             let prefix = pick(&mut rng, &p.phone_prefixes);
             let suffix: u32 = rng.gen_range(10000000..99999999);
             format!("{}{}", prefix, suffix)
         }
         SensitiveType::IdCard => {
-            let p = &data.patterns;
+            let p = &data.zh.patterns;
             let area = pick(&mut rng, &p.id_area_codes);
             let year: u32 = rng.gen_range(1960..2000);
             let month: u32 = rng.gen_range(1..13);
@@ -476,7 +529,7 @@ pub fn apply_replace(
             format!("{}{}", id17, check)
         }
         SensitiveType::BankCard => {
-            let p = &data.patterns;
+            let p = &data.zh.patterns;
             let prefix = pick(&mut rng, &p.bank_card_prefixes);
             // 根据原文长度生成对应长度的假银行卡号
             let orig_len = text.chars().count();
@@ -489,7 +542,7 @@ pub fn apply_replace(
             format!("{}{}", prefix, digits)
         }
         SensitiveType::Email => {
-            let p = &data.patterns;
+            let p = &data.zh.patterns;
             let name = pick(&mut rng, &p.email_names);
             let num: u32 = rng.gen_range(100..999);
             let domain = pick(&mut rng, &p.email_domains);
@@ -505,13 +558,13 @@ pub fn apply_replace(
             )
         }
         SensitiveType::LandlinePhone => {
-            let p = &data.patterns;
+            let p = &data.zh.patterns;
             let area = pick(&mut rng, &p.landline_area_codes);
             let num: u32 = rng.gen_range(60000000..89999999);
             format!("{}-{}", area, num)
         }
         SensitiveType::LicensePlate => {
-            let p = &data.patterns;
+            let p = &data.zh.patterns;
             let province = pick(&mut rng, &p.plate_provinces);
             let letters: Vec<char> = p.plate_letters.chars().collect();
             let letter = letters[rng.gen_range(0..letters.len())];
@@ -519,7 +572,7 @@ pub fn apply_replace(
             format!("{}{}{:05}", province, letter, suffix)
         }
         SensitiveType::CreditCode => {
-            let p = &data.patterns;
+            let p = &data.zh.patterns;
             let area = pick(&mut rng, &p.credit_code_areas);
             let charset: Vec<char> = p.credit_code_charset.chars().collect();
             let mut code = format!("91{}", area);
