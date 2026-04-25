@@ -469,7 +469,7 @@ impl ReplaceState {
     }
 
     /// 某式：地址替换（某地、某地二 ... / English 在 Task 6 实现）
-    pub fn next_mou_address(&mut self, original: &str, lang: Language) -> String {
+    pub fn next_mou_address(&mut self, _original: &str, lang: Language) -> String {
         match lang {
             Language::Zh => {
                 let key = "mou_address".to_string();
@@ -488,7 +488,7 @@ impl ReplaceState {
     }
 
     /// 某式：职务替换（某职务、某职务二 ... / English 在 Task 6 实现）
-    pub fn next_mou_title(&mut self, original: &str, lang: Language) -> String {
+    pub fn next_mou_title(&mut self, _original: &str, lang: Language) -> String {
         match lang {
             Language::Zh => {
                 let key = "mou_title".to_string();
