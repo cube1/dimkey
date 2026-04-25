@@ -425,56 +425,84 @@ impl ReplaceState {
         }
     }
 
-    /// 某式：人名替换（张某、张某二、李某...）
-    pub fn next_mou_name(&mut self, original: &str) -> String {
-        if original.is_empty() {
-            return "某某".to_string();
-        }
-        let surname = extract_surname(original);
-        let key = format!("mou_surname_{}", surname);
-        let count = self.counters.entry(key).or_insert(0);
-        *count += 1;
-        if *count == 1 {
-            format!("{}某", surname)
-        } else {
-            format!("{}某{}", surname, to_chinese_numeral(*count))
-        }
-    }
-
-    /// 某式：组织名替换（某公司、某法院、某公司二...）
-    pub fn next_mou_org(&mut self, original: &str) -> String {
-        let suffix = extract_org_suffix(original);
-        let key = format!("mou_org_{}", suffix);
-        let count = self.counters.entry(key).or_insert(0);
-        *count += 1;
-        if *count == 1 {
-            format!("某{}", suffix)
-        } else {
-            format!("某{}{}", suffix, to_chinese_numeral(*count))
+    /// 某式：人名替换（张某、张某二、李某 ... / English 在 Task 6 实现）
+    pub fn next_mou_name(&mut self, original: &str, lang: Language) -> String {
+        match lang {
+            Language::Zh => {
+                if original.is_empty() {
+                    return "某某".to_string();
+                }
+                let surname = extract_surname(original);
+                let key = format!("mou_surname_{}", surname);
+                let count = self.counters.entry(key).or_insert(0);
+                *count += 1;
+                if *count == 1 {
+                    format!("{}某", surname)
+                } else {
+                    format!("{}某{}", surname, to_chinese_numeral(*count))
+                }
+            }
+            Language::En => {
+                unimplemented!("EN mou_name 在 Task 6 实现")
+            }
         }
     }
 
-    /// 某式：地址替换（某地、某地二...）
-    pub fn next_mou_address(&mut self, _original: &str) -> String {
-        let key = "mou_address".to_string();
-        let count = self.counters.entry(key).or_insert(0);
-        *count += 1;
-        if *count == 1 {
-            "某地".to_string()
-        } else {
-            format!("某地{}", to_chinese_numeral(*count))
+    /// 某式：组织名替换（某公司、某法院、某公司二 ... / English 在 Task 6 实现）
+    pub fn next_mou_org(&mut self, original: &str, lang: Language) -> String {
+        match lang {
+            Language::Zh => {
+                let suffix = extract_org_suffix(original);
+                let key = format!("mou_org_{}", suffix);
+                let count = self.counters.entry(key).or_insert(0);
+                *count += 1;
+                if *count == 1 {
+                    format!("某{}", suffix)
+                } else {
+                    format!("某{}{}", suffix, to_chinese_numeral(*count))
+                }
+            }
+            Language::En => {
+                unimplemented!("EN mou_org 在 Task 6 实现")
+            }
         }
     }
 
-    /// 某式：职务替换（某职务、某职务二...）
-    pub fn next_mou_title(&mut self, _original: &str) -> String {
-        let key = "mou_title".to_string();
-        let count = self.counters.entry(key).or_insert(0);
-        *count += 1;
-        if *count == 1 {
-            "某职务".to_string()
-        } else {
-            format!("某职务{}", to_chinese_numeral(*count))
+    /// 某式：地址替换（某地、某地二 ... / English 在 Task 6 实现）
+    pub fn next_mou_address(&mut self, original: &str, lang: Language) -> String {
+        match lang {
+            Language::Zh => {
+                let key = "mou_address".to_string();
+                let count = self.counters.entry(key).or_insert(0);
+                *count += 1;
+                if *count == 1 {
+                    "某地".to_string()
+                } else {
+                    format!("某地{}", to_chinese_numeral(*count))
+                }
+            }
+            Language::En => {
+                unimplemented!("EN mou_address 在 Task 6 实现")
+            }
+        }
+    }
+
+    /// 某式：职务替换（某职务、某职务二 ... / English 在 Task 6 实现）
+    pub fn next_mou_title(&mut self, original: &str, lang: Language) -> String {
+        match lang {
+            Language::Zh => {
+                let key = "mou_title".to_string();
+                let count = self.counters.entry(key).or_insert(0);
+                *count += 1;
+                if *count == 1 {
+                    "某职务".to_string()
+                } else {
+                    format!("某职务{}", to_chinese_numeral(*count))
+                }
+            }
+            Language::En => {
+                unimplemented!("EN mou_title 在 Task 6 实现")
+            }
         }
     }
 
@@ -537,22 +565,22 @@ pub fn apply_replace(
     match sensitive_type {
         SensitiveType::PersonName => match style {
             ReplaceStyle::Fake => state.next_name(lang),
-            ReplaceStyle::Mou => state.next_mou_name(text),
+            ReplaceStyle::Mou => state.next_mou_name(text, lang),
             ReplaceStyle::Ordinal => state.next_ordinal_name(),
         },
         SensitiveType::OrgName => match style {
             ReplaceStyle::Fake => state.next_org(lang),
-            ReplaceStyle::Mou => state.next_mou_org(text),
+            ReplaceStyle::Mou => state.next_mou_org(text, lang),
             ReplaceStyle::Ordinal => state.next_ordinal_org(text),
         },
         SensitiveType::Title => match style {
             ReplaceStyle::Fake => state.next_title(lang),
-            ReplaceStyle::Mou => state.next_mou_title(text),
+            ReplaceStyle::Mou => state.next_mou_title(text, lang),
             ReplaceStyle::Ordinal => state.next_ordinal_title(),
         },
         SensitiveType::Address => match style {
             ReplaceStyle::Fake => state.next_address(lang),
-            ReplaceStyle::Mou => state.next_mou_address(text),
+            ReplaceStyle::Mou => state.next_mou_address(text, lang),
             ReplaceStyle::Ordinal => state.next_ordinal_address(),
         },
         SensitiveType::Phone => {
@@ -877,34 +905,34 @@ mod tests {
     #[test]
     fn test_mou_person_name() {
         let mut state = ReplaceState::new(42, HashMap::new());
-        assert_eq!(state.next_mou_name("张三"), "张某");
-        assert_eq!(state.next_mou_name("李四"), "李某");
-        assert_eq!(state.next_mou_name("张四"), "张某二");
-        assert_eq!(state.next_mou_name("欧阳修"), "欧阳某");
+        assert_eq!(state.next_mou_name("张三", Language::Zh), "张某");
+        assert_eq!(state.next_mou_name("李四", Language::Zh), "李某");
+        assert_eq!(state.next_mou_name("张四", Language::Zh), "张某二");
+        assert_eq!(state.next_mou_name("欧阳修", Language::Zh), "欧阳某");
         // 空名字应返回 "某某"
-        assert_eq!(state.next_mou_name(""), "某某");
+        assert_eq!(state.next_mou_name("", Language::Zh), "某某");
     }
 
     #[test]
     fn test_mou_org_name() {
         let mut state = ReplaceState::new(42, HashMap::new());
-        assert_eq!(state.next_mou_org("腾讯科技有限公司"), "某公司");
-        assert_eq!(state.next_mou_org("北京市朝阳区人民法院"), "某法院");
-        assert_eq!(state.next_mou_org("百度在线网络技术有限公司"), "某公司二");
+        assert_eq!(state.next_mou_org("腾讯科技有限公司", Language::Zh), "某公司");
+        assert_eq!(state.next_mou_org("北京市朝阳区人民法院", Language::Zh), "某法院");
+        assert_eq!(state.next_mou_org("百度在线网络技术有限公司", Language::Zh), "某公司二");
     }
 
     #[test]
     fn test_mou_address() {
         let mut state = ReplaceState::new(42, HashMap::new());
-        assert_eq!(state.next_mou_address("北京市朝阳区"), "某地");
-        assert_eq!(state.next_mou_address("上海市浦东新区"), "某地二");
+        assert_eq!(state.next_mou_address("北京市朝阳区", Language::Zh), "某地");
+        assert_eq!(state.next_mou_address("上海市浦东新区", Language::Zh), "某地二");
     }
 
     #[test]
     fn test_mou_title() {
         let mut state = ReplaceState::new(42, HashMap::new());
-        assert_eq!(state.next_mou_title("总经理"), "某职务");
-        assert_eq!(state.next_mou_title("副总裁"), "某职务二");
+        assert_eq!(state.next_mou_title("总经理", Language::Zh), "某职务");
+        assert_eq!(state.next_mou_title("副总裁", Language::Zh), "某职务二");
     }
 
     // ========== 序号式测试 ==========
