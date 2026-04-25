@@ -1419,6 +1419,10 @@ mod tests {
             "应不含汉字: {}",
             result
         );
+        // Sibling state 走 Fake 应得到相同输出（验证真的走了 next_name）
+        let mut sibling = test_state();
+        let expected = sibling.next_name(Language::En);
+        assert_eq!(result, expected, "Ordinal EN 应降级为 Fake，输出应与 next_name(En) 首次调用一致");
     }
 
     #[test]
@@ -1450,6 +1454,10 @@ mod tests {
         );
         assert!(!result.starts_with("地址"), "EN Ordinal 应降级为 Fake: {}", result);
         assert!(result.contains(','), "应是 EN Fake 输出: {}", result);
+        // Sibling state 走 Fake 应得到相同输出
+        let mut sibling = test_state();
+        let expected = sibling.next_address(Language::En);
+        assert_eq!(result, expected, "Ordinal EN 应降级为 Fake，输出应与 next_address(En) 首次调用一致");
     }
 
     #[test]
@@ -1462,6 +1470,10 @@ mod tests {
             &ReplaceStyle::Ordinal,
         );
         assert!(!result.starts_with("职务"), "EN Ordinal 应降级为 Fake: {}", result);
+        // Sibling state 走 Fake 应得到相同输出
+        let mut sibling = test_state();
+        let expected = sibling.next_title(Language::En);
+        assert_eq!(result, expected, "Ordinal EN 应降级为 Fake，输出应与 next_title(En) 首次调用一致");
     }
 
     #[test]
