@@ -303,8 +303,33 @@ impl ReplaceState {
                 }
             }
             Language::En => {
-                // 实现见 Task 5
-                unimplemented!("EN next_name 在 Task 5 实现")
+                let first_count = data.en.person_names.first_names.len() as u32;
+                let last_count = data.en.person_names.last_names.len() as u32;
+                let pool_size = first_count * last_count;
+
+                let indices = self.name_indices_en.get_or_insert_with(|| {
+                    Self::init_shuffled_indices(self.seed, NAME_SEED_OFFSET_EN, pool_size)
+                });
+
+                let counter = self.counters.entry("PersonName_en".to_string()).or_insert(0);
+                let idx = indices[*counter % indices.len()] as usize;
+                let wrap = *counter / indices.len();
+                *counter += 1;
+
+                let first_idx = idx / last_count as usize;
+                let last_idx = idx % last_count as usize;
+
+                let name = format!(
+                    "{} {}",
+                    data.en.person_names.first_names[first_idx],
+                    data.en.person_names.last_names[last_idx]
+                );
+
+                if wrap > 0 {
+                    format!("{} {}", name, wrap)
+                } else {
+                    name
+                }
             }
         }
     }
@@ -347,7 +372,37 @@ impl ReplaceState {
                 }
             }
             Language::En => {
-                unimplemented!("EN next_org 在 Task 5 实现")
+                let prefix_count = data.en.org_components.prefixes.len() as u32;
+                let industry_count = data.en.org_components.industries.len() as u32;
+                let suffix_count = data.en.org_components.suffixes.len() as u32;
+                let pool_size = prefix_count * industry_count * suffix_count;
+
+                let indices = self.org_indices_en.get_or_insert_with(|| {
+                    Self::init_shuffled_indices(self.seed, ORG_SEED_OFFSET_EN, pool_size)
+                });
+
+                let counter = self.counters.entry("OrgName_en".to_string()).or_insert(0);
+                let idx = indices[*counter % indices.len()] as usize;
+                let wrap = *counter / indices.len();
+                *counter += 1;
+
+                let suffix_idx = idx % suffix_count as usize;
+                let remaining = idx / suffix_count as usize;
+                let industry_idx = remaining % industry_count as usize;
+                let prefix_idx = remaining / industry_count as usize;
+
+                let org = format!(
+                    "{} {} {}",
+                    data.en.org_components.prefixes[prefix_idx],
+                    data.en.org_components.industries[industry_idx],
+                    data.en.org_components.suffixes[suffix_idx]
+                );
+
+                if wrap > 0 {
+                    format!("{} {}", org, wrap)
+                } else {
+                    org
+                }
             }
         }
     }
@@ -390,7 +445,37 @@ impl ReplaceState {
                 }
             }
             Language::En => {
-                unimplemented!("EN next_address 在 Task 5 实现")
+                let city_count = data.en.address_components.cities.len() as u32;
+                let street_count = data.en.address_components.streets.len() as u32;
+                let number_count = data.en.address_components.numbers.len() as u32;
+                let pool_size = city_count * street_count * number_count;
+
+                let indices = self.address_indices_en.get_or_insert_with(|| {
+                    Self::init_shuffled_indices(self.seed, ADDRESS_SEED_OFFSET_EN, pool_size)
+                });
+
+                let counter = self.counters.entry("Address_en".to_string()).or_insert(0);
+                let idx = indices[*counter % indices.len()] as usize;
+                let wrap = *counter / indices.len();
+                *counter += 1;
+
+                let number_idx = idx % number_count as usize;
+                let remaining = idx / number_count as usize;
+                let street_idx = remaining % street_count as usize;
+                let city_idx = remaining / street_count as usize;
+
+                let addr = format!(
+                    "{} {}, {}",
+                    data.en.address_components.numbers[number_idx],
+                    data.en.address_components.streets[street_idx],
+                    data.en.address_components.cities[city_idx]
+                );
+
+                if wrap > 0 {
+                    format!("{} {}", addr, wrap)
+                } else {
+                    addr
+                }
             }
         }
     }
@@ -420,7 +505,24 @@ impl ReplaceState {
                 }
             }
             Language::En => {
-                unimplemented!("EN next_title 在 Task 5 实现")
+                let pool_size = data.en.titles.len() as u32;
+
+                let indices = self.title_indices_en.get_or_insert_with(|| {
+                    Self::init_shuffled_indices(self.seed, TITLE_SEED_OFFSET_EN, pool_size)
+                });
+
+                let counter = self.counters.entry("Title_en".to_string()).or_insert(0);
+                let idx = indices[*counter % indices.len()] as usize;
+                let wrap = *counter / indices.len();
+                *counter += 1;
+
+                let title = data.en.titles[idx].clone();
+
+                if wrap > 0 {
+                    format!("{} {}", title, wrap)
+                } else {
+                    title
+                }
             }
         }
     }
@@ -558,29 +660,40 @@ pub fn apply_replace(
     style: &ReplaceStyle,
 ) -> String {
     let data = get_fake_data();
-    // Task 3: 统一传 Zh 保持和现状等效；EN 路径在 Task 5 替换 unimplemented!() 后再切到 detect_language(text)
-    let lang = Language::Zh;
+    let lang = detect_language(text);
     let mut rng = rand::thread_rng();
 
     match sensitive_type {
         SensitiveType::PersonName => match style {
             ReplaceStyle::Fake => state.next_name(lang),
-            ReplaceStyle::Mou => state.next_mou_name(text, lang),
+            ReplaceStyle::Mou => match lang {
+                Language::Zh => state.next_mou_name(text, lang),
+                Language::En => state.next_name(lang), // Task 6: 临时降级到 Fake，避免触发 unimplemented!
+            },
             ReplaceStyle::Ordinal => state.next_ordinal_name(),
         },
         SensitiveType::OrgName => match style {
             ReplaceStyle::Fake => state.next_org(lang),
-            ReplaceStyle::Mou => state.next_mou_org(text, lang),
+            ReplaceStyle::Mou => match lang {
+                Language::Zh => state.next_mou_org(text, lang),
+                Language::En => state.next_org(lang), // Task 6: 临时降级到 Fake，避免触发 unimplemented!
+            },
             ReplaceStyle::Ordinal => state.next_ordinal_org(text),
         },
         SensitiveType::Title => match style {
             ReplaceStyle::Fake => state.next_title(lang),
-            ReplaceStyle::Mou => state.next_mou_title(text, lang),
+            ReplaceStyle::Mou => match lang {
+                Language::Zh => state.next_mou_title(text, lang),
+                Language::En => state.next_title(lang), // Task 6: 临时降级到 Fake，避免触发 unimplemented!
+            },
             ReplaceStyle::Ordinal => state.next_ordinal_title(),
         },
         SensitiveType::Address => match style {
             ReplaceStyle::Fake => state.next_address(lang),
-            ReplaceStyle::Mou => state.next_mou_address(text, lang),
+            ReplaceStyle::Mou => match lang {
+                Language::Zh => state.next_mou_address(text, lang),
+                Language::En => state.next_address(lang), // Task 6: 临时降级到 Fake，避免触发 unimplemented!
+            },
             ReplaceStyle::Ordinal => state.next_ordinal_address(),
         },
         SensitiveType::Phone => {
@@ -1006,5 +1119,123 @@ mod tests {
     #[test]
     fn test_detect_language_empty_falls_back_to_zh() {
         assert_eq!(detect_language(""), Language::Zh);
+    }
+
+    // ========== EN Fake 测试 ==========
+
+    #[test]
+    fn test_replace_person_name_en() {
+        let mut state = test_state();
+        let result = apply_replace(
+            "John Smith",
+            &SensitiveType::PersonName,
+            &mut state,
+            &ReplaceStyle::Fake,
+        );
+        // 不含汉字
+        assert!(
+            result.chars().all(|c| !('\u{4E00}'..='\u{9FFF}').contains(&c)),
+            "EN 假名不应含汉字: {}",
+            result
+        );
+        // 含一个空格分隔 first/last
+        assert!(result.contains(' '), "EN 假名应含空格: {}", result);
+        // 不等于原文
+        assert_ne!(result, "John Smith");
+    }
+
+    #[test]
+    fn test_replace_org_en() {
+        let mut state = test_state();
+        let result = apply_replace(
+            "Apple Inc.",
+            &SensitiveType::OrgName,
+            &mut state,
+            &ReplaceStyle::Fake,
+        );
+        assert!(
+            result.chars().all(|c| !('\u{4E00}'..='\u{9FFF}').contains(&c)),
+            "EN 假机构不应含汉字: {}",
+            result
+        );
+        // 应含某个 EN suffix
+        let en_suffixes = ["Inc.", "Corp.", "LLC", "Ltd.", "Group", "Holdings",
+                           "Partners", "Associates", "International", "Co."];
+        assert!(
+            en_suffixes.iter().any(|s| result.ends_with(s)),
+            "EN 假机构应以已知 suffix 结尾: {}",
+            result
+        );
+    }
+
+    #[test]
+    fn test_replace_address_en() {
+        let mut state = test_state();
+        let result = apply_replace(
+            "123 Main St, NY",
+            &SensitiveType::Address,
+            &mut state,
+            &ReplaceStyle::Fake,
+        );
+        assert!(
+            result.chars().all(|c| !('\u{4E00}'..='\u{9FFF}').contains(&c)),
+            "EN 假地址不应含汉字: {}",
+            result
+        );
+        // 形如 "123 Main St, New York, NY"，含逗号
+        assert!(result.contains(','), "EN 假地址应含逗号: {}", result);
+    }
+
+    #[test]
+    fn test_replace_title_en() {
+        let mut state = test_state();
+        let result = apply_replace(
+            "Software Engineer",
+            &SensitiveType::Title,
+            &mut state,
+            &ReplaceStyle::Fake,
+        );
+        assert!(
+            result.chars().all(|c| !('\u{4E00}'..='\u{9FFF}').contains(&c)),
+            "EN 假职位不应含汉字: {}",
+            result
+        );
+    }
+
+    #[test]
+    fn test_uniqueness_names_en() {
+        let mut state = test_state();
+        let mut names: Vec<String> = Vec::new();
+        for _ in 0..100 {
+            names.push(state.next_name(Language::En));
+        }
+        let unique: std::collections::HashSet<&String> = names.iter().collect();
+        assert_eq!(unique.len(), 100, "100 个 EN 姓名应全部唯一");
+    }
+
+    #[test]
+    fn test_uniqueness_orgs_en() {
+        let mut state = test_state();
+        let mut orgs: Vec<String> = Vec::new();
+        for _ in 0..100 {
+            orgs.push(state.next_org(Language::En));
+        }
+        let unique: std::collections::HashSet<&String> = orgs.iter().collect();
+        assert_eq!(unique.len(), 100, "100 个 EN 机构应全部唯一");
+    }
+
+    #[test]
+    fn test_counters_isolated() {
+        // 中英 counter 独立
+        let mut state = test_state();
+        for _ in 0..5 {
+            state.next_name(Language::Zh);
+        }
+        for _ in 0..3 {
+            state.next_name(Language::En);
+        }
+        let counters = state.export_counters();
+        assert_eq!(counters.get("PersonName_zh"), Some(&5));
+        assert_eq!(counters.get("PersonName_en"), Some(&3));
     }
 }
