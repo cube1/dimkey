@@ -1,5 +1,6 @@
 use crate::models::sensitive::SensitiveType;
 use crate::models::strategy::ReplaceStyle;
+use crate::models::language::Language;
 use rand::Rng;
 use rand::rngs::StdRng;
 use rand::seq::SliceRandom;
@@ -59,6 +60,17 @@ struct FakeData {
 }
 
 static FAKE_DATA: OnceLock<FakeData> = OnceLock::new();
+
+/// 按实体原文字符自动判断语言：含任一汉字 → Zh，否则 En；空字符串兜底 Zh。
+pub fn detect_language(text: &str) -> Language {
+    if text.chars().any(|c| ('\u{4E00}'..='\u{9FFF}').contains(&c)) {
+        Language::Zh
+    } else if text.is_empty() {
+        Language::Zh
+    } else {
+        Language::En
+    }
+}
 
 fn get_fake_data() -> &'static FakeData {
     FAKE_DATA.get_or_init(|| FakeData {
@@ -840,5 +852,34 @@ mod tests {
         let r = apply_replace("13812345678", &SensitiveType::Phone, &mut state, &ReplaceStyle::Mou);
         assert_eq!(r.len(), 11);
         assert!(r.chars().all(|c| c.is_ascii_digit()));
+    }
+
+    // ========== detect_language 测试 ==========
+
+    #[test]
+    fn test_detect_language_chinese() {
+        assert_eq!(detect_language("张三"), Language::Zh);
+        assert_eq!(detect_language("北京市朝阳区"), Language::Zh);
+        assert_eq!(detect_language("腾讯科技有限公司"), Language::Zh);
+    }
+
+    #[test]
+    fn test_detect_language_english() {
+        assert_eq!(detect_language("John Smith"), Language::En);
+        assert_eq!(detect_language("Apple Inc."), Language::En);
+        assert_eq!(detect_language("123 Main St, New York"), Language::En);
+    }
+
+    #[test]
+    fn test_detect_language_mixed_falls_back_to_zh() {
+        // 含任一汉字即视为中文
+        assert_eq!(detect_language("John 张"), Language::Zh);
+        assert_eq!(detect_language("Mr. 王"), Language::Zh);
+        assert_eq!(detect_language("北京 Office"), Language::Zh);
+    }
+
+    #[test]
+    fn test_detect_language_empty_falls_back_to_zh() {
+        assert_eq!(detect_language(""), Language::Zh);
     }
 }
