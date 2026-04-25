@@ -144,7 +144,7 @@ state.next_name(Language::En):
 - 不保留原文首字母（与中文"保留姓"语义不同 —— 美国匿名化优先级是"完全不泄露"，保留首字母反而构成 PII 残留）
 
 **OrgName Mou:**
-- 后缀表 `EN_ORG_SUFFIXES = ["Inc.", "Corp.", "LLC", "Ltd.", "Group", "Holdings", "Partners", "Associates", "International", "Co."]`（与 Fake 池 `en/org_components.json` 的 suffixes 完全对齐，避免不一致）
+- 后缀表 `EN_ORG_SUFFIXES = ["Inc.", "Corp.", "LLC", "LLP", "Ltd.", "Group", "Holdings", "Partners", "Associates", "International", "Co."]`（与 Fake 池 `en/org_components.json` 的 suffixes 完全对齐，避免不一致）。LLP 单列以覆盖美国法律事务所最常见后缀（Limited Liability Partnership）
 - 按出现顺序匹配原文末尾；匹配到 → 输出 `Acme {suffix}`；匹配不到（如 `GitHub`）→ 兜底 `Acme Co.`
 - 同 suffix 第 N 次出现 → `Acme Inc. 2`；counter key `mou_org_en_{suffix}`
 

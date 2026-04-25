@@ -12,7 +12,7 @@
     "Pharma", "Defense", "Research", "Trading", "Properties", "Insurance"
   ],
   "suffixes": [
-    "Inc.", "Corp.", "LLC", "Ltd.", "Group", "Holdings", "Partners", "Associates",
+    "Inc.", "Corp.", "LLC", "LLP", "Ltd.", "Group", "Holdings", "Partners", "Associates",
     "International", "Co."
   ]
 }

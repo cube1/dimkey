@@ -156,8 +156,9 @@ const ORG_SUFFIXES: &[&str] = &[
 ];
 
 /// 英文组织后缀表（与 fake_data/en/org_components.json 的 suffixes 完全对齐）
+/// LLP 是美国法律事务所最常见后缀（Limited Liability Partnership），单列。
 const EN_ORG_SUFFIXES: &[&str] = &[
-    "Inc.", "Corp.", "LLC", "Ltd.", "Group", "Holdings",
+    "Inc.", "Corp.", "LLC", "LLP", "Ltd.", "Group", "Holdings",
     "Partners", "Associates", "International", "Co.",
 ];
 
@@ -1310,6 +1311,7 @@ mod tests {
     fn test_extract_en_org_suffix() {
         assert_eq!(extract_en_org_suffix("Apple Inc."), "Inc.");
         assert_eq!(extract_en_org_suffix("Acme LLC"), "LLC");
+        assert_eq!(extract_en_org_suffix("Mitchell, Chen & Park LLP"), "LLP");
         assert_eq!(extract_en_org_suffix("Smith & Partners"), "Partners");
         assert_eq!(extract_en_org_suffix("GitHub"), "Co."); // 兜底
     }
