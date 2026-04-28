@@ -64,3 +64,6 @@ e2e/utils/__pycache__/
 
 # 测试数据（不提交）
 test-data/
+
+# Playwright MCP 临时输出
+.playwright-mcp/
