@@ -2,7 +2,7 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Dimkey",
   "version": "0.7.0",
-  "identifier": "com.dimkey",
+  "identifier": "com.dimkey.cn",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -26,7 +26,7 @@
   "plugins": {
     "updater": {
       "endpoints": [
-        "https://dimkey.com/latest.json"
+        "https://dimkey.com/latest-zh.json"
       ],
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEI1QjgwMEE2NjM5N0RGQTkKUldTcDM1ZGpwZ0M0dFdWWDdyc3pQbEhDYldhYmJxbncwdU43Z2VTanNNc1NLaTZvVkpqMWhCdXoK"
     }

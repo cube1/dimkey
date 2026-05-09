@@ -22,7 +22,7 @@ use commands::alias_group::{
     create_alias_group, add_alias_member, remove_alias_member,
     delete_alias_group, list_alias_groups,
 };
-use commands::language::{AppLanguage, set_language, get_language};
+use commands::language::{AppLanguage, get_language};
 use analytics::{get_analytics_enabled, set_analytics_enabled};
 use engine::ner_engine::NerEngine;
 use engine::backends::onnx_token_classifier::OnnxTokenClassifier;
@@ -88,10 +88,8 @@ pub fn run() {
             };
             app.manage(NerEngineState(Arc::new(Mutex::new(ner_engine))));
 
-            // 初始化语言状态（默认中文）
-            app.manage(AppLanguage(std::sync::RwLock::new(
-                crate::models::language::Language::default(),
-            )));
+            // 初始化语言状态（由 Cargo feature `lang-zh` / `lang-en` 在编译期决定）
+            app.manage(AppLanguage::from_build());
 
             // 初始化 PDFium（从 resources/pdfium/ 加载动态库）
             let pdfium_lib_name = if cfg!(target_os = "macos") {
@@ -194,8 +192,7 @@ pub fn run() {
             remove_alias_member,
             delete_alias_group,
             list_alias_groups,
-            // 语言
-            set_language,
+            // 语言（运行时只读，编译期由 Cargo feature 决定）
             get_language,
         ])
         .run(tauri::generate_context!())

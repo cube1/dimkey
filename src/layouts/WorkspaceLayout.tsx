@@ -10,7 +10,6 @@ import { useAutoDesensitize } from "../hooks/useAutoDesensitize";
 import { WorkspaceList } from "../components/WorkspaceList";
 import { CenterPanel } from "../components/CenterPanel";
 import { StrategyPanel } from "../components/StrategyPanel";
-import LanguageSwitcher from "../components/LanguageSwitcher";
 
 /** 导出成功 Toast（含打开目录 + 复制到剪贴板） */
 function ExportToast({ toastId, outputPath, label }: { toastId: string; outputPath: string; label: string }) {
@@ -482,9 +481,8 @@ export function WorkspaceLayout() {
           {/* 中间：按 centerView 渲染不同内容 */}
           {renderToolbarCenter()}
 
-          {/* 右侧：语言切换 + 操作按钮 + 右栏切换 */}
+          {/* 右侧：操作按钮 + 右栏切换 */}
           <div className="flex items-center gap-2 shrink-0">
-            <LanguageSwitcher />
             {showRightControls && (
               <>
                 {renderToolbarActions()}

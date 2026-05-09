@@ -36,10 +36,10 @@ export function DictSection() {
 
   const entries = wsData?.workspace.dict_entries || [];
 
-  // 加载内置词典（语言变化时重新加载）
+  // 加载内置词典（语言由编译期常量决定，启动时加载一次即可）
   useEffect(() => {
     invoke<DictEntry[]>("get_builtin_dict").then(setBuiltinEntries).catch(() => {});
-  }, [i18n.language]);
+  }, []);
 
   // 合并展示：用户词条 + 内置词条
   const allEntries = [...entries, ...builtinEntries];
