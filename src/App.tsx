@@ -8,6 +8,7 @@ import { WorkspaceLayout } from "./layouts/WorkspaceLayout";
 import { UpdateChecker } from "./components/UpdateChecker";
 import { AnalyticsConsent } from "./components/AnalyticsConsent";
 import { TrialExpiredBanner } from "./components/license/TrialExpiredBanner";
+import { TrialCountdownBadge } from "./components/license/TrialCountdownBadge";
 import { ActivationDialog } from "./components/license/ActivationDialog";
 
 function App() {
@@ -90,6 +91,9 @@ function App() {
   return (
     <>
       <TrialExpiredBanner onActivate={() => setActivationOpen(true)} />
+      <div className="fixed top-2 right-2 z-40 pointer-events-auto">
+        <TrialCountdownBadge onActivate={() => setActivationOpen(true)} />
+      </div>
       <WorkspaceLayout />
       <UpdateChecker />
       <AnalyticsConsent />
