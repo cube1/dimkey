@@ -7,3 +7,4 @@ pub mod workspace;
 pub mod migrate;
 pub mod alias_group;
 pub mod language;
+pub mod license;

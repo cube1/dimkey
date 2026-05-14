@@ -24,6 +24,16 @@ use commands::alias_group::{
     delete_alias_group, list_alias_groups,
 };
 use commands::language::{AppLanguage, get_language};
+use commands::license::{
+    LicenseManagerState,
+    license_get_state, license_get_fingerprint, license_get_fingerprint_mismatch_hint,
+    license_get_trial_info, license_activate, license_deactivate_current,
+    license_list_devices, license_deactivate_device,
+    license_recover_email, license_open_purchase_page,
+};
+use license::state::LicenseManager;
+use license::storage::build_default_stores;
+use license::fingerprint::compute_fingerprint;
 use analytics::{get_analytics_enabled, set_analytics_enabled};
 use engine::ner_engine::NerEngine;
 use engine::backends::onnx_token_classifier::OnnxTokenClassifier;
@@ -137,6 +147,22 @@ pub fn run() {
                 "version": env!("CARGO_PKG_VERSION"),
             })));
 
+            // === License 系统初始化（Phase 9 集成层）===
+            // 1) 解析 app_config_dir 作为证书/试用记录目录
+            // 2) 计算本机指纹（一次性，缓存在 manager）
+            // 3) 装配 3 处 TrialStore + manager + boot 决定状态
+            // 4) 注册全局 State + 启动后台 heartbeat 任务
+            let config_dir = app.path().app_config_dir()
+                .unwrap_or_else(|_| std::path::PathBuf::from("."));
+            let machine_fp = compute_fingerprint();
+            let trial_stores = build_default_stores(config_dir.clone());
+            let manager = Arc::new(LicenseManager::new(trial_stores, config_dir, machine_fp));
+            manager.boot();
+            app.manage(LicenseManagerState(manager.clone()));
+
+            // 后台 heartbeat（启动后立即跑一次，之后每 24h）
+            license::heartbeat::spawn(app.handle().clone(), manager);
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -195,6 +221,17 @@ pub fn run() {
             list_alias_groups,
             // 语言（运行时只读，编译期由 Cargo feature 决定）
             get_language,
+            // 许可证（Phase 9）
+            license_get_state,
+            license_get_fingerprint,
+            license_get_fingerprint_mismatch_hint,
+            license_get_trial_info,
+            license_activate,
+            license_deactivate_current,
+            license_list_devices,
+            license_deactivate_device,
+            license_recover_email,
+            license_open_purchase_page,
         ])
         .run(tauri::generate_context!())
         .expect("启动应用失败");

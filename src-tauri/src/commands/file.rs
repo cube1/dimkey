@@ -266,6 +266,7 @@ pub async fn export_file(
     output_path: String,
     original_path: Option<String>,
     app_handle: tauri::AppHandle,
+    license_manager: tauri::State<'_, crate::commands::license::LicenseManagerState>,
 ) -> Result<(), String> {
     let start = std::time::Instant::now();
     let ext = std::path::Path::new(&output_path)
@@ -280,9 +281,10 @@ pub async fn export_file(
         FileContent::Document { file_type, .. } => format!("{:?}", file_type).to_lowercase(),
     };
 
+    // Arc clone manager 后 move 进 spawn_blocking（State 本身不能跨线程）
+    let manager_arc = license_manager.0.clone();
     let result = tokio::task::spawn_blocking(move || {
-        // Phase 8: license_manager 暂传 None，Phase 9 通过 Tauri State 注入真实 manager
-        export_content(&content, &output_path, original_path.as_deref(), None)
+        export_content(&content, &output_path, original_path.as_deref(), Some(&*manager_arc))
     })
     .await
     .map_err(|e| format!("文件导出任务失败: {}", e))?;
