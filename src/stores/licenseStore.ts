@@ -106,3 +106,10 @@ export const useLicenseStore = create<LicenseStoreState>((set, get) => ({
     await invoke("license_open_purchase_page");
   },
 }));
+
+// dev/E2E 调试用：暴露 store 到 window，便于测试驱动 refresh / 检查状态
+// 生产构建中 import.meta.env.DEV 为 false，整段会被 tree-shake 掉
+if (import.meta.env.DEV && typeof window !== "undefined") {
+  (window as unknown as { __DIMKEY_LICENSE_STORE__: typeof useLicenseStore }).__DIMKEY_LICENSE_STORE__ =
+    useLicenseStore;
+}
