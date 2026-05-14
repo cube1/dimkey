@@ -44,7 +44,7 @@ impl TrialStore for ConfigDirStore {
         if let Some(parent) = self.path.parent() {
             std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
         }
-        let s = serde_json::to_string_pretty(rec).map_err(|e| e.to_string())?;
+        let s = serde_json::to_string(rec).map_err(|e| e.to_string())?;
         std::fs::write(&self.path, s).map_err(|e| e.to_string())
     }
 }
@@ -58,6 +58,11 @@ impl TrialStore for HiddenFileStore {
         serde_json::from_str(&s).ok()
     }
     fn write(&self, rec: &TrialRecord) -> Result<(), String> {
+        if let Some(parent) = self.path.parent() {
+            if !parent.as_os_str().is_empty() {
+                std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+            }
+        }
         let s = serde_json::to_string(rec).map_err(|e| e.to_string())?;
         std::fs::write(&self.path, s).map_err(|e| e.to_string())
     }
@@ -184,4 +189,17 @@ mod tests {
 
     // 注：不为 KeyringStore 写测试。Keychain 在 CI/沙盒环境会失败，
     // 实机手动验证即可。
+
+    #[test]
+    fn hidden_file_store_creates_parent_dir() {
+        let d = tempdir().unwrap();
+        let store = HiddenFileStore { path: d.path().join("nested/sub/.state") };
+        let rec = TrialRecord {
+            version: 1, first_run_at: "2026-05-14T00:00:00Z".into(),
+            last_run_at: "2026-05-14T00:00:00Z".into(), machine_fp: "fp".into(),
+        };
+        store.write(&rec).unwrap();
+        assert!(d.path().join("nested/sub").exists());
+        assert_eq!(store.read().unwrap(), rec);
+    }
 }
