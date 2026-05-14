@@ -4,6 +4,7 @@ pub mod parser;
 pub mod desensitizer;
 pub mod models;
 pub mod analytics;
+pub mod license;
 
 use std::sync::{Arc, Mutex};
 use commands::file::{import_file, export_file, check_file_exists, import_file_with_password, copy_file_to_clipboard, import_clipboard_text, export_pdf_redacted_cmd, compute_pdf_redact_preview, render_pdf_pages};
