@@ -10,6 +10,7 @@ use crate::license::certificate::CertEnvelope;
 use crate::license::errors::LicenseError;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use std::sync::OnceLock;
 use std::time::Duration;
 
 const DEFAULT_API_BASE: &str = "https://dimkey.app/api/v1";
@@ -19,12 +20,16 @@ pub fn api_base() -> String {
     std::env::var("DIMKEY_API_BASE").unwrap_or_else(|_| DEFAULT_API_BASE.into())
 }
 
-fn client() -> reqwest::Client {
-    reqwest::Client::builder()
-        .timeout(Duration::from_secs(REQUEST_TIMEOUT_SECS))
-        .user_agent(format!("Dimkey/{}", env!("CARGO_PKG_VERSION")))
-        .build()
-        .expect("reqwest client build")
+static CLIENT: OnceLock<reqwest::Client> = OnceLock::new();
+
+fn client() -> &'static reqwest::Client {
+    CLIENT.get_or_init(|| {
+        reqwest::Client::builder()
+            .timeout(Duration::from_secs(REQUEST_TIMEOUT_SECS))
+            .user_agent(format!("Dimkey/{}", env!("CARGO_PKG_VERSION")))
+            .build()
+            .expect("reqwest client build")
+    })
 }
 
 #[derive(Debug, Deserialize)]
@@ -272,16 +277,23 @@ mod tests {
     }
 
     #[test]
-    fn api_base_default_is_dimkey_app() {
+    fn api_base_default_and_env_override() {
+        // 保存原始值（如果有），最后恢复，避免污染其他测试
+        let original = std::env::var("DIMKEY_API_BASE").ok();
+
+        // 默认值
         std::env::remove_var("DIMKEY_API_BASE");
         assert_eq!(api_base(), "https://dimkey.app/api/v1");
-    }
 
-    #[test]
-    fn api_base_env_override_works() {
+        // env 覆盖
         std::env::set_var("DIMKEY_API_BASE", "http://localhost:8788/api/v1");
         assert_eq!(api_base(), "http://localhost:8788/api/v1");
-        std::env::remove_var("DIMKEY_API_BASE");
+
+        // 恢复
+        match original {
+            Some(v) => std::env::set_var("DIMKEY_API_BASE", v),
+            None => std::env::remove_var("DIMKEY_API_BASE"),
+        }
     }
 
     #[test]
