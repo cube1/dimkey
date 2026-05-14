@@ -63,6 +63,12 @@ pub enum CertError {
     SignatureInvalid,
 }
 
+/// 已知公钥列表（按 key_version 索引）
+/// 当前只有 v1；未来轮换 v2 时追加 (2, &PUBKEY_V2)
+const KNOWN_PUBKEYS: &[(u32, &[u8; 32])] = &[
+    (1, &PUBKEY_V1),
+];
+
 pub fn read_certificate(config_dir: &Path) -> Result<LicensePayload, CertError> {
     let path = config_dir.join(CERTIFICATE_FILE);
     if !path.exists() {
@@ -79,16 +85,29 @@ pub fn read_certificate(config_dir: &Path) -> Result<LicensePayload, CertError> 
     let sig_bytes = B64.decode(&env.sig_b64).map_err(|_| CertError::SigB64)?;
     let sig = Signature::from_slice(&sig_bytes).map_err(|_| CertError::SignatureInvalid)?;
 
+    // Verify-first：用所有已知公钥试一遍。任一成功才继续。
+    // 这样攻击者无法通过 JSON 解析失败 / UnsupportedKeyVersion 等错误码探测客户端状态。
+    let mut verified_key_version: Option<u32> = None;
+    for (kv, pk_bytes) in KNOWN_PUBKEYS {
+        if let Ok(pk) = VerifyingKey::from_bytes(pk_bytes) {
+            if pk.verify(&payload_bytes, &sig).is_ok() {
+                verified_key_version = Some(*kv);
+                break;
+            }
+        }
+    }
+    let verified_kv = verified_key_version.ok_or(CertError::SignatureInvalid)?;
+
+    // 此时签名已通过验证，可安全反序列化 payload
     let payload: LicensePayload = serde_json::from_slice(&payload_bytes)
         .map_err(|e| CertError::PayloadJson(e.to_string()))?;
 
-    let pubkey = match payload.key_version {
-        1 => VerifyingKey::from_bytes(&PUBKEY_V1).map_err(|_| CertError::SignatureInvalid)?,
-        v => return Err(CertError::UnsupportedKeyVersion(v)),
-    };
-    pubkey
-        .verify(&payload_bytes, &sig)
-        .map_err(|_| CertError::SignatureInvalid)?;
+    // 防御性：payload 内的 key_version 必须与验证通过的公钥版本一致
+    // （理论上只要签名 OK 就一定一致，因为 payload 字节包含 key_version；
+    //  但加一道断言防 payload 字段被攻击者操纵）
+    if payload.key_version != verified_kv {
+        return Err(CertError::UnsupportedKeyVersion(payload.key_version));
+    }
 
     Ok(payload)
 }
@@ -235,5 +254,28 @@ mod tests {
         let payload_bytes = serde_json::to_vec(&payload).unwrap();
         let sig: Signature = sk1.sign(&payload_bytes);
         assert!(pk2.verify(&payload_bytes, &sig).is_err());
+    }
+
+    #[test]
+    fn read_certificate_with_placeholder_pubkey_always_fails_signature() {
+        // 占位 PUBKEY_V1 是全 0，无法对应任何真实私钥，所以任何包含真实签名的 .lic
+        // 走到 verify 时都会失败。这个测试锁定该行为，便于 Plan A 真公钥烧入后改为通过 case。
+        use ed25519_dalek::{Signer, SigningKey};
+        use rand::rngs::OsRng;
+        let d = tempdir().unwrap();
+        let mut rng = OsRng;
+        let sk = SigningKey::generate(&mut rng);
+        let payload = build_test_payload();
+        let payload_bytes = serde_json::to_vec(&payload).unwrap();
+        let sig: Signature = sk.sign(&payload_bytes);
+        let env = CertEnvelope {
+            v: 1,
+            payload_b64: B64.encode(&payload_bytes),
+            sig_b64: B64.encode(sig.to_bytes()),
+        };
+        write_certificate_envelope(d.path(), &env).unwrap();
+        let r = read_certificate(d.path());
+        assert!(matches!(r, Err(CertError::SignatureInvalid)),
+            "expected SignatureInvalid (because PUBKEY_V1 placeholder won't match any real key), got: {:?}", r);
     }
 }
