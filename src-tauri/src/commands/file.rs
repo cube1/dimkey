@@ -376,7 +376,9 @@ fn export_csv(
     rows: &[Vec<crate::models::sensitive::CellValue>],
     watermark: Option<&str>,
 ) -> Result<(), String> {
-    let mut writer = csv::Writer::from_path(path)
+    let mut writer = csv::WriterBuilder::new()
+        .flexible(true)
+        .from_path(path)
         .map_err(|e| format!("创建 CSV 文件失败: {}", e))?;
 
     if let Some(wm) = watermark {
