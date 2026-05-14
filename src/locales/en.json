@@ -404,5 +404,63 @@
   "textToolbar": {
     "selectType": "Select redact type",
     "cancel": "Cancel"
+  },
+  "license": {
+    "activate": {
+      "title": "Activate Dimkey",
+      "email_label": "Email",
+      "key_label": "License Key",
+      "key_placeholder": "DK-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX",
+      "recover_link": "Lost your license? Recover by email",
+      "cancel": "Cancel",
+      "button": "Activate",
+      "button_loading": "Activating...",
+      "success_toast": "Activated to {{email}}"
+    },
+    "error": {
+      "invalid": "Invalid email or license key",
+      "email_mismatch": "Email doesn't match this license",
+      "device_limit": "Device limit reached ({{max}})",
+      "device_limit_action": "Deactivate one or view your devices",
+      "network": "Network unavailable, please retry",
+      "fingerprint_mismatch": "This certificate belongs to another machine",
+      "signature_invalid": "Certificate file corrupted, please re-activate",
+      "revoked": "This license is no longer valid",
+      "rate_limited": "Too many requests, please try later",
+      "server": "Service temporarily unavailable, please try later"
+    },
+    "trial": {
+      "welcome_toast": "Welcome to Dimkey · 30-day trial · See settings",
+      "remaining": "Trial · {{days}} days remaining",
+      "expired_banner": "Trial ended · Exports will be watermarked",
+      "banner_dismiss": "Got it"
+    },
+    "about": {
+      "activated_to": "Activated to {{email}}",
+      "plan_perpetual": "Lifetime License",
+      "devices": "{{active}} / {{max}} devices active",
+      "deactivate_current": "Deactivate this device",
+      "manage_devices": "Manage devices...",
+      "fingerprint_label": "Device fingerprint",
+      "fingerprint_copy": "Fingerprint copied",
+      "fingerprint_mismatch_hint": "This certificate belongs to another machine (fp:{{fp}}). Click to re-activate this machine"
+    },
+    "devices": {
+      "title": "Activated devices",
+      "this_device": "(this device)",
+      "deactivate": "Deactivate",
+      "deactivate_confirm": "Deactivate this device?",
+      "summary": "{{active}} / {{max}} devices · Deactivating frees a slot immediately"
+    },
+    "recover": {
+      "title": "Recover by email",
+      "hint": "Enter the email you used at purchase. Your license will be re-sent.",
+      "send": "Send",
+      "success_msg": "If this email has a license, an email has been sent"
+    },
+    "purchase": {
+      "button": "Buy",
+      "enter_key": "Enter license"
+    }
   }
 }

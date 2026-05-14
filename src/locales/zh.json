@@ -404,5 +404,63 @@
   "textToolbar": {
     "selectType": "选择涂黑类型",
     "cancel": "取消"
+  },
+  "license": {
+    "activate": {
+      "title": "激活 Dimkey",
+      "email_label": "邮箱",
+      "key_label": "许可证密钥",
+      "key_placeholder": "DK-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX",
+      "recover_link": "忘记许可证? 通过邮箱找回",
+      "cancel": "取消",
+      "button": "激活",
+      "button_loading": "激活中...",
+      "success_toast": "已激活给 {{email}}"
+    },
+    "error": {
+      "invalid": "邮箱或许可证不正确",
+      "email_mismatch": "邮箱与许可证不匹配",
+      "device_limit": "已达 {{max}} 台设备上限",
+      "device_limit_action": "请先解绑一台或查看设备列表",
+      "network": "网络不可用，请检查网络后重试",
+      "fingerprint_mismatch": "该证书绑定到另一台机器",
+      "signature_invalid": "授权文件已损坏，请重新激活",
+      "revoked": "本许可证已失效",
+      "rate_limited": "请求过于频繁，请稍后再试",
+      "server": "服务暂时不可用，请稍后再试"
+    },
+    "trial": {
+      "welcome_toast": "欢迎使用 Dimkey · 试用 30 天，可在设置查看",
+      "remaining": "试用版 · 剩余 {{days}} 天",
+      "expired_banner": "试用已结束 · 导出文件将带水印",
+      "banner_dismiss": "我知道了"
+    },
+    "about": {
+      "activated_to": "已授权给 {{email}}",
+      "plan_perpetual": "永久许可",
+      "devices": "当前 {{active}} / {{max}} 台设备已激活",
+      "deactivate_current": "解绑当前设备",
+      "manage_devices": "管理设备...",
+      "fingerprint_label": "设备指纹",
+      "fingerprint_copy": "已复制设备指纹",
+      "fingerprint_mismatch_hint": "此授权文件属于另一台机器（fp:{{fp}}），点此重新激活本机"
+    },
+    "devices": {
+      "title": "已激活的设备",
+      "this_device": "(此设备)",
+      "deactivate": "解绑",
+      "deactivate_confirm": "确认解绑此设备?",
+      "summary": "{{active}} / {{max}} 台设备 · 解绑后立即释放配额"
+    },
+    "recover": {
+      "title": "通过邮箱找回",
+      "hint": "输入购买时使用的邮箱，许可证将重发到该邮箱",
+      "send": "发送",
+      "success_msg": "如该邮箱有授权，已发送邮件"
+    },
+    "purchase": {
+      "button": "购买",
+      "enter_key": "输入许可证"
+    }
   }
 }
