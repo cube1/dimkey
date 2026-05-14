@@ -69,16 +69,22 @@ fn decode_text(bytes: &[u8]) -> Result<(String, String), String> {
 /// 导出脱敏后的 TXT 文件
 ///
 /// 按原始编码写回，段落之间用换行符连接
+/// 当 `watermark` 为 `Some(text)` 时，在文件首行写入 `# {text}` 作为试用过期水印。
 pub fn export_txt(
     paragraphs: &[Paragraph],
     output_path: &str,
     encoding: Option<&str>,
+    watermark: Option<&str>,
 ) -> Result<(), String> {
-    let text: String = paragraphs
+    let body: String = paragraphs
         .iter()
         .map(|p| p.text.as_str())
         .collect::<Vec<_>>()
         .join("\n");
+    let text = match watermark {
+        Some(wm) => format!("# {}\n{}", wm, body),
+        None => body,
+    };
 
     let bytes = match encoding.unwrap_or("utf-8") {
         "gbk" => {
@@ -157,10 +163,27 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("output.txt");
 
-        export_txt(&paragraphs, path.to_str().unwrap(), Some("utf-8")).unwrap();
+        export_txt(&paragraphs, path.to_str().unwrap(), Some("utf-8"), None).unwrap();
 
         let content = std::fs::read_to_string(&path).unwrap();
         assert_eq!(content, "第一行\n第二行");
+    }
+
+    #[test]
+    fn test_export_txt_with_watermark() {
+        let paragraphs = vec![
+            Paragraph { index: 0, text: "第一行".to_string(), style: "normal".to_string(), table_position: None, pdf_position: None },
+            Paragraph { index: 1, text: "第二行".to_string(), style: "normal".to_string(), table_position: None, pdf_position: None },
+        ];
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("output.txt");
+
+        export_txt(&paragraphs, path.to_str().unwrap(), Some("utf-8"), Some("Dimkey trial 水印")).unwrap();
+
+        let content = std::fs::read_to_string(&path).unwrap();
+        assert!(content.starts_with("# Dimkey trial 水印\n"), "实际内容: {}", content);
+        assert!(content.contains("第一行"));
+        assert!(content.contains("第二行"));
     }
 
     #[test]
@@ -171,7 +194,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("output.txt");
 
-        export_txt(&paragraphs, path.to_str().unwrap(), Some("gbk")).unwrap();
+        export_txt(&paragraphs, path.to_str().unwrap(), Some("gbk"), None).unwrap();
 
         let bytes = std::fs::read(&path).unwrap();
         let (decoded, _, _) = encoding_rs::GBK.decode(&bytes);

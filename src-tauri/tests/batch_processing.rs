@@ -85,7 +85,7 @@ fn test_batch_export_individually() {
             .unwrap_or_else(|e| panic!("创建临时文件失败: {}", e));
         let tmp_path = tmp.path().to_str().unwrap();
 
-        export_content(&result.content, tmp_path, None)
+        export_content(&result.content, tmp_path, None, None)
             .unwrap_or_else(|e| panic!("{} 导出失败: {}", file, e));
 
         // 重新导入验证

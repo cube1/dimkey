@@ -10,10 +10,14 @@ use crate::parser::word::parse_document_xml;
 
 /// 导出脱敏后的 docx 文件
 /// 读取原始 docx，替换 document.xml 中的段落文本，其他内容原封不动
+///
+/// 当 `watermark` 为 `Some(text)` 时，在 `<w:body>` 起始标签后插入一段灰色小字水印段落
+/// （试用过期态时由调用方传入）。
 pub fn export_docx(
     original_path: &str,
     paragraphs: &[Paragraph],
     output_path: &str,
+    watermark: Option<&str>,
 ) -> Result<(), String> {
     let file = File::open(original_path)
         .map_err(|e| format!("无法打开原始文件：{}", e))?;
@@ -59,7 +63,7 @@ pub fn export_docx(
 
         if entry_name == "word/document.xml" {
             // 替换段落文本（使用已缓存的原始 XML）
-            let new_xml = replace_paragraph_texts(&original_xml, &para_map)?;
+            let new_xml = replace_paragraph_texts(&original_xml, &para_map, watermark)?;
 
             zip_writer.start_file(&entry_name, options)
                 .map_err(|e| format!("写入 ZIP entry 失败：{}", e))?;
@@ -89,9 +93,13 @@ pub fn export_docx(
 /// - 第一个 <w:t>：写入完整的替换文本
 /// - 后续 <w:t>：清空文本
 /// 这样无论文档包含多复杂的结构（hyperlink、bookmarkStart、mc:AlternateContent 等）都不会丢失
+///
+/// 当 `watermark` 为 `Some(text)` 时，在 `<w:body>` 起始标签后立即插入一段灰色小字水印段落，
+/// 使其呈现在文档最前。水印段落不参与 `para_index` 计数（不影响 para_map 索引语义）。
 fn replace_paragraph_texts(
     xml: &str,
     para_map: &HashMap<usize, &str>,
+    watermark: Option<&str>,
 ) -> Result<String, String> {
     let mut reader = XmlReader::from_str(xml);
     let mut output = Cursor::new(Vec::new());
@@ -113,7 +121,14 @@ fn replace_paragraph_texts(
                 let name = String::from_utf8_lossy(e.name().as_ref()).to_string();
                 let local = local_name(&name);
 
-                if local == "p" && is_w_ns(&name) && !in_paragraph {
+                if local == "body" && is_w_ns(&name) {
+                    // 先写出 <w:body> 起始标签，再插入水印段落（若有）
+                    writer.write_event(Event::Start(e.clone()))
+                        .map_err(|e| format!("XML 写入失败：{}", e))?;
+                    if let Some(wm_text) = watermark {
+                        write_watermark_paragraph(&mut writer, wm_text)?;
+                    }
+                } else if local == "p" && is_w_ns(&name) && !in_paragraph {
                     in_paragraph = true;
                     replacing = needs_replacement(para_index, para_map);
                     t_count = 0;
@@ -228,6 +243,48 @@ fn needs_replacement(para_index: usize, para_map: &HashMap<usize, &str>) -> bool
     para_map.contains_key(&para_index)
 }
 
+/// 在 `<w:body>` 起始后写入一段水印段落：
+/// `<w:p><w:r><w:rPr><w:color w:val="999999"/><w:sz w:val="18"/></w:rPr><w:t xml:space="preserve">TEXT</w:t></w:r></w:p>`
+/// 灰色小字（color=#999999，9pt = sz=18 半磅单位），文本由 XmlWriter 自动 XML 转义。
+fn write_watermark_paragraph<W: std::io::Write>(
+    writer: &mut XmlWriter<W>,
+    text: &str,
+) -> Result<(), String> {
+    use quick_xml::events::BytesEnd;
+
+    // <w:p>
+    writer.write_event(Event::Start(BytesStart::new("w:p")))
+        .map_err(|e| format!("XML 写入失败：{}", e))?;
+    // <w:r>
+    writer.write_event(Event::Start(BytesStart::new("w:r")))
+        .map_err(|e| format!("XML 写入失败：{}", e))?;
+    // <w:rPr>
+    writer.write_event(Event::Start(BytesStart::new("w:rPr")))
+        .map_err(|e| format!("XML 写入失败：{}", e))?;
+    // <w:color w:val="999999"/>
+    let mut color = BytesStart::new("w:color");
+    color.push_attribute(("w:val", "999999"));
+    writer.write_event(Event::Empty(color))
+        .map_err(|e| format!("XML 写入失败：{}", e))?;
+    // <w:sz w:val="18"/>  — 18 半磅 = 9pt
+    let mut sz = BytesStart::new("w:sz");
+    sz.push_attribute(("w:val", "18"));
+    writer.write_event(Event::Empty(sz))
+        .map_err(|e| format!("XML 写入失败：{}", e))?;
+    // </w:rPr>
+    writer.write_event(Event::End(BytesEnd::new("w:rPr")))
+        .map_err(|e| format!("XML 写入失败：{}", e))?;
+    // <w:t xml:space="preserve">TEXT</w:t>
+    write_t_element(writer, text)?;
+    // </w:r>
+    writer.write_event(Event::End(BytesEnd::new("w:r")))
+        .map_err(|e| format!("XML 写入失败：{}", e))?;
+    // </w:p>
+    writer.write_event(Event::End(BytesEnd::new("w:p")))
+        .map_err(|e| format!("XML 写入失败：{}", e))?;
+    Ok(())
+}
+
 /// 写入 <w:t xml:space="preserve">text</w:t>
 /// 注意：text 是明文（未转义），XmlWriter 会在写入时自动进行 XML 转义
 fn write_t_element<W: std::io::Write>(
@@ -306,7 +363,7 @@ mod tests {
         let mut para_map = HashMap::new();
         para_map.insert(1, "包含***信息的段落");
 
-        let result = replace_paragraph_texts(xml, &para_map).unwrap();
+        let result = replace_paragraph_texts(xml, &para_map, None).unwrap();
 
         assert!(result.contains("原始标题"), "未替换的段落应保持原文");
         assert!(result.contains("包含***信息的段落"), "替换段落应包含新文本");
@@ -325,7 +382,7 @@ mod tests {
 </w:document>"#;
 
         let para_map = HashMap::new();
-        let result = replace_paragraph_texts(xml, &para_map).unwrap();
+        let result = replace_paragraph_texts(xml, &para_map, None).unwrap();
         assert!(result.contains("Hello"));
     }
 
@@ -343,7 +400,7 @@ mod tests {
         let mut para_map = HashMap::new();
         para_map.insert(0, "A & B <脱敏>");
 
-        let result = replace_paragraph_texts(xml, &para_map).unwrap();
+        let result = replace_paragraph_texts(xml, &para_map, None).unwrap();
         assert!(result.contains("A &amp; B &lt;脱敏&gt;"), "XML 特殊字符应被正确转义，实际结果: {}", result);
         // 验证输出是合法 XML
         let mut reader = XmlReader::from_str(&result);
@@ -384,7 +441,7 @@ mod tests {
 </w:document>"#;
 
         let para_map = HashMap::new();
-        let result = replace_paragraph_texts(xml, &para_map).unwrap();
+        let result = replace_paragraph_texts(xml, &para_map, None).unwrap();
 
         assert!(result.contains("w:drawing"), "图片元素应保留");
         assert!(result.contains("image_data"), "图片数据应保留");
@@ -428,7 +485,7 @@ mod tests {
         // 替换第 2 个段落（含敏感信息的段落）
         para_map.insert(2, "***的手机号是***");
 
-        let result = replace_paragraph_texts(xml, &para_map).unwrap();
+        let result = replace_paragraph_texts(xml, &para_map, None).unwrap();
 
         // 标题和超链接段落不受影响
         assert!(result.contains("标题内容"), "标题应保留");
@@ -473,7 +530,7 @@ mod tests {
         let mut para_map = HashMap::new();
         para_map.insert(0, "脱敏后的内容");
 
-        let result = replace_paragraph_texts(xml, &para_map).unwrap();
+        let result = replace_paragraph_texts(xml, &para_map, None).unwrap();
 
         // mc:AlternateContent 结构应完整保留
         assert!(result.contains("mc:AlternateContent"), "AlternateContent 应保留");
@@ -506,7 +563,7 @@ mod tests {
         // 替换表格内第 2 个单元格（para_index=2）
         para_map.insert(2, "138****1111");
 
-        let result = replace_paragraph_texts(xml, &para_map).unwrap();
+        let result = replace_paragraph_texts(xml, &para_map, None).unwrap();
 
         assert!(result.contains("表格前段落"), "表格前段落应保留");
         assert!(result.contains("姓名"), "未替换的表格单元格应保留");
@@ -530,7 +587,7 @@ mod tests {
         let mut para_map = HashMap::new();
         para_map.insert(0, "");
 
-        let result = replace_paragraph_texts(xml, &para_map).unwrap();
+        let result = replace_paragraph_texts(xml, &para_map, None).unwrap();
 
         assert!(!result.contains("需要清空的段落"), "原文应被清空");
         assert!(result.contains("保留的段落"), "未替换段落应保留");
@@ -566,7 +623,7 @@ mod tests {
         let mut para_map = HashMap::new();
         para_map.insert(0, "脱敏说明");
 
-        let result = replace_paragraph_texts(xml, &para_map).unwrap();
+        let result = replace_paragraph_texts(xml, &para_map, None).unwrap();
 
         // 图片结构应完整保留
         assert!(result.contains("w:drawing"), "drawing 元素应保留");
@@ -575,5 +632,76 @@ mod tests {
         // 文本被替换
         assert!(result.contains("脱敏说明"), "替换文本应存在");
         assert!(!result.contains("图片说明文字"), "原始文本应被替换");
+    }
+
+    #[test]
+    fn test_watermark_injected_after_body_start() {
+        let xml = r#"<?xml version="1.0" encoding="UTF-8"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    <w:p><w:r><w:t>正文段落一</w:t></w:r></w:p>
+    <w:p><w:r><w:t>正文段落二</w:t></w:r></w:p>
+  </w:body>
+</w:document>"#;
+
+        let para_map = HashMap::new();
+        let result = replace_paragraph_texts(xml, &para_map, Some("Dimkey 试用版水印")).unwrap();
+
+        // 水印文本应注入
+        assert!(result.contains("Dimkey 试用版水印"), "水印文本应存在: {}", result);
+        // 原文段落应保留
+        assert!(result.contains("正文段落一"), "原段落 1 应保留");
+        assert!(result.contains("正文段落二"), "原段落 2 应保留");
+        // 灰色小字格式
+        assert!(result.contains("999999"), "应包含灰色 color 属性");
+        // 水印段落必须出现在 body 起始之后、第一个原段落之前
+        let body_pos = result.find("<w:body>").expect("应有 body 起始");
+        let watermark_pos = result.find("Dimkey 试用版水印").expect("应有水印文本");
+        let first_para_pos = result.find("正文段落一").expect("应有第一段");
+        assert!(body_pos < watermark_pos, "水印应在 <w:body> 之后");
+        assert!(watermark_pos < first_para_pos, "水印应在第一段原文之前");
+
+        // 输出仍是合法 XML
+        let mut reader = XmlReader::from_str(&result);
+        let mut buf = Vec::new();
+        loop {
+            match reader.read_event_into(&mut buf) {
+                Ok(Event::Eof) => break,
+                Err(e) => panic!("注入水印后输出 XML 不合法: {}", e),
+                _ => {}
+            }
+            buf.clear();
+        }
+    }
+
+    #[test]
+    fn test_watermark_xml_special_chars_escaped() {
+        let xml = r#"<?xml version="1.0" encoding="UTF-8"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    <w:p><w:r><w:t>Hello</w:t></w:r></w:p>
+  </w:body>
+</w:document>"#;
+
+        let para_map = HashMap::new();
+        let result = replace_paragraph_texts(xml, &para_map, Some("A & B <trial>")).unwrap();
+
+        assert!(result.contains("A &amp; B &lt;trial&gt;"), "水印中的特殊字符应被转义: {}", result);
+    }
+
+    #[test]
+    fn test_no_watermark_when_none() {
+        let xml = r#"<?xml version="1.0" encoding="UTF-8"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    <w:p><w:r><w:t>Hello</w:t></w:r></w:p>
+  </w:body>
+</w:document>"#;
+
+        let para_map = HashMap::new();
+        let result = replace_paragraph_texts(xml, &para_map, None).unwrap();
+
+        assert!(!result.contains("999999"), "无水印时不应注入颜色属性");
+        assert!(result.contains("Hello"), "原文应保留");
     }
 }

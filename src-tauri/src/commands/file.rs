@@ -7,6 +7,8 @@ use crate::parser::pdf::parse_pdf;
 use crate::parser::word::parse_docx;
 use crate::parser::word::parse_docx_from_bytes;
 use crate::parser::word_export::export_docx;
+use crate::license::state::{LicenseManager, LicenseState};
+use crate::license::watermark;
 
 /// PDF 页面渲染结果
 #[derive(Debug, Clone, Serialize)]
@@ -279,7 +281,8 @@ pub async fn export_file(
     };
 
     let result = tokio::task::spawn_blocking(move || {
-        export_content(&content, &output_path, original_path.as_deref())
+        // Phase 8: license_manager 暂传 None，Phase 9 通过 Tauri State 注入真实 manager
+        export_content(&content, &output_path, original_path.as_deref(), None)
     })
     .await
     .map_err(|e| format!("文件导出任务失败: {}", e))?;
@@ -296,11 +299,20 @@ pub async fn export_file(
 }
 
 /// 内部导出逻辑（供 export_file 和还原导出复用）
+///
+/// `license_manager` 为 `Some(mgr)` 且 `mgr.current()` 处于 `LicenseState::TrialExpired` 时，
+/// 在 xlsx/csv/docx/txt 4 种格式中注入水印。PDF 暂不支持（v1 留 TODO）。
 pub fn export_content(
     content: &FileContent,
     output_path: &str,
     original_path: Option<&str>,
+    license_manager: Option<&LicenseManager>,
 ) -> Result<(), String> {
+    // 仅当 license_manager 存在且当前状态为 TrialExpired 时启用水印
+    let watermark_text: Option<&str> = license_manager
+        .filter(|mgr| matches!(mgr.current(), LicenseState::TrialExpired))
+        .map(|_| watermark::watermark_text());
+
     match content {
         FileContent::Spreadsheet {
             file_type,
@@ -309,9 +321,9 @@ pub fn export_content(
         } => match file_type {
             FileType::Csv => {
                 if let Some(sheet) = sheets.first() {
-                    export_csv(output_path, &sheet.headers, &sheet.rows)
+                    export_csv(output_path, &sheet.headers, &sheet.rows, watermark_text)
                 } else {
-                    export_csv(output_path, &[], &[])
+                    export_csv(output_path, &[], &[], watermark_text)
                 }
             }
             FileType::Xlsx | FileType::Xls => {
@@ -332,30 +344,50 @@ pub fn export_content(
                 } else {
                     output_path.to_string()
                 };
-                export_xlsx(&final_path, sheets)
+                export_xlsx(&final_path, sheets, watermark_text)
             }
             _ => Err("不支持的导出格式".to_string()),
         },
         FileContent::Document { file_type, paragraphs, encoding, .. } => match file_type {
-            FileType::Txt => export_txt(paragraphs, output_path, encoding.as_deref()),
+            FileType::Txt => export_txt(paragraphs, output_path, encoding.as_deref(), watermark_text),
             FileType::Pdf => {
                 // PDF 涂黑导出需要走 export_pdf_redacted_cmd command
                 // 此处提供简单的纯文本降级导出
+                // TODO(Phase 8+): PDF 试用过期水印未实现 — 涂黑导出走独立 command 路径，
+                // 后续需在 pdf_export 渲染时叠加水印水位文字（页脚/对角线灰字）。
                 Err("PDF 导出请使用专用的涂黑导出功能".to_string())
             }
             _ => {
                 let src = original_path
                     .ok_or_else(|| "导出 Word 文档需要提供原始文件路径".to_string())?;
-                export_docx(src, paragraphs, output_path)
+                export_docx(src, paragraphs, output_path, watermark_text)
             }
         },
     }
 }
 
 /// 导出为 CSV 文件
-fn export_csv(path: &str, headers: &[String], rows: &[Vec<crate::models::sensitive::CellValue>]) -> Result<(), String> {
+///
+/// `watermark` 为 `Some(text)` 时，在表头之前先写入一行水印（仅第一列含 watermark text，
+/// 其余列留空，列数与 headers 对齐避免破坏 CSV 解析器）。
+fn export_csv(
+    path: &str,
+    headers: &[String],
+    rows: &[Vec<crate::models::sensitive::CellValue>],
+    watermark: Option<&str>,
+) -> Result<(), String> {
     let mut writer = csv::Writer::from_path(path)
         .map_err(|e| format!("创建 CSV 文件失败: {}", e))?;
+
+    if let Some(wm) = watermark {
+        // 水印行长度与 headers 对齐（至少 1 列），避免某些严格 CSV 解析器报"列数不一致"
+        let col_count = headers.len().max(1);
+        let mut wm_row: Vec<String> = vec![String::new(); col_count];
+        wm_row[0] = format!("# {}", wm);
+        writer
+            .write_record(&wm_row)
+            .map_err(|e| format!("写入 CSV 水印行失败: {}", e))?;
+    }
 
     writer
         .write_record(headers)
@@ -620,8 +652,11 @@ pub async fn render_pdf_pages(
 }
 
 /// 导出为 Excel 文件（支持多 Sheet，按 CellType 分发写入）
-fn export_xlsx(path: &str, sheets: &[SheetData]) -> Result<(), String> {
-    use rust_xlsxwriter::{Workbook, Format, ExcelDateTime};
+///
+/// `watermark` 为 `Some(text)` 时，在每个 sheet 的第 0 行写入水印（A1 单元格灰色字），
+/// 表头与数据行整体下移一行。
+fn export_xlsx(path: &str, sheets: &[SheetData], watermark: Option<&str>) -> Result<(), String> {
+    use rust_xlsxwriter::{Workbook, Format, ExcelDateTime, Color};
     use crate::models::sensitive::CellType;
 
     let mut workbook = Workbook::new();
@@ -629,6 +664,14 @@ fn export_xlsx(path: &str, sheets: &[SheetData]) -> Result<(), String> {
     // 预建日期/时间格式
     let date_format = Format::new().set_num_format("yyyy-mm-dd");
     let datetime_format = Format::new().set_num_format("yyyy-mm-dd hh:mm:ss");
+    // 水印格式：灰色 9pt 斜体
+    let watermark_format = Format::new()
+        .set_font_color(Color::RGB(0x99_99_99))
+        .set_font_size(9)
+        .set_italic();
+
+    // 启用水印时，所有数据/表头行下移
+    let row_offset: u32 = if watermark.is_some() { 1 } else { 0 };
 
     for sheet in sheets {
         let worksheet = workbook.add_worksheet();
@@ -640,14 +683,21 @@ fn export_xlsx(path: &str, sheets: &[SheetData]) -> Result<(), String> {
                 .map_err(|e| format!("设置工作表名称失败: {}", e))?;
         }
 
+        // 在第 0 行写水印（仅 A 列），其它列留空
+        if let Some(wm) = watermark {
+            worksheet
+                .write_string_with_format(0, 0, format!("# {}", wm), &watermark_format)
+                .map_err(|e| format!("写入 xlsx 水印失败: {}", e))?;
+        }
+
         for (col, header) in sheet.headers.iter().enumerate() {
             worksheet
-                .write_string(0, col as u16, header)
+                .write_string(row_offset, col as u16, header)
                 .map_err(|e| format!("写入表头失败: {}", e))?;
         }
 
         for (row_idx, row) in sheet.rows.iter().enumerate() {
-            let excel_row = (row_idx + 1) as u32;
+            let excel_row = (row_idx as u32) + 1 + row_offset;
             for (col_idx, cell) in row.iter().enumerate() {
                 let excel_col = col_idx as u16;
                 match &cell.cell_type {

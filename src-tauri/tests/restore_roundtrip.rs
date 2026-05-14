@@ -71,7 +71,7 @@ fn test_roundtrip_csv() {
         .tempfile()
         .expect("创建临时文件失败");
     let tmp_path = tmp.path().to_str().unwrap();
-    export_content(&result.content, tmp_path, None).expect("CSV 导出失败");
+    export_content(&result.content, tmp_path, None, None).expect("CSV 导出失败");
 
     // 重新导入
     let reimported = import_file_internal(tmp_path).expect("重新导入失败");
@@ -121,7 +121,7 @@ fn test_roundtrip_xlsx() {
         .tempfile()
         .expect("创建临时文件失败");
     let tmp_path = tmp.path().to_str().unwrap();
-    export_content(&result.content, tmp_path, None).expect("Excel 导出失败");
+    export_content(&result.content, tmp_path, None, None).expect("Excel 导出失败");
 
     // 重新导入
     let reimported = import_file_internal(tmp_path).expect("重新导入失败");
@@ -174,7 +174,7 @@ fn test_roundtrip_docx() {
         .tempfile()
         .expect("创建临时文件失败");
     let tmp_path = tmp.path().to_str().unwrap();
-    export_content(&result.content, tmp_path, Some(&path)).expect("Word 导出失败");
+    export_content(&result.content, tmp_path, Some(&path), None).expect("Word 导出失败");
 
     // 重新导入
     let reimported = import_file_internal(tmp_path).expect("重新导入失败");
@@ -221,7 +221,7 @@ fn test_roundtrip_csv_customer() {
         .tempfile()
         .expect("创建临时文件失败");
     let tmp_path = tmp.path().to_str().unwrap();
-    export_content(&result.content, tmp_path, None).expect("CSV 导出失败");
+    export_content(&result.content, tmp_path, None, None).expect("CSV 导出失败");
 
     let reimported = import_file_internal(tmp_path).expect("重新导入失败");
     let mut restored = reimported;
@@ -267,7 +267,7 @@ fn test_roundtrip_xlsx_law() {
         .tempfile()
         .expect("创建临时文件失败");
     let tmp_path = tmp.path().to_str().unwrap();
-    export_content(&result.content, tmp_path, None).expect("Excel 导出失败");
+    export_content(&result.content, tmp_path, None, None).expect("Excel 导出失败");
 
     let reimported = import_file_internal(tmp_path).expect("重新导入失败");
     let mut restored = reimported;

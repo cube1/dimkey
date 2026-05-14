@@ -80,7 +80,7 @@ fn assert_spreadsheet_roundtrip(fixture_rel_path: &str, suffix: &str) {
         .tempfile()
         .expect("创建临时文件失败");
     let tmp_path = tmp.path().to_str().unwrap();
-    export_content(&result.content, tmp_path, None).expect("导出失败");
+    export_content(&result.content, tmp_path, None, None).expect("导出失败");
 
     // 重新导入
     let reimported = import_file_internal(tmp_path).expect("重新导入失败");
@@ -170,7 +170,7 @@ fn assert_document_roundtrip(fixture_rel_path: &str, suffix: &str) {
         .expect("创建临时文件失败");
     let tmp_path = tmp.path().to_str().unwrap();
     let original_path = if suffix == ".docx" { Some(path.as_str()) } else { None };
-    export_content(&result.content, tmp_path, original_path).expect("导出失败");
+    export_content(&result.content, tmp_path, original_path, None).expect("导出失败");
 
     // 重新导入
     let reimported = import_file_internal(tmp_path).expect("重新导入失败");

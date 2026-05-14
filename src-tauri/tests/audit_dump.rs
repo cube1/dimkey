@@ -125,7 +125,7 @@ fn audit_csv_roundtrip() {
         .tempfile()
         .expect("创建临时文件失败");
     let tmp_path = tmp.path().to_str().unwrap();
-    export_content(&result.content, tmp_path, None).expect("导出失败");
+    export_content(&result.content, tmp_path, None, None).expect("导出失败");
 
     let reimported = import_file_internal(tmp_path).expect("重新导入失败");
     let mut restored = reimported.clone();
