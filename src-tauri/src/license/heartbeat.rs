@@ -33,10 +33,19 @@ async fn check_once(app: &tauri::AppHandle, manager: &LicenseManager) {
         None => return, // 未激活，无需 ping
     };
 
-    let next_check: DateTime<Utc> = parse_iso(&payload.next_check_at);
     let now = Utc::now();
-    if now < next_check {
-        return; // 还没到复验时间
+
+    // next_check_at 解析失败 → 视为已过期，立即 ping（不静默忽略）
+    let next_check = parse_iso(&payload.next_check_at);
+    if let Some(nc) = next_check {
+        if now < nc {
+            return; // 还没到复验时间
+        }
+    } else {
+        eprintln!(
+            "[license::heartbeat] invalid next_check_at: {:?}",
+            payload.next_check_at
+        );
     }
 
     let body = api_client::HeartbeatBody {
@@ -47,10 +56,14 @@ async fn check_once(app: &tauri::AppHandle, manager: &LicenseManager) {
     match api_client::heartbeat(&body).await {
         Ok(data) => {
             if data.status == "revoked" {
-                // 删证书，重 boot
+                // 删证书，重 boot，强制进入 Revoked 态（spec §4.4 状态机要求）
                 let _ = certificate::delete_certificate(manager.config_dir());
                 manager.boot();
-                let _ = app.emit("license:state-changed", manager.current());
+                let revoked = LicenseState::Revoked {
+                    reason: "服务端吊销".to_string(),
+                };
+                manager.set_state(revoked.clone());
+                let _ = app.emit("license:state-changed", revoked);
             } else {
                 // active：emit 事件让前端知道复验通过（不持久化 next_check_at —— 私钥在后端，
                 // 客户端用内存中的下次检查时间隐式推进，下次启动会重新基于证书的 next_check_at 计算）
@@ -62,9 +75,23 @@ async fn check_once(app: &tauri::AppHandle, manager: &LicenseManager) {
         }
         Err(_) => {
             // 网络失败：检查是否超过 max_grace_until
-            let max_grace = parse_iso(&payload.max_grace_until);
-            if Utc::now() > max_grace {
-                let days_over = (Utc::now() - max_grace).num_days();
+            // 解析失败 → 视为很久前 → 立即进入 GraceMode（不静默忽略）
+            let max_grace_parsed = parse_iso(&payload.max_grace_until);
+            let exceeded_grace = match max_grace_parsed {
+                Some(max_grace) => now > max_grace,
+                None => {
+                    eprintln!(
+                        "[license::heartbeat] invalid max_grace_until: {:?}, treating as exceeded",
+                        payload.max_grace_until
+                    );
+                    true
+                }
+            };
+            if exceeded_grace {
+                let days_over = match max_grace_parsed {
+                    Some(max_grace) => (now - max_grace).num_days(),
+                    None => 0,
+                };
                 let new_state = LicenseState::GraceMode {
                     email: payload.email.clone(),
                     days_until_block: -days_over,
@@ -77,8 +104,26 @@ async fn check_once(app: &tauri::AppHandle, manager: &LicenseManager) {
     }
 }
 
-fn parse_iso(s: &str) -> DateTime<Utc> {
+fn parse_iso(s: &str) -> Option<DateTime<Utc>> {
     DateTime::parse_from_rfc3339(s)
         .map(|d| d.with_timezone(&Utc))
-        .unwrap_or_else(|_| Utc::now())
+        .ok()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_iso_valid_rfc3339() {
+        let r = parse_iso("2026-05-14T10:00:00Z");
+        assert!(r.is_some());
+    }
+
+    #[test]
+    fn parse_iso_invalid_returns_none() {
+        assert!(parse_iso("not-rfc3339").is_none());
+        assert!(parse_iso("").is_none());
+        assert!(parse_iso("2026-13-50T99:99:99Z").is_none());
+    }
 }
