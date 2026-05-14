@@ -14,7 +14,13 @@ use sha2::{Digest, Sha256};
 
 pub const FINGERPRINT_VERSION: &str = "v1";
 
-/// 计算当前机器的设备指纹（128 bit hex）
+/// 计算当前机器的设备指纹（128 bit hex，32 字符）
+/// 算法：sha256(machine_id || "||" || mac || "||" || cpu || "||" || os_install_id)[0..16]
+///
+/// 调用方应缓存返回值，避免重复调用（每次 ~50-100ms：sysinfo 网卡扫描 + ioreg 子进程）
+///
+/// macOS 前提：app entitlements 须含 `com.apple.security.network.client`，
+/// 否则 sysinfo Networks 返回空导致 MAC 走 "unknown" 兜底，与已授权状态指纹不同
 pub fn compute_fingerprint() -> String {
     let machine_id = read_machine_id().unwrap_or_else(|| "unknown".into());
     let mac = read_primary_mac().unwrap_or_else(|| "unknown".into());
@@ -43,19 +49,18 @@ fn read_primary_mac() -> Option<String> {
     let mut macs: Vec<String> = networks
         .iter()
         .filter(|(name, _)| {
-            // 过滤 lo / 虚拟接口 / USB 网卡（保留以太网/Wi-Fi 物理接口）
             let n = name.to_lowercase();
-            !n.starts_with("lo")
-                && !n.contains("vmnet")
-                && !n.contains("vboxnet")
-                && !n.contains("utun")
-                && !n.contains("anpi")
-                && !n.contains("awdl")
-                && !n.contains("llw")
-                && !n.contains("bridge")
-                && !n.contains("docker")
-                && !n.contains("tap")
-                && !n.contains("ham")
+            if n.starts_with("lo") { return false; }
+            // 通用虚拟接口（macOS / Linux / Windows）
+            let virtual_keywords = [
+                "vmnet", "vboxnet", "utun", "tun", "anpi", "awdl", "llw",
+                "bridge", "docker", "tap", "ham",
+                // Windows 虚拟/非物理接口
+                "bluetooth", "hyper-v", "pseudo", "wsl",
+                "wireguard", "tailscale", "zerotier",
+                "loopback", "vethernet", "isatap", "teredo",
+            ];
+            !virtual_keywords.iter().any(|k| n.contains(k))
         })
         .map(|(_, data)| data.mac_address().to_string())
         .filter(|m| m != "00:00:00:00:00:00" && !m.is_empty())
@@ -65,9 +70,10 @@ fn read_primary_mac() -> Option<String> {
 }
 
 fn read_cpu_brand() -> Option<String> {
-    use sysinfo::System;
-    let mut sys = System::new();
-    sys.refresh_cpu_all();
+    use sysinfo::{CpuRefreshKind, RefreshKind, System};
+    let sys = System::new_with_specifics(
+        RefreshKind::new().with_cpu(CpuRefreshKind::new()),
+    );
     sys.cpus().first().map(|c| c.brand().to_string())
 }
 
@@ -103,7 +109,9 @@ fn read_os_install_id() -> Option<String> {
     // SID via `whoami /user` — 输出格式: NAME SID
     let out = Command::new("whoami").arg("/user").output().ok()?;
     let s = String::from_utf8_lossy(&out.stdout);
-    s.split_whitespace().last().map(|x| x.to_string())
+    s.split_whitespace()
+        .find(|t| t.starts_with("S-1-"))
+        .map(|x| x.trim_end_matches('\r').to_string())
 }
 
 #[cfg(not(any(target_os = "macos", target_os = "windows")))]
