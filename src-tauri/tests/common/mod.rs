@@ -682,3 +682,136 @@ pub fn get_paragraphs(content: &FileContent) -> &Vec<Paragraph> {
         _ => panic!("期望 Document 类型"),
     }
 }
+
+// ============================================================
+// Regression helper — 防"测试过 UI 没替换"静默 passthrough
+//
+// 用户痛点 #1 的 Rust 侧镜像: 真后端跑出来的脱敏结果
+// 必须真的把内容改了，summary 不能虚报。
+//
+// 用法: 用户报来一个"打开后没替换"的文件，作者把它放到
+// e2e/fixtures/regression/，然后写一个测试调
+// `assert_no_silent_passthrough(path, expected_min_replacements)`，
+// 这个 case 就永远进入 CI 拦截网。
+// ============================================================
+
+/// 把任意 FileContent 拍成一段纯文本，方便整体比对（不区分 sheet/段落）
+fn content_to_flat_text(content: &FileContent) -> String {
+    match content {
+        FileContent::Spreadsheet { sheets, .. } => {
+            let mut parts = Vec::new();
+            for sheet in sheets {
+                for row in &sheet.rows {
+                    for cell in row {
+                        parts.push(cell.text.clone());
+                    }
+                }
+            }
+            parts.join("\n")
+        }
+        FileContent::Document { paragraphs, .. } => {
+            paragraphs.iter().map(|p| p.text.clone()).collect::<Vec<_>>().join("\n")
+        }
+    }
+}
+
+/// 默认 regression 策略: 所有可逆类型走 Replace+Fake，保证内容真改且能还原
+fn default_regression_strategies() -> Vec<StrategyConfig> {
+    use SensitiveType::*;
+    [
+        PersonName, Phone, IdCard, Email, Address, OrgName, BankCard,
+        CreditCode, IpAddress, LandlinePhone, LicensePlate,
+    ]
+    .into_iter()
+    .map(|t| StrategyConfig {
+        sensitive_type: t,
+        strategy: Strategy::Replace { style: ReplaceStyle::Fake },
+        consistent: true,
+    })
+    .collect()
+}
+
+/// **核心 regression 断言**: 跑全管线，检测必须找到东西、脱敏必须真改内容。
+///
+/// 抓的 bug：
+/// 1. 三层引擎对该文件全漏识别 (用户报"打开后没识别")
+/// 2. 识别到了但 desensitize 把所有项变成 noop (用户报"识别但没替换")
+/// 3. summary.total 与实际 mapping 数严重不一致 (会让还原错位)
+///
+/// 用法示例：
+/// ```ignore
+/// assert_no_silent_passthrough(
+///     &fixture_path("regression/issue_001_pdf_skipped.txt"),
+///     Language::Zh,
+///     5,  // 期望至少识别+替换 5 处
+/// );
+/// ```
+pub fn assert_no_silent_passthrough(
+    fixture_abs_path: &str,
+    lang: Language,
+    expected_min_replacements: usize,
+) {
+    // 0. 前置检查: NER 模型必须加载，否则伪装成"漏识别"
+    let ner_loaded = {
+        let guard = get_ner_engine().lock().unwrap_or_else(|p| p.into_inner());
+        guard.is_loaded()
+    };
+    assert!(
+        ner_loaded,
+        "NER 模型未加载 (resources/ner/model.onnx)，回归测试无法判定漏识别原因。\n\
+         这本身就是一个用户痛点 #2 的信号 — 检查 verify-bundle.sh"
+    );
+
+    // 1. 解析
+    let content = parse_fixture(fixture_abs_path);
+    let original_text = content_to_flat_text(&content);
+    assert!(
+        !original_text.is_empty(),
+        "fixture 解析后内容为空: {}",
+        fixture_abs_path
+    );
+
+    // 2. 三层引擎全管线检测
+    let items = detect_full_pipeline(&content, lang);
+    assert!(
+        items.len() >= expected_min_replacements,
+        "全管线识别项数 {} < 期望 {}（fixture: {}）— 用户痛点 #1 原因 a: 引擎漏识别",
+        items.len(),
+        expected_min_replacements,
+        fixture_abs_path
+    );
+
+    // 3. 用默认 Replace 策略执行脱敏
+    let strategies = default_regression_strategies();
+    let result = desensitize_content(&content, &items, &strategies);
+
+    assert!(
+        result.summary.total > 0,
+        "summary.total = 0（识别到 {} 项但全部 noop）— 用户痛点 #1 原因 b: 策略未生效",
+        items.len()
+    );
+    assert!(
+        !result.mappings.is_empty(),
+        "mappings 为空（summary.total={}）— 还原将完全无法工作",
+        result.summary.total
+    );
+
+    // 4. **关键**: 脱敏后内容必须与原文不同
+    let desensitized_text = content_to_flat_text(&result.content);
+    assert_ne!(
+        original_text, desensitized_text,
+        "脱敏后内容与原文完全相同 — 静默 passthrough。\n\
+         summary 报了 {} 处替换但 content 没变 = 用户打开 UI 看到的就是没替换的原文。\n\
+         fixture: {}",
+        result.summary.total, fixture_abs_path
+    );
+
+    // 5. summary.total 与 mappings 应该数量级一致（mapping 至少是 total 的一半，
+    //    考虑 consistent=true 时多次出现合并）
+    assert!(
+        result.mappings.len() * 2 >= result.summary.total,
+        "mappings ({}) 远低于 summary.total ({}) — 还原会丢映射",
+        result.mappings.len(),
+        result.summary.total
+    );
+}

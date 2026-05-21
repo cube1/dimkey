@@ -148,6 +148,18 @@ cargo tauri build
 export APPLE_ID="$_SAVED_APPLE_ID"
 export APPLE_PASSWORD="$_SAVED_APPLE_PASSWORD"
 
+# ── Bundle Smoke Check：校验 ONNX 模型 / pdfium / 可执行文件齐全 ──
+# 解决用户痛点："打包后连模型文件都没带，都不能识别"
+echo ""
+echo "校验 bundle 关键资源..."
+APP_PATH="$BUNDLE_DIR/macos/Dimkey.app"
+if ! ./scripts/verify-bundle.sh "$APP_PATH" macos; then
+  echo ""
+  echo "错误: bundle 校验失败，拒绝继续发布流程。"
+  echo "请检查 src-tauri/resources/ 下的 ner/ 与 pdfium/ 资源是否齐全后重新构建。"
+  exit 1
+fi
+
 # ── xcrun notarytool 公证 ──
 echo ""
 echo "使用 xcrun notarytool 公证..."
@@ -215,6 +227,35 @@ echo "构建产物:"
 [ -n "$SIG" ] && echo "  签名: $(basename "$SIG")" || echo "  [缺失] tar.gz.sig 未找到"
 
 [ -n "$DMG" ] || [ -n "$TAR_GZ" ] || { echo "错误: 未找到任何构建产物"; exit 1; }
+
+# ── 二次校验：updater 包和 DMG 解压后资源仍齐全（防止打包过程丢失）──
+echo ""
+echo "二次校验: 解压 updater 包并验证资源..."
+TAR_VERIFY_DIR=$(mktemp -d)
+tar -xzf "$TAR_GZ" -C "$TAR_VERIFY_DIR"
+if ! ./scripts/verify-bundle.sh "$TAR_VERIFY_DIR/Dimkey.app" macos; then
+  rm -rf "$TAR_VERIFY_DIR"
+  echo "错误: updater 包 ($TAR_GZ) 解压后资源缺失，拒绝发布。"
+  exit 1
+fi
+rm -rf "$TAR_VERIFY_DIR"
+
+if [ -n "$DMG" ]; then
+  echo ""
+  echo "二次校验: 挂载 DMG 并验证资源..."
+  DMG_MOUNT=$(hdiutil attach "$DMG" -nobrowse -noverify -noautoopen | tail -1 | awk '{print $NF}')
+  if [ -n "$DMG_MOUNT" ] && [ -d "$DMG_MOUNT/Dimkey.app" ]; then
+    if ! ./scripts/verify-bundle.sh "$DMG_MOUNT/Dimkey.app" macos; then
+      hdiutil detach "$DMG_MOUNT" -force >/dev/null 2>&1 || true
+      echo "错误: DMG ($DMG) 内 .app 资源缺失，拒绝发布。"
+      exit 1
+    fi
+    hdiutil detach "$DMG_MOUNT" -force >/dev/null 2>&1 || true
+  else
+    echo "警告: 无法挂载 DMG 进行校验"
+  fi
+fi
+echo "  二次校验通过"
 
 # ── 上传到 GitHub Release（私有 + 公开仓库）──
 upload_to_release() {
