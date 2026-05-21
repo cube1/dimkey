@@ -47,7 +47,7 @@ bullets, bold). Do not add commentary, just output the translation directly.
 $ZH_BODY"
 
   # claude -p 非交互模式
-  if claude -p "$PROMPT" --bare --allow-dangerously-skip-permissions > "$EN_OUT" 2>/tmp/claude-translate.log; then
+  if claude -p "$PROMPT" --bare --disallowedTools "*" > "$EN_OUT" 2>/tmp/claude-translate.log; then
     if [ -s "$EN_OUT" ]; then
       echo "已写入英文 release notes: $EN_OUT"
       exit 0
