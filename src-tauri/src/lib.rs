@@ -148,15 +148,17 @@ pub fn run() {
             })));
 
             // === License 系统初始化（Phase 9 集成层）===
-            // 1) 解析 app_config_dir 作为证书/试用记录目录
-            // 2) 计算本机指纹（一次性，缓存在 manager）
-            // 3) 装配 3 处 TrialStore + manager + boot 决定状态
-            // 4) 注册全局 State + 启动后台 heartbeat 任务
-            let config_dir = app.path().app_config_dir()
-                .unwrap_or_else(|_| std::path::PathBuf::from("."));
+            // license 数据跨 zh/en 包共享：不依赖 Tauri app_config_dir（那个路径附加
+            // bundle identifier 会让 com.dimkey.cn 和 com.dimkey.en 分裂）
+            let license_config_dir = dirs::config_dir()
+                .map(|d| d.join("com.dimkey"))
+                .unwrap_or_else(|| std::path::PathBuf::from("."));
+            if let Err(e) = std::fs::create_dir_all(&license_config_dir) {
+                eprintln!("[license] 创建共享配置目录失败: {} ({})", license_config_dir.display(), e);
+            }
             let machine_fp = compute_fingerprint();
-            let trial_stores = build_default_stores(config_dir.clone());
-            let manager = Arc::new(LicenseManager::new(trial_stores, config_dir, machine_fp));
+            let trial_stores = build_default_stores(license_config_dir.clone());
+            let manager = Arc::new(LicenseManager::new(trial_stores, license_config_dir, machine_fp));
             manager.boot();
             app.manage(LicenseManagerState(manager.clone()));
 
