@@ -10,16 +10,16 @@
 
 ## 0. 背景
 
-`feat/license-control` 分支实现了 license 控制模块（trial / 证书验签 / heartbeat / 水印），但**还未集成到 zh/en 双语发版流水线**。同时 dimkey-web 后端（license API、ed25519 keypair）也尚未部署。本设计稿合并解决：
+`feat/license-control` 分支实现了 license 控制模块（trial / 证书验签 / heartbeat / 水印），但**还未集成到 zh/en 双语发版流水线**。同时 dimkey-site 后端（license API、ed25519 keypair）也尚未部署。本设计稿合并解决：
 
 1. license 模块本身的两个**跨 lang 共享**改造（存储路径 + PUBKEY 烧入）
 2. 现有 `release.yml` + `release-macos.sh` 双语流水线的**集成点**（preflight 校验 + CHANGELOG 双语）
-3. **跨仓库发版顺序**（dimkey-web 先于 dimkey）
+3. **跨仓库发版顺序**（dimkey-site 先于 dimkey）
 4. **测试策略**（CI / 本地 / 实机三层）
 
 明确**不在范围**（后续独立立项，仅在文末挂 TODO）：
 - Windows Authenticode 代码签名
-- LemonSqueezy webhook（dimkey-web 仓库职责）
+- LemonSqueezy webhook（dimkey-site 仓库职责）
 - 国内手动激活渠道
 
 ---
@@ -46,7 +46,7 @@
 | `certificate.rs:15` `PUBKEY_V1` | `[0; 32]` 占位，所有 verify 失败 |
 | `api_client.rs:16` `DEFAULT_API_BASE` | `https://dimkey.app/api/v1`（生产域）|
 | license 存储路径 | 走 `app.path().app_config_dir()` → 在 zh/en 间**分裂** |
-| dimkey-web 后端 | keypair 未生成、Workers 未部署 |
+| dimkey-site 后端 | keypair 未生成、Go server 未部署 |
 
 ---
 
@@ -55,7 +55,7 @@
 1. **license 一份激活 zh+en**：用户买一份证书在同一台设备上同时激活中英文版（业务决策，参见 brainstorming 记录）。
 2. **PUBKEY 写死代码**：公钥不是秘密，编译期硬编码最简单。preflight 脚本卡占位 PUBKEY 流入生产。
 3. **流水线零侵入**：现有 release.yml + release-macos.sh 结构不动，只新增 preflight 校验 + CHANGELOG 双语注入。
-4. **跨仓库顺序硬约束**：dimkey-web 后端必须先部署。preflight 卡 API 健康检查。
+4. **跨仓库顺序硬约束**：dimkey-site 后端必须先部署。preflight 卡 API 健康检查。
 5. **本轮聚焦 license 集成**：Windows 签名等独立问题不并发处理。
 
 ---
@@ -70,8 +70,8 @@
 
 将第 11–18 行：
 ```rust
-// ⚠️ TODO(plan-a): 必须用 dimkey-web 仓库 scripts/gen-ed25519-keypair.ts 输出的
-// pub array 替换以下 32 个 0。后端私钥已存为 Workers Secret ED25519_PRIVATE_KEY。
+// ⚠️ TODO(plan-a): 必须用 dimkey-site 仓库 cmd/dimkey-keygen（Go） 输出的
+// pub array 替换以下 32 个 0。后端私钥已存为 dimkey-site server 的 ED25519_PRIVATE_KEY 配置。
 // 在 Plan A 部署前，本占位会让所有 verify 调用失败 (SignatureInvalid)，预期行为：
 // 客户端无法激活 → 走 Trial 分支。Task 4.2 (集成测试) 同样依赖此真公钥。
 pub const PUBKEY_V1: [u8; 32] = [
@@ -80,11 +80,11 @@ pub const PUBKEY_V1: [u8; 32] = [
 ];
 ```
 
-替换为 dimkey-web 仓库 `scripts/gen-ed25519-keypair.ts` 输出的真公钥（32 字节）。TODO 注释删除。
+替换为 dimkey-site 仓库 `cmd/dimkey-keygen（Go）` 输出的真公钥（32 字节）。TODO 注释删除。
 
 **测试**：`certificate.rs:222` 处的 sign+verify roundtrip 单测保留（用临时 keypair，不依赖 PUBKEY_V1）；`certificate.rs:261` 处的"占位 PUBKEY 必然失败"测试**需要删除**——切换为真公钥后这个断言会反向（任何持有合法签名的 envelope 都应验证成功）。改写为：用 PUBKEY_V1 对应的**测试 fixture .lic 文件**做正向验证。
 
-fixture 安全性：fixture 用一个**测试专用的 license_id / license_key**（dimkey-web 后端在测试数据库中预置、生产数据库不含），device_id 和 fingerprint 用占位字符串。这样 fixture commit 进公开仓库不会暴露任何真实用户数据，也无法在生产环境被滥用（生产后端查不到该 license_id）。
+fixture 安全性：fixture 用一个**测试专用的 license_id / license_key**（dimkey-site 后端在测试数据库中预置、生产数据库不含），device_id 和 fingerprint 用占位字符串。这样 fixture commit 进公开仓库不会暴露任何真实用户数据，也无法在生产环境被滥用（生产后端查不到该 license_id）。
 
 #### 3.1.2 license/trial 存储跨 lang 共享
 
@@ -140,7 +140,7 @@ let manager = Arc::new(LicenseManager::new(trial_stores, license_config_dir, mac
 
 职责（任一不通过即 exit 1）：
 1. grep `certificate.rs` 中 `PUBKEY_V1` 不是 `[0, 0, 0, ...]` 全 0 占位
-2. `curl -sf https://dimkey.app/api/v1/health` 200 OK（health endpoint 需 dimkey-web 实现，spec 中要求加上）
+2. `curl -sf https://dimkey.app/api/v1/health` 200 OK（health endpoint 需 dimkey-site 实现，spec 中要求加上）
 3. `Cargo.toml` 与 `tauri.conf.json` 的 version 字段一致
 4. 当前在 git 提交干净状态（无未提交改动），避免脏构建
 
@@ -181,13 +181,13 @@ let manager = Arc::new(LicenseManager::new(trial_stores, license_config_dir, mac
 
 ### 3.3 跨仓库发版顺序
 
-**硬约束**：dimkey-web 后端必须在 dimkey 客户端发版**之前**完成部署。
+**硬约束**：dimkey-site 后端必须在 dimkey 客户端发版**之前**完成部署。
 
-#### 3.3.1 dimkey-web 仓库需完成的事
+#### 3.3.1 dimkey-site 仓库需完成的事
 
-1. 运行 `scripts/gen-ed25519-keypair.ts` 输出 keypair JSON（pubkey 32 字节、私钥 b64）
-2. 私钥执行 `wrangler secret put ED25519_PRIVATE_KEY`
-3. Workers 部署生产 `dimkey.app/api/v1`，5 个业务 endpoint + `/health` endpoint 通畅
+1. 运行 `go run ./cmd/dimkey-keygen` 输出 keypair JSON（pubkey 32 字节、私钥 b64）
+2. 私钥写入 dimkey-site server 的 `ED25519_PRIVATE_KEY` 配置（具体注入方式见 dimkey-site 仓库部署文档）
+3. Go server 部署到生产 `dimkey.app/api/v1`，5 个业务 endpoint + `/health` endpoint 通畅
 4. 把公钥（hex 或 byte array 形式）以 PR 形式提到 dimkey 仓库
 
 #### 3.3.2 dimkey 仓库的发版步骤（详尽）
@@ -199,7 +199,7 @@ git checkout main && git pull
 # 1. 合并 feat/license-control（需先 review + 测试通过）
 git merge --no-ff feat/license-control
 
-# 2. 替换 PUBKEY_V1 真公钥（从 dimkey-web 拿来的）
+# 2. 替换 PUBKEY_V1 真公钥（从 dimkey-site 拿来的）
 $EDITOR src-tauri/src/license/certificate.rs
 
 # 3. 版本号 0.8.0
@@ -224,10 +224,10 @@ git push origin main v0.8.0  # 触发 Windows CI
 | Rust 单元测试 | ✓ | ✓ | 全跑，不依赖网络 |
 | api_client mock 测试 | ✓ | ✓ | **本次新增**：用 `mockito` 起本地 HTTP server，覆盖 5 个 endpoint × {happy/error code/network timeout} |
 | certificate sign+verify roundtrip | ✓ | ✓ | 已有，不依赖 PUBKEY_V1 |
-| certificate read with real PUBKEY | ✓ | ✓ | **本次替换**：用 dimkey-web issue 出的 fixture .lic 做正向验证（替换 `certificate.rs:261` 的占位失败测试） |
+| certificate read with real PUBKEY | ✓ | ✓ | **本次替换**：用 dimkey-site issue 出的 fixture .lic 做正向验证（替换 `certificate.rs:261` 的占位失败测试） |
 | trial 流程 e2e | ✓ | ✓ | 已有，不依赖网络 |
 | UI Playwright e2e | ✓ | ✓ | 已有，license 部分用 mock IPC |
-| **实机激活（连真 API）** | ✗ | ✓ 手动 | dev guide 文档化操作步骤；dimkey-web staging Worker 部署后才能测试 |
+| **实机激活（连真 API）** | ✗ | ✓ 手动 | dev guide 文档化操作步骤；dimkey-site staging server 部署后才能测试 |
 
 #### 3.4.1 mockito 测试新增项
 
@@ -247,11 +247,26 @@ Mockito 用法参考：每个 test 起一个 server，set env `DIMKEY_API_BASE=<
 **新文件**：`docs/dev-license-activation.md`
 
 内容：
-- 启动 dimkey-web staging Worker（dimkey-web 仓库提供命令）
+- 启动 dimkey-site staging server（dimkey-site 仓库提供命令）
 - 设置 `DIMKEY_API_BASE=https://dimkey-staging.workers.dev/api/v1`
-- 用 staging keypair（dimkey-web 仓库 issue 出测试公钥）替换 `PUBKEY_V1`（本地临时改、不提交）
+- 用 staging keypair（dimkey-site 仓库 issue 出测试公钥）替换 `PUBKEY_V1`（本地临时改、不提交）
 - 用 staging license key 走 `cargo tauri dev` 试激活
 - 验证 `~/Library/Application Support/com.dimkey/license.lic` 写入成功
+
+### 3.5 Prod keypair 切换 SOP
+
+当前主线提交的是 **dev keypair**（`certificate.rs:11-21` 注释明确标注），prod cut-over 前必须重新生成一对独立的生产 keypair。SOP 如下：
+
+1. **生成 prod keypair**：在 dimkey-site 仓库运行 `go run ./cmd/dimkey-keygen --env prod` 输出 keypair JSON。私钥**只能从此次运行的输出中读取一次**，必须妥善保管。
+2. **私钥注入 prod server**：把私钥写入 dimkey-site 生产环境的 `ED25519_PRIVATE_KEY` 配置（具体注入方式以 dimkey-site 仓库的部署文档为准），redeploy server。
+3. **客户端公钥替换**：把 prod pubkey 32 字节写进 `src-tauri/src/license/certificate.rs:15` `PUBKEY_V1`，更新顶部注释从 "Dev keypair" 改为 "Prod keypair"。
+4. **preflight 卡指纹一致**：dimkey-site server `/health` endpoint 返回的 `ed25519_pubkey_fingerprint`（sha256(pubkey)[:16]）必须与客户端 PUBKEY_V1 的 sha256[:16] 一致；preflight 脚本自动校验（参见 §3.2.1）。
+5. **commit + tag**：把 PUBKEY 改动单独 commit（消息中标注 `feat(license): prod keypair cut-over`），随版本号 bump 一起 tag 发版。
+6. **回滚预案**：若 prod 发版后激活全员失败，立刻回滚到上一个 dev-key 版本（用户继续走 trial），同时排查 keypair 配对问题。
+
+**禁止**：
+- 同时部署"prod server + dev pubkey 客户端" 或 "dev server + prod pubkey 客户端"（指纹不匹配，preflight 应卡住但仍要警惕人为绕过）
+- 把 prod 私钥提交到任何代码仓库（包括 dimkey-site 私有仓库）；只能通过 server 部署环境注入
 
 ---
 
@@ -260,8 +275,8 @@ Mockito 用法参考：每个 test 起一个 server，set env `DIMKEY_API_BASE=<
 | 项目 | 后续在哪儿处理 |
 |---|---|
 | Windows Authenticode 代码签名 | 独立设计稿，预计在 license 完整可用后下一轮 |
-| LemonSqueezy webhook 与 license 后端的对接 | dimkey-web 仓库自己的设计稿（参见 `1d0e387` 提的 LS 渠道） |
-| 国内手动激活渠道 | 同上，dimkey-web 仓库 |
+| LemonSqueezy webhook 与 license 后端的对接 | dimkey-site 仓库自己的设计稿（参见 `1d0e387` 提的 LS 渠道） |
+| 国内手动激活渠道 | 同上，dimkey-site 仓库 |
 | dimkey.com 落地页针对 license 的文案/购买入口 | dimkey-site 仓库独立处理 |
 | 公钥轮换（PUBKEY_V2）流程 | `certificate.rs` 已有 `KNOWN_PUBKEYS` 多版本支持的架子，但轮换 SOP 单独立项 |
 
@@ -286,9 +301,9 @@ Mockito 用法参考：每个 test 起一个 server，set env `DIMKEY_API_BASE=<
 
 | 风险 | 缓解 |
 |---|---|
-| dimkey-web 部署延后导致客户端发版被卡 | preflight 卡 API 健康检查，本仓库不能单独 ship 0.8.0 |
+| dimkey-site 部署延后导致客户端发版被卡 | preflight 卡 API 健康检查，本仓库不能单独 ship 0.8.0 |
 | LLM CLI 在 mac 上未安装/未授权导致翻译失败 | 提供 fallback 文本，preflight 不卡，给出明确告警 |
 | 用户跨 lang 包安装时，旧 trial 数据被识别为篡改 | 三处存储取最早 `first_run_at`，且 `~/.dimkey_state` + keyring 已跨 lang，不需迁移即可继续计时 |
 | 公钥轮换时旧 .lic 失效 | `KNOWN_PUBKEYS` 多版本机制已就绪；客户端通过 `next_check_at` 触发 heartbeat 自动续签 |
 | 公开仓库（dimkey-site）泄露公钥 | 公钥本就是公开信息，无风险 |
-| 私钥（Workers Secret）泄露 | dimkey-web 仓库独立处理，本仓库不接触 |
+| 私钥（dimkey-site server secret）泄露 | dimkey-site 仓库独立处理，本仓库不接触 |

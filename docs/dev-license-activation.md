@@ -10,8 +10,8 @@
 
 ## 前置条件
 
-1. license 后端已部署一个 **staging Worker/Server**，URL 形如 `https://dimkey-staging.your-account.workers.dev/api/v1`
-2. staging 用一对 **测试 keypair**（与生产 keypair 区分开），公钥已临时填进本地 `src-tauri/src/license/certificate.rs:15`（**不要 commit 这个临时改动**）
+1. **dimkey-site** 后端（Go server）已部署 staging 实例，URL 形如 `https://dimkey-staging.example.com/api/v1` 或本地 `http://localhost:8080/api/v1`
+2. staging 用一对 **测试 keypair**（与生产 keypair 区分开），通过 dimkey-site 仓库 `go run ./cmd/dimkey-keygen` 生成；公钥已临时填进本地 `src-tauri/src/license/certificate.rs:15`（**不要 commit 这个临时改动**）；私钥放进 staging server 的 `ED25519_PRIVATE_KEY` 配置
 3. staging 数据库中已预置一个 test license：`DK-TEST1-TEST2-TEST3-TEST4-TEST5`、email `dev@dimkey.local`
 
 ## 操作步骤
@@ -19,8 +19,9 @@
 ### 1. 启动 dev 服务
 
 ```bash
-# 指向 staging API
-export DIMKEY_API_BASE=https://dimkey-staging.your-account.workers.dev/api/v1
+# 指向 staging API（按你的 dimkey-site 部署地址替换）
+export DIMKEY_API_BASE=https://dimkey-staging.example.com/api/v1
+# 或本地：export DIMKEY_API_BASE=http://localhost:8080/api/v1
 
 # 默认中文版
 TAURI_DEV_HOST=127.0.0.1 cargo tauri dev
@@ -59,7 +60,7 @@ heartbeat 任务每 24h 跑一次。本地手动触发：在 `src-tauri/src/lice
 
 ### 6. 验证吊销
 
-在 license 后台 SQL 把该 device 的 `revoked_at` 设为 now。等下次 heartbeat 触发，客户端应进入 Revoked 状态、UI 显示横幅。
+在 dimkey-site staging 数据库把该 device 的 `revoked_at` 设为 now（具体 SQL/admin 入口见 dimkey-site 仓库文档）。等下次 heartbeat 触发，客户端应进入 Revoked 状态、UI 显示横幅。
 
 ## 常见坑
 

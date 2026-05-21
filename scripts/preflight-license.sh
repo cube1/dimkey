@@ -31,7 +31,7 @@ if [ -z "$PUBKEY_BLOCK" ]; then
 fi
 NONZERO=$(echo "$PUBKEY_BLOCK" | grep -oE '[1-9][0-9]*' || true)
 if [ -z "$NONZERO" ]; then
-  fail "PUBKEY_V1 仍为 [0; 32] 占位 — 需要先把 dimkey-web 生成的真公钥填进 $CERT_FILE"
+  fail "PUBKEY_V1 仍为 [0; 32] 占位 — 需要先把 dimkey-site 生成的真公钥填进 $CERT_FILE"
 fi
 ok "PUBKEY_V1 已烧入真公钥（非全零）"
 
@@ -42,7 +42,7 @@ HTTP_CODE=$(curl -sS -o /tmp/dimkey-health.json -w "%{http_code}" --max-time 10 
 # 若 curl 失败（exit non-zero），-w 仍会输出 000，|| echo "000" 再追加一次，去掉后6位取最后3位
 HTTP_CODE="${HTTP_CODE: -3}"
 if [ "${HTTP_CODE}" != "200" ]; then
-  fail "${HEALTH_URL} 返回 HTTP ${HTTP_CODE}（期望 200）— dimkey-web 后端可能未部署"
+  fail "${HEALTH_URL} 返回 HTTP ${HTTP_CODE}（期望 200）— dimkey-site license 后端可能未部署"
 fi
 
 # 检查 health response 中的 pubkey fingerprint 是否匹配本地 PUBKEY_V1 sha256[:16]
