@@ -39,7 +39,10 @@ pub struct LicensePayload {
     pub expires_at: Option<String>,
     pub next_check_at: String,
     pub max_grace_until: String,
-    pub key_version: u32,
+    /// 服务端可不返回此字段；缺失时信任 signature 验出的 verified_kv
+    /// （签名已通过 = payload 未被篡改 = 信任 key 版本与签名一致）
+    #[serde(default)]
+    pub key_version: Option<u32>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -103,11 +106,13 @@ pub fn read_certificate(config_dir: &Path) -> Result<LicensePayload, CertError> 
     let payload: LicensePayload = serde_json::from_slice(&payload_bytes)
         .map_err(|e| CertError::PayloadJson(e.to_string()))?;
 
-    // 防御性：payload 内的 key_version 必须与验证通过的公钥版本一致
-    // （理论上只要签名 OK 就一定一致，因为 payload 字节包含 key_version；
-    //  但加一道断言防 payload 字段被攻击者操纵）
-    if payload.key_version != verified_kv {
-        return Err(CertError::UnsupportedKeyVersion(payload.key_version));
+    // 防御性 cross-check：payload 内的 key_version 必须与验证通过的公钥版本一致。
+    // 服务端可以选择不返回该字段（v1 协议向后兼容）；缺失时信任 verified_kv，
+    // 因为签名验证已经在前面通过，攻击者无法在不破坏签名的前提下篡改 payload。
+    if let Some(payload_kv) = payload.key_version {
+        if payload_kv != verified_kv {
+            return Err(CertError::UnsupportedKeyVersion(payload_kv));
+        }
     }
 
     Ok(payload)
@@ -149,7 +154,7 @@ mod tests {
             expires_at: None,
             next_check_at: "2026-05-21T10:00:00Z".into(),
             max_grace_until: "2026-05-28T10:00:00Z".into(),
-            key_version: 1,
+            key_version: Some(1),
         }
     }
 
