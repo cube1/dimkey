@@ -324,8 +324,23 @@ mod tests {
         let mut server = Server::new_async().await;
         let url = server.url();
 
-        // 保存原 env，结束时恢复
-        let original = std::env::var("DIMKEY_API_BASE").ok();
+        // RAII guard：即使 panic 也恢复原 DIMKEY_API_BASE
+        struct EnvGuard {
+            key: &'static str,
+            original: Option<String>,
+        }
+        impl Drop for EnvGuard {
+            fn drop(&mut self) {
+                match &self.original {
+                    Some(v) => std::env::set_var(self.key, v),
+                    None => std::env::remove_var(self.key),
+                }
+            }
+        }
+        let _env_guard = EnvGuard {
+            key: "DIMKEY_API_BASE",
+            original: std::env::var("DIMKEY_API_BASE").ok(),
+        };
         std::env::set_var("DIMKEY_API_BASE", format!("{}/api/v1", url));
 
         // ── /activate happy ──
@@ -463,10 +478,5 @@ mod tests {
         assert!(matches!(r, Err(LicenseError::NetworkUnavailable)));
         m.assert_async().await;
 
-        // 恢复 env
-        match original {
-            Some(v) => std::env::set_var("DIMKEY_API_BASE", v),
-            None => std::env::remove_var("DIMKEY_API_BASE"),
-        }
     }
 }
