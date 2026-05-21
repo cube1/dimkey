@@ -62,11 +62,33 @@ heartbeat 任务每 24h 跑一次。本地手动触发：在 `src-tauri/src/lice
 
 在 dimkey-site staging 数据库把该 device 的 `revoked_at` 设为 now（具体 SQL/admin 入口见 dimkey-site 仓库文档）。等下次 heartbeat 触发，客户端应进入 Revoked 状态、UI 显示横幅。
 
+## 命令行快速测试（不开 GUI）
+
+`src-tauri/examples/license-cli.rs` 提供 CLI，直接调 LicenseManager 跑完整流程，适合手机远程 / SSH / CI 场景：
+
+```bash
+# 激活
+DIMKEY_API_BASE=http://127.0.0.1:8080/api/v1 \
+  cargo run --example license-cli -- activate <license_key> <email>
+
+# 查当前状态（boot 一次）
+DIMKEY_API_BASE=http://127.0.0.1:8080/api/v1 \
+  cargo run --example license-cli -- status
+
+# 读 .lic payload
+cargo run --example license-cli -- read-cert
+
+# 解绑（删 .lic + 调后端 /deactivate）
+DIMKEY_API_BASE=http://127.0.0.1:8080/api/v1 \
+  cargo run --example license-cli -- deactivate
+```
+
 ## 常见坑
 
 - **PUBKEY 没换 staging**：客户端用生产 PUBKEY，staging keypair 签的 .lic 必然 SignatureInvalid。检查 `certificate.rs:15` 是否是 staging 公钥。
 - **`DIMKEY_API_BASE` 未生效**：env var 必须在 `cargo tauri dev` 之前 export，且 reqwest client 是 OnceLock 缓存的，运行时改 env 无效——必须重启 app。
 - **共享路径未创建**：第一次启动应在 `~/Library/Application Support/com.dimkey/` 自动建目录。如果失败检查 lib.rs 中 `create_dir_all` 是否 silently failing。
+- **localhost ↔ 127.0.0.1**：macOS 上 reqwest 解析 `localhost` 可能优先走 IPv6（`::1`），若后端只在 IPv4 上响应（或服务端 IPv6 + IPv4 dual-stack 但 v4 路径异常），会失败并被 `NetworkUnavailable` 吞掉错误。**dev 调试统一用 `http://127.0.0.1:8080/api/v1`**。
 
 ## 切换回生产 PUBKEY
 
