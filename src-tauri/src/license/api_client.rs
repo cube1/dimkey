@@ -311,4 +311,162 @@ mod tests {
             LicenseError::FingerprintMismatch
         ));
     }
+
+    /// Mockito 串行测试：5 endpoint × happy/error path。
+    ///
+    /// 必须单 #[tokio::test]，因为：
+    /// 1) api_base() 读 DIMKEY_API_BASE 环境变量；多测试并发改 env 会 race
+    /// 2) reqwest::Client 是 OnceLock 缓存的，多 server URL 在同 process 内
+    ///    通过 env 切换是唯一方式（不改 api_client 接口的前提下）
+    #[tokio::test]
+    async fn mockito_all_endpoints_happy_and_error_paths() {
+        use mockito::Server;
+        let mut server = Server::new_async().await;
+        let url = server.url();
+
+        // 保存原 env，结束时恢复
+        let original = std::env::var("DIMKEY_API_BASE").ok();
+        std::env::set_var("DIMKEY_API_BASE", format!("{}/api/v1", url));
+
+        // ── /activate happy ──
+        let m = server.mock("POST", "/api/v1/activate")
+            .with_status(200)
+            .with_header("content-type", "application/json")
+            .with_body(json!({
+                "ok": true,
+                "data": {
+                    "license_certificate": {
+                        "v": 1,
+                        "payload_b64": "cGF5bG9hZA==",
+                        "sig_b64": "c2ln"
+                    },
+                    "device_summary": {
+                        "current_device_id": "d1",
+                        "active_count": 1,
+                        "max_devices": 3
+                    }
+                }
+            }).to_string())
+            .create_async().await;
+        let body = ActivateBody {
+            license_key: "DK-A-B-C-D-E", email: "u@x.com", fingerprint: "fp",
+            machine_label: "mac", os: "macos", flavor: "zh", app_version: "0.8.0",
+        };
+        let r = activate(&body).await.expect("activate ok");
+        assert_eq!(r.device_summary.active_count, 1);
+        m.assert_async().await;
+
+        // ── /activate error INVALID_LICENSE ──
+        let m = server.mock("POST", "/api/v1/activate")
+            .with_status(200)
+            .with_body(json!({"ok": false, "code": "INVALID_LICENSE", "message": "bad key"}).to_string())
+            .create_async().await;
+        let r = activate(&body).await;
+        assert!(matches!(r, Err(LicenseError::InvalidLicense)));
+        m.assert_async().await;
+
+        // ── /activate error DEVICE_LIMIT_REACHED ──
+        let m = server.mock("POST", "/api/v1/activate")
+            .with_status(200)
+            .with_body(json!({
+                "ok": false,
+                "code": "DEVICE_LIMIT_REACHED",
+                "message": "limit",
+                "data": {"max_devices": 3, "devices": []}
+            }).to_string())
+            .create_async().await;
+        let r = activate(&body).await;
+        assert!(matches!(r, Err(LicenseError::DeviceLimitReached { max: 3, .. })));
+        m.assert_async().await;
+
+        // ── /heartbeat happy ──
+        let m = server.mock("POST", "/api/v1/heartbeat")
+            .with_status(200)
+            .with_body(json!({
+                "ok": true,
+                "data": {"status": "active", "next_check_at": 1234567890}
+            }).to_string())
+            .create_async().await;
+        let r = heartbeat(&HeartbeatBody {
+            license_id: "id", device_id: "d", fingerprint: "fp"
+        }).await.expect("heartbeat ok");
+        assert_eq!(r.status, "active");
+        m.assert_async().await;
+
+        // ── /heartbeat error LICENSE_REVOKED ──
+        let m = server.mock("POST", "/api/v1/heartbeat")
+            .with_status(200)
+            .with_body(json!({
+                "ok": false, "code": "LICENSE_REVOKED",
+                "message": "revoked by admin"
+            }).to_string())
+            .create_async().await;
+        let r = heartbeat(&HeartbeatBody {
+            license_id: "id", device_id: "d", fingerprint: "fp"
+        }).await;
+        assert!(matches!(r, Err(LicenseError::LicenseRevoked { .. })));
+        m.assert_async().await;
+
+        // ── /deactivate happy ──
+        let m = server.mock("POST", "/api/v1/deactivate")
+            .with_status(200)
+            .with_body(json!({"ok": true, "data": null}).to_string())
+            .create_async().await;
+        let r = deactivate(&DeactivateBody {
+            license_key: "k", email: "u@x.com", device_id: Some("d"), fingerprint: Some("fp")
+        }).await;
+        assert!(r.is_ok());
+        m.assert_async().await;
+
+        // ── /devices/list happy ──
+        let m = server.mock("POST", "/api/v1/devices/list")
+            .with_status(200)
+            .with_body(json!({
+                "ok": true,
+                "data": {"devices": [], "max_devices": 3}
+            }).to_string())
+            .create_async().await;
+        let r = list_devices(&DevicesListBody {
+            license_key: "k", email: "u@x.com", fingerprint: None
+        }).await.expect("list ok");
+        assert_eq!(r.max_devices, 3);
+        m.assert_async().await;
+
+        // ── /recover happy ──
+        let m = server.mock("POST", "/api/v1/recover")
+            .with_status(200)
+            .with_body(json!({"ok": true}).to_string())
+            .create_async().await;
+        let r = recover(&RecoverBody { email: "u@x.com" }).await;
+        assert!(r.is_ok());
+        m.assert_async().await;
+
+        // ── /recover error EMAIL_FORMAT_INVALID ──
+        let m = server.mock("POST", "/api/v1/recover")
+            .with_status(200)
+            .with_body(json!({
+                "ok": false, "code": "EMAIL_FORMAT_INVALID", "message": "bad email"
+            }).to_string())
+            .create_async().await;
+        let r = recover(&RecoverBody { email: "bad" }).await;
+        assert!(matches!(r, Err(LicenseError::EmailFormatInvalid)));
+        m.assert_async().await;
+
+        // ── 5xx → NetworkUnavailable ──
+        let m = server.mock("POST", "/api/v1/heartbeat")
+            .with_status(500)
+            .with_body("internal error")
+            .create_async().await;
+        let r = heartbeat(&HeartbeatBody {
+            license_id: "id", device_id: "d", fingerprint: "fp"
+        }).await;
+        assert!(matches!(r, Err(LicenseError::NetworkUnavailable)));
+        m.assert_async().await;
+
+        // 恢复 env
+        match original {
+            Some(v) => std::env::set_var("DIMKEY_API_BASE", v),
+            None => std::env::remove_var("DIMKEY_API_BASE"),
+        }
+    }
 }
