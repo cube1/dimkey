@@ -8,6 +8,7 @@
 //   cargo run --example license-cli -- read-cert
 
 use dimkey_lib::license::{
+    api_client,
     fingerprint::compute_fingerprint,
     state::{LicenseManager, LicenseState},
     storage::build_default_stores,
@@ -67,6 +68,7 @@ async fn main() {
         eprintln!("用法:");
         eprintln!("  cargo run --example license-cli -- activate <license_key> <email>");
         eprintln!("  cargo run --example license-cli -- status");
+        eprintln!("  cargo run --example license-cli -- heartbeat");
         eprintln!("  cargo run --example license-cli -- deactivate");
         eprintln!("  cargo run --example license-cli -- read-cert");
         std::process::exit(1);
@@ -135,6 +137,38 @@ async fn main() {
                 }
                 Err(e) => {
                     eprintln!("❌ 解绑失败: {:?}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
+        "heartbeat" => {
+            let payload = match manager.current_payload() {
+                Some(p) => p,
+                None => {
+                    eprintln!("❌ 本地无 .lic（或验签失败），无法 heartbeat");
+                    std::process::exit(1);
+                }
+            };
+            println!(
+                "调用 heartbeat(license_id={}, device_id={})...",
+                payload.license_id, payload.device_id
+            );
+            let body = api_client::HeartbeatBody {
+                license_id: &payload.license_id,
+                device_id: &payload.device_id,
+                fingerprint: &payload.fingerprint,
+            };
+            match api_client::heartbeat(&body).await {
+                Ok(data) => {
+                    println!("✅ heartbeat 返回");
+                    println!("  status:        {}", data.status);
+                    println!("  next_check_at: {} (unix)", data.next_check_at);
+                    if data.status == "revoked" {
+                        println!("⚠️  服务端已吊销，client 应进入 Revoked 态");
+                    }
+                }
+                Err(e) => {
+                    eprintln!("❌ heartbeat 失败: {:?}", e);
                     std::process::exit(1);
                 }
             }
