@@ -105,8 +105,18 @@ async fn main() {
                 "调用 try_activate(license_key={}, email={})...",
                 license_key, email
             );
+            let hostname =
+                sysinfo::System::host_name().unwrap_or_else(|| "Unknown".to_string());
+            let machine_label = format!("{} (cli-dev)", hostname);
+            let os = if cfg!(target_os = "macos") {
+                "macos"
+            } else {
+                "windows"
+            };
+            let app_version = env!("CARGO_PKG_VERSION");
+            println!("machine_label: {}", machine_label);
             match manager
-                .try_activate(license_key, email, "dev-cli", "macos", "zh", "0.8.0")
+                .try_activate(license_key, email, &machine_label, os, "zh", app_version)
                 .await
             {
                 Ok(data) => {
