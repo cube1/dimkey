@@ -48,6 +48,9 @@ interface LicenseStoreState {
   deactivateDevice: (device_id: string) => Promise<void>;
   recover: (email: string) => Promise<void>;
   openPurchase: () => Promise<void>;
+  /** 用户主动触发的强制 heartbeat — GraceMode "立即联网恢复" / Activated "重新验证"。
+   * 错误（NETWORK_UNAVAILABLE / SERVER_ERROR 等）冒泡给调用方。 */
+  forceHeartbeat: () => Promise<void>;
 }
 
 export const useLicenseStore = create<LicenseStoreState>((set, get) => ({
@@ -104,6 +107,13 @@ export const useLicenseStore = create<LicenseStoreState>((set, get) => ({
 
   openPurchase: async () => {
     await invoke("license_open_purchase_page");
+  },
+
+  forceHeartbeat: async () => {
+    // 后端会在 heartbeat 成功且当前 GraceMode 时自行 boot 并 emit license:state-changed
+    // 这里只补一次本地 refresh，覆盖事件竞速场景（监听器异步注册前后端已变状态）
+    await invoke("license_force_heartbeat");
+    await get().refresh();
   },
 }));
 

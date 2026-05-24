@@ -6,7 +6,8 @@
 // 收到 status=revoked → 客户端转 Revoked 态（删证书 + 重 boot + emit）。
 
 use crate::license::api_client;
-use crate::license::certificate;
+use crate::license::certificate::{self, LicensePayload};
+use crate::license::errors::LicenseError;
 use crate::license::state::{LicenseManager, LicenseState};
 use chrono::{DateTime, Utc};
 use std::sync::Arc;
@@ -51,6 +52,28 @@ async fn check_once(app: &tauri::AppHandle, manager: &LicenseManager) {
         );
     }
 
+    // 周期触发：忽略 ping 结果（GraceMode 静默推进 / 错误下个周期重试）
+    let _ = do_ping(app, manager, &payload).await;
+}
+
+/// 用户主动触发的强制 heartbeat — 绕过 next_check_at 检查，把错误冒泡给前端。
+/// 用于 GraceMode 状态下"立即联网恢复"按钮：用户期望立刻看到结果而非等下个 24h 周期。
+pub async fn force_check(
+    app: &tauri::AppHandle,
+    manager: &LicenseManager,
+) -> Result<(), LicenseError> {
+    match manager.current_payload() {
+        Some(payload) => do_ping(app, manager, &payload).await,
+        None => Ok(()), // 未激活 → no-op（前端只在 Activated/GraceMode 调用，这是防御）
+    }
+}
+
+/// 实际发请求 + 应用结果。`周期 check_once` 和 `用户触发 force_check` 共用此核心。
+async fn do_ping(
+    app: &tauri::AppHandle,
+    manager: &LicenseManager,
+    payload: &LicensePayload,
+) -> Result<(), LicenseError> {
     let body = api_client::HeartbeatBody {
         license_id: &payload.license_id,
         device_id: &payload.device_id,
@@ -74,11 +97,19 @@ async fn check_once(app: &tauri::AppHandle, manager: &LicenseManager) {
                     "license:heartbeat-ok",
                     serde_json::json!({ "next_check_at": data.next_check_at }),
                 );
+                // 如果当前是 GraceMode，复验成功 → 重 boot 让状态回到 Activated
+                // （boot 内部读证书 + 验签 + 写 state；emit 给前端订阅）
+                if let LicenseState::GraceMode { .. } = manager.current() {
+                    let recovered = manager.boot();
+                    let _ = app.emit("license:state-changed", recovered);
+                }
             }
+            Ok(())
         }
-        Err(_) => {
+        Err(e) => {
             // 网络失败：检查是否超过 max_grace_until
             // 解析失败 → 视为很久前 → 立即进入 GraceMode（不静默忽略）
+            let now = Utc::now();
             let max_grace_parsed = parse_iso(&payload.max_grace_until);
             let exceeded_grace = match max_grace_parsed {
                 Some(max_grace) => now > max_grace,
@@ -107,7 +138,8 @@ async fn check_once(app: &tauri::AppHandle, manager: &LicenseManager) {
                 manager.set_state(new_state.clone());
                 let _ = app.emit("license:state-changed", new_state);
             }
-            // 未超过宽限期：静默重试，下个周期再 ping
+            // 未超过宽限期：静默重试，下个周期再 ping；force 调用时把错误冒泡上去
+            Err(e)
         }
     }
 }

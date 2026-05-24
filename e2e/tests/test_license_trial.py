@@ -83,11 +83,9 @@ def test_about_modal_shows_trial_remaining(page):
         timeout=5000,
     )
 
-    # 点击 WorkspaceList 底部的"关于"按钮（title="关于Dimkey"）
-    try:
-        page.locator('button[title="关于Dimkey"]').first.click(timeout=3000)
-    except Exception:
-        pytest.skip("About modal trigger 在当前 UI 下不可点击；其他测试已验证 trial 状态")
+    # 走 LicenseStatusCard 的 ⋮ 菜单 → "关于 Dimkey"（取代旧的左下角 Info 按钮入口）
+    page.locator('button[title="更多操作"]').first.click(timeout=3000)
+    page.locator('text=/关于 Dimkey/').first.click(timeout=3000)
 
     # AboutModal 渲染后，trial 状态会显示 "试用版 · 剩余 30 天"
     page.wait_for_selector('text=/剩余 30 天/', timeout=3000)

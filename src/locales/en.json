@@ -474,11 +474,22 @@
       "revoked": "License revoked",
       "contactSupport": "Contact support ›",
       "fpDrift": "Device info changed",
+      "fpDriftDetail": "was {{fp}} · re-verify ›",
       "viewDetail": "Re-verify ›",
-      "refreshing": "Re-verifying…",
+      "reconnecting": "Re-verifying online…",
+      "reconnectOk": "Online verification recovered",
+      "reconnectFailed": "Re-verify failed: {{msg}}",
       "mailFailed": "Could not open mail client",
       "deactivateConfirm": "Deactivate the current license on this device? This device will return to trial / unactivated state.",
       "deactivated": "Deactivated on this device",
+      "feedbackSubject": "Dimkey Feedback",
+      "revokedSubject": "Dimkey License Revoked - Inquiry",
+      "deactivateError": {
+        "NETWORK_UNAVAILABLE": "Network unavailable, please retry",
+        "RATE_LIMITED": "Too many requests, please try later",
+        "SERVER_ERROR": "Service temporarily unavailable, please try later",
+        "fallback": "Deactivate failed: {{msg}}"
+      },
       "menu": {
         "title": "More actions",
         "activate": "Activate / Enter license",
@@ -486,7 +497,8 @@
         "feedback": "Send feedback",
         "about": "About Dimkey",
         "deactivate": "Deactivate this device",
-        "recoverOnline": "Reconnect now"
+        "recoverOnline": "Reconnect now",
+        "reverify": "Re-verify this device"
       }
     }
   }

@@ -147,6 +147,16 @@ pub async fn license_recover_email(email: String) -> Result<(), LicenseError> {
     api_client::recover(&body).await
 }
 
+/// 用户主动触发的强制 heartbeat — 用于 GraceMode "立即联网恢复" 或 Activated "重新验证"。
+/// 绕过周期任务的 next_check_at 检查，立刻发请求；错误冒泡到前端。
+#[tauri::command]
+pub async fn license_force_heartbeat(
+    app: tauri::AppHandle,
+    state: State<'_, LicenseManagerState>,
+) -> Result<(), LicenseError> {
+    crate::license::heartbeat::force_check(&app, &state.0).await
+}
+
 #[tauri::command]
 pub fn license_open_purchase_page(app: tauri::AppHandle) -> Result<(), LicenseError> {
     use tauri_plugin_opener::OpenerExt;

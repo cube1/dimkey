@@ -29,7 +29,7 @@ use commands::license::{
     license_get_state, license_get_fingerprint, license_get_fingerprint_mismatch_hint,
     license_get_trial_info, license_activate, license_deactivate_current,
     license_list_devices, license_deactivate_device,
-    license_recover_email, license_open_purchase_page,
+    license_recover_email, license_open_purchase_page, license_force_heartbeat,
 };
 use license::state::LicenseManager;
 use license::storage::build_default_stores;
@@ -234,6 +234,7 @@ pub fn run() {
             license_deactivate_device,
             license_recover_email,
             license_open_purchase_page,
+            license_force_heartbeat,
         ])
         .run(tauri::generate_context!())
         .expect("启动应用失败");
