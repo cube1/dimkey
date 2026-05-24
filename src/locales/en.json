@@ -461,6 +461,33 @@
     "purchase": {
       "button": "Buy",
       "enter_key": "Enter license"
+    },
+    "statusCard": {
+      "checking": "Checking license…",
+      "trial": "Trial",
+      "trialDaysLeftCta": "{{days}} days left · Activate now",
+      "trialExpired": "Trial expired",
+      "activateNow": "Activate now ›",
+      "activated": "Dimkey Activated",
+      "graceMode": "Offline grace period",
+      "graceDaysLeft": "{{days}} days left · Reconnect ›",
+      "revoked": "License revoked",
+      "contactSupport": "Contact support ›",
+      "fpDrift": "Device info changed",
+      "viewDetail": "Re-verify ›",
+      "refreshing": "Re-verifying…",
+      "mailFailed": "Could not open mail client",
+      "deactivateConfirm": "Deactivate the current license on this device? This device will return to trial / unactivated state.",
+      "deactivated": "Deactivated on this device",
+      "menu": {
+        "title": "More actions",
+        "activate": "Activate / Enter license",
+        "devices": "Manage devices",
+        "feedback": "Send feedback",
+        "about": "About Dimkey",
+        "deactivate": "Deactivate this device",
+        "recoverOnline": "Reconnect now"
+      }
     }
   }
 }

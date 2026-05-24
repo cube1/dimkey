@@ -461,6 +461,33 @@
     "purchase": {
       "button": "购买",
       "enter_key": "输入许可证"
+    },
+    "statusCard": {
+      "checking": "正在检查授权…",
+      "trial": "试用版",
+      "trialDaysLeftCta": "剩 {{days}} 天 · 立即激活",
+      "trialExpired": "试用已过期",
+      "activateNow": "立即激活 ›",
+      "activated": "Dimkey 已激活",
+      "graceMode": "离线宽限期",
+      "graceDaysLeft": "剩 {{days}} 天 · 联网恢复 ›",
+      "revoked": "许可证已撤销",
+      "contactSupport": "联系支持 ›",
+      "fpDrift": "设备信息已变化",
+      "viewDetail": "点此重新验证 ›",
+      "refreshing": "正在重新验证…",
+      "mailFailed": "无法打开邮件客户端",
+      "deactivateConfirm": "确认在本机解绑当前许可证？解绑后本机将进入试用/未激活状态。",
+      "deactivated": "已解绑本设备",
+      "menu": {
+        "title": "更多操作",
+        "activate": "激活 / 输入许可证",
+        "devices": "设备管理",
+        "feedback": "反馈问题",
+        "about": "关于 Dimkey",
+        "deactivate": "解绑当前设备",
+        "recoverOnline": "立即联网恢复"
+      }
     }
   }
 }

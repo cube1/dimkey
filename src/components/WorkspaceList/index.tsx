@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from "react";
-import { Plus, Trash2, Loader2, Info, FolderOpen, ClipboardList } from "lucide-react";
+import { Plus, Trash2, Loader2, FolderOpen, ClipboardList } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import { getVersion } from "@tauri-apps/api/app";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { useWorkspaceStore } from "../../stores/workspaceStore";
 import { useUpdateStore } from "../../stores/updateStore";
-import { AboutModal } from "../AboutModal";
+import { LicenseStatusCard } from "../LicenseStatusCard";
 
 /** 格式化时间为简短格式 */
 function formatTime(iso: string, lang: string): string {
@@ -122,9 +122,6 @@ export function WorkspaceList() {
     }
     // "available" 时 UpdateChecker 浮窗会自动显示
   };
-
-  // 关于弹窗
-  const [aboutVisible, setAboutVisible] = useState(false);
 
   // 统计开关
   const [analyticsEnabled, setAnalyticsEnabled] = useState(true);
@@ -257,34 +254,28 @@ export function WorkspaceList() {
         )}
       </div>
 
+      {/* License 状态卡 — 把 license 状态露出到 UI 外层 */}
+      <LicenseStatusCard />
+
       {/* 底部：版本号 + 统计开关（单行紧凑布局） */}
       <div className="px-4 py-2 border-t border-slate-200 shrink-0">
         <div className="flex items-center justify-between">
-          {/* 左侧：版本号 + 关于 */}
-          <div className="flex items-center gap-1.5">
-            {version && (
-              <button
-                onClick={handleCheckUpdate}
-                disabled={updateState.status === "checking"}
-                className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-primary-500 transition-colors disabled:opacity-50 tabular-nums"
-                title={t("workspace.checkUpdate")}
-              >
-                {updateState.status === "checking" ? (
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                ) : (
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-300 shrink-0" />
-                )}
-                <span>v{version}</span>
-              </button>
-            )}
+          {/* 左侧：版本号 */}
+          {version && (
             <button
-              onClick={() => setAboutVisible(true)}
-              className="p-0.5 text-slate-300 hover:text-primary-500 transition-colors"
-              title={t("workspace.aboutApp")}
+              onClick={handleCheckUpdate}
+              disabled={updateState.status === "checking"}
+              className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-primary-500 transition-colors disabled:opacity-50 tabular-nums"
+              title={t("workspace.checkUpdate")}
             >
-              <Info className="w-3.5 h-3.5" />
+              {updateState.status === "checking" ? (
+                <Loader2 className="w-3 h-3 animate-spin" />
+              ) : (
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-300 shrink-0" />
+              )}
+              <span>v{version}</span>
             </button>
-          </div>
+          )}
 
           {/* 右侧：匿名统计 */}
           <button
@@ -309,8 +300,6 @@ export function WorkspaceList() {
           </button>
         </div>
       </div>
-
-      <AboutModal visible={aboutVisible} onClose={() => setAboutVisible(false)} />
     </>
   );
 }
