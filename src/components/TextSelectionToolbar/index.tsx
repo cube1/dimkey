@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useDetectStore } from "../../stores/detectStore";
 import { SENSITIVE_TYPE_CONFIG } from "../../types";
-import type { SensitiveItem, SensitiveType } from "../../types";
+import type { SensitiveItem, SensitiveType, PdfBbox } from "../../types";
 
 interface SelectionInfo {
   text: string;
@@ -11,6 +11,7 @@ interface SelectionInfo {
   start: number;
   end: number;
   rect: DOMRect;
+  pdf_bbox?: PdfBbox;
 }
 
 /** 从 DOM 选区中提取坐标信息 */
@@ -31,14 +32,29 @@ function getSelectionInfo(): SelectionInfo | null {
   const col = parseInt(container.getAttribute("data-col") || "0", 10);
   if (row < 0) return null;
 
-  // PDF 文本层模式：使用 data-char-offset 计算偏移
+  // PDF 文本层模式：使用 data-char-offset 计算偏移，并额外计算 pdf_bbox
+  // （pdf_bbox 是关键路径——后端按 bbox 涂黑，绕开 row/start-end 与
+  // paragraph 索引/段内偏移不匹配的问题）
   const startSpan = findCharOffsetSpan(range.startContainer);
   if (startSpan) {
     const baseOffset = parseInt(startSpan.getAttribute("data-char-offset") || "0", 10);
     const start = baseOffset + range.startOffset;
     const end = start + text.length;
     const rect = range.getBoundingClientRect();
-    return { text, row, col, start, end, rect };
+    const pdfPageEl = startSpan.closest("[data-pdf-page]") as HTMLElement | null;
+    let pdf_bbox: PdfBbox | undefined;
+    if (pdfPageEl) {
+      const pageRect = pdfPageEl.getBoundingClientRect();
+      const pageIdx = parseInt(pdfPageEl.getAttribute("data-pdf-page") || "0", 10);
+      pdf_bbox = {
+        page_index: pageIdx,
+        left: (rect.left - pageRect.left) / pageRect.width,
+        top: (rect.top - pageRect.top) / pageRect.height,
+        right: (rect.right - pageRect.left) / pageRect.width,
+        bottom: (rect.bottom - pageRect.top) / pageRect.height,
+      };
+    }
+    return { text, row, col, start, end, rect, pdf_bbox };
   }
 
   // 计算文本偏移：遍历容器内的文本节点
@@ -205,6 +221,7 @@ export function TextSelectionToolbar({
         row: selectionInfo.row,
         col: selectionInfo.col,
         sheet_index: sheetIndex,
+        pdf_bbox: selectionInfo.pdf_bbox,
       };
 
       if (onAddItem) {

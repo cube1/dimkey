@@ -18,6 +18,7 @@ export function PdfTextLayer({ textObjects, displayWidth, displayHeight, pageInd
       style={{ width: displayWidth, height: displayHeight }}
       data-row={pageIndex}
       data-col={0}
+      data-pdf-page={pageIndex}
     >
       {textObjects.map((obj, idx) => {
         const left = obj.left * displayWidth;
