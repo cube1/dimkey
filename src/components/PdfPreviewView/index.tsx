@@ -254,7 +254,7 @@ function RedactionOverlay({
       {pageRects.map((rect, idx) => (
         <div
           key={idx}
-          className="absolute bg-black"
+          className="absolute bg-black/80"
           style={{
             left: rect.left * displayWidth,
             top: rect.top * displayHeight,

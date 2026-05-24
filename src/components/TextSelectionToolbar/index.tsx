@@ -45,14 +45,18 @@ function getSelectionInfo(): SelectionInfo | null {
     let pdf_bbox: PdfBbox | undefined;
     if (pdfPageEl) {
       const pageRect = pdfPageEl.getBoundingClientRect();
-      const pageIdx = parseInt(pdfPageEl.getAttribute("data-pdf-page") || "0", 10);
-      pdf_bbox = {
-        page_index: pageIdx,
-        left: (rect.left - pageRect.left) / pageRect.width,
-        top: (rect.top - pageRect.top) / pageRect.height,
-        right: (rect.right - pageRect.left) / pageRect.width,
-        bottom: (rect.bottom - pageRect.top) / pageRect.height,
-      };
+      // 防御：容器尚未布局或被 display:none 时 width/height=0，避免计算出 Infinity
+      // 让 bbox 失败后端走文字匹配路径，至少不会破坏 IPC 序列化
+      if (pageRect.width > 0 && pageRect.height > 0) {
+        const pageIdx = parseInt(pdfPageEl.getAttribute("data-pdf-page") || "0", 10);
+        pdf_bbox = {
+          page_index: pageIdx,
+          left: (rect.left - pageRect.left) / pageRect.width,
+          top: (rect.top - pageRect.top) / pageRect.height,
+          right: (rect.right - pageRect.left) / pageRect.width,
+          bottom: (rect.bottom - pageRect.top) / pageRect.height,
+        };
+      }
     }
     return { text, row, col, start, end, rect, pdf_bbox };
   }
@@ -263,6 +267,7 @@ export function TextSelectionToolbar({
       row: selectionInfo.row,
       col: selectionInfo.col,
       sheet_index: sheetIndex,
+      pdf_bbox: selectionInfo.pdf_bbox,
     };
     onAddItem?.(item);
 

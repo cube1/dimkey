@@ -29,6 +29,11 @@ pub fn compute_redact_targets(
     let mut redact_by_page: HashMap<usize, Vec<RedactTarget>> = HashMap::new();
 
     for item in sensitive_items {
+        // 已带 pdf_bbox 的 item（手动框选 / 手动文字选中）由调用方按 bbox 路径单独处理；
+        // 这里跳过避免基于 paragraphs.get(row) 的错位匹配在错段落画鬼影黑块
+        if item.pdf_bbox.is_some() {
+            continue;
+        }
         let para_index = item.row;
         let para = match paragraphs.get(para_index) {
             Some(p) => p,
