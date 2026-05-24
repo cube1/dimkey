@@ -143,9 +143,13 @@ pub fn export_pdf_redacted(
     }
 
     if redact_by_page.is_empty() {
-        std::fs::copy(original_path, output_path)
-            .map_err(|e| format!("复制 PDF 文件失败：{}", e))?;
-        return Ok(());
+        // sensitive_items 在 line 89 已判空并提前返回；走到这里说明：用户期待脱敏，
+        // 但所有 item 的 bbox 都超页 / row 都失效 → 报错而非静默 copy 原文件，
+        // 避免用户拿到未脱敏 PDF 却看到"导出成功"
+        return Err(format!(
+            "无法定位任何待脱敏区域（{} 个敏感项均无效，可能源 PDF 已变更或敏感项 stale）",
+            sensitive_items.len()
+        ));
     }
 
     for (&page_index, targets) in &redact_by_page {
@@ -176,17 +180,30 @@ pub fn export_pdf_redacted(
                     Ok(b) => b,
                     Err(_) => continue,
                 };
+                // text object 中心点（PDF 坐标系：top > bottom）
+                let obj_cx = (bounds.left().value + bounds.right().value) / 2.0;
+                let obj_cy = (bounds.top().value + bounds.bottom().value) / 2.0;
 
-                // 匹配：text 内容相同 + bbox 接近（tolerance 0.5）
                 let tolerance = 0.5;
                 for target in targets {
-                    if target.text.is_empty() { continue; } // rect-select targets don't match text objects
-                    if text == target.text
-                        && (bounds.left().value - target.left).abs() < tolerance
-                        && (bounds.top().value - target.top).abs() < tolerance
-                        && (bounds.right().value - target.right).abs() < tolerance
-                        && (bounds.bottom().value - target.bottom).abs() < tolerance
-                    {
+                    let matched = if target.text.is_empty() {
+                        // rect-select / 手动文字选中（bbox 路径）：text object 中心
+                        // 落在 bbox 内即删除——绕开 row/start-end 与 paragraph 索引
+                        // 不一致的问题，让黑矩形下面的真文字也被删掉，避免 pdftotext
+                        // 提取出"被涂黑"的原文
+                        obj_cx >= target.left
+                            && obj_cx <= target.right
+                            && obj_cy >= target.bottom
+                            && obj_cy <= target.top
+                    } else {
+                        // 文字路径：text 内容相同 + bbox 接近（tolerance 0.5）
+                        text == target.text
+                            && (bounds.left().value - target.left).abs() < tolerance
+                            && (bounds.top().value - target.top).abs() < tolerance
+                            && (bounds.right().value - target.right).abs() < tolerance
+                            && (bounds.bottom().value - target.bottom).abs() < tolerance
+                    };
+                    if matched {
                         to_remove.push((i, target.clone()));
                         break;
                     }

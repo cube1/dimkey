@@ -74,6 +74,14 @@ function getSelectionInfo(): SelectionInfo | null {
         }
       }
     }
+    // PDF 模式但 pdf_bboxes 计算失败（容器未布局 / 跨页全过滤 / pageEl 不存在）→
+    // 返回 null，让 toolbar 不显示。如果 fallback 走回 row=pageIndex + start/end，
+    // 后端 paragraphs.get(row) 错位会画鬼影黑块（exact 是 2422868 commit 想避免的）
+    if (!pdf_bboxes || pdf_bboxes.length === 0) {
+      // eslint-disable-next-line no-console
+      console.warn("[PdfTextLayer] 无法计算 pdf_bboxes（页容器未布局或选区跨页），放弃此次选中");
+      return null;
+    }
     return { text, row, col, start, end, rect, pdf_bboxes };
   }
 
@@ -271,7 +279,10 @@ export function TextSelectionToolbar({
       templateReplacement.trim()
     );
 
-    // 同时也添加为 SensitiveItem（用于高亮显示）
+    // 同时也添加为 SensitiveItem（用于高亮显示）。
+    // 模板替换模式：不传 pdf_bboxes —— PDF 走 export_pdf_redacted bbox 路径
+    // 只会画黑矩形，不会渲染用户配的替换文本；这里走文字路径让 desensitize.rs
+    // 的 TemplateReplace 分支拿到 row/start-end 做文字替换
     const item: SensitiveItem = {
       id: `manual_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
       text: selectionInfo.text,
@@ -283,7 +294,6 @@ export function TextSelectionToolbar({
       row: selectionInfo.row,
       col: selectionInfo.col,
       sheet_index: sheetIndex,
-      pdf_bboxes: selectionInfo.pdf_bboxes,
     };
     onAddItem?.(item);
 
