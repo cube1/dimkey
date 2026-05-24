@@ -16,7 +16,10 @@ use tauri::Emitter;
 const POLL_INTERVAL_SECS: u64 = 24 * 60 * 60; // 24h
 
 pub fn spawn(app: tauri::AppHandle, manager: Arc<LicenseManager>) {
-    // 用 Tauri 自带的 async_runtime，避免 setup 钩子非 Tokio 上下文导致 panic
+    // 用 Tauri 自带的 async_runtime，避免 setup 钩子非 Tokio 上下文导致 panic。
+    // sleep 仍用 tokio::time::sleep —— Tauri v2 默认 tokio 后端，spawn 出的
+    // future 必然跑在 tokio runtime 上下文，无需也无法切换（tauri::async_runtime
+    // 不暴露 sleep API）
     tauri::async_runtime::spawn(async move {
         // 启动后立即检查一次
         check_once(&app, &manager).await;
@@ -88,8 +91,13 @@ async fn check_once(app: &tauri::AppHandle, manager: &LicenseManager) {
                 }
             };
             if exceeded_grace {
+                // ceiling 除法：超过宽限即使 1 秒也算 1 天，避免 num_days() 截断
+                // 到 0 让前端拿到的 days_until_block=0 与"还 active"语义混淆
                 let days_over = match max_grace_parsed {
-                    Some(max_grace) => (now - max_grace).num_days(),
+                    Some(max_grace) => {
+                        let secs = (now - max_grace).num_seconds().max(0);
+                        (secs + 86_400 - 1) / 86_400
+                    }
                     None => 0,
                 };
                 let new_state = LicenseState::GraceMode {
