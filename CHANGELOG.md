@@ -1,5 +1,25 @@
 # 更新日志
 
+## [v0.8.0] — 2026-05-21
+
+**下载：** [官网下载](https://dimkey.com/#download)
+
+### 新功能
+- **许可证控制（License）**：30 天试用期 + Ed25519 离线证书验签 + 设备指纹绑定 + 24h 心跳吊销检测
+  - 同一份 license 可在同设备上同时激活中文版和英文版（跨 bundle id 共享存储）
+  - 试用期 ≤7 天时右上角倒计时角标，过期后导出文件自动注入水印（xlsx/csv/docx/txt 四格式）
+  - About 弹窗集成 license 区块：激活 / 停用 / 设备管理 / 邮箱找回
+  - 试用期防篡改：3 处冗余存储（config_dir / hidden file / keyring）取最早 first_run_at
+- **跨语言版本共享 license**：从中文版切换到英文版无需重新激活（hidden file + keyring 跨 bundle 共享）
+
+### 重构
+- **license 存储路径**：从 `app_config_dir`（带 bundle id）改为 `dirs::config_dir/com.dimkey`（跨 lang 共享）
+
+### CI
+- **发版前置 preflight 校验**：卡占位 PUBKEY / API 不通 / 版本不一致 / 工作区脏，避免坏包流入生产
+- **CHANGELOG 双语**：release 脚本调 claude -p 自动翻译中文 changelog 为英文，注入 latest-en.json
+- **api_client mockito 测试**：CI 上不依赖真实后端即可验证 5 个 license endpoint 业务逻辑
+
 ## [v0.6.0] — 2026-04-07
 
 **下载：** [官网下载](https://dimkey.com/#download)

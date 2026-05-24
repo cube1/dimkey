@@ -83,6 +83,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: License preflight 校验（lang=zh 阶段）
+        if: matrix.lang == 'zh'
+        shell: bash
+        run: |
+          chmod +x scripts/preflight-license.sh
+          ./scripts/preflight-license.sh
+
       - name: 恢复 NER 模型缓存（${{ matrix.lang }}）
         uses: actions/cache/restore@v4
         with:
@@ -259,6 +266,18 @@ jobs:
           echo "=== 已下载的签名文件 ==="
           ls -la release-assets/ || true
 
+      - name: 下载双语 release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download "${TAG_NAME}" \
+            --dir release-assets \
+            --repo "${{ github.repository }}" \
+            --pattern "dimkey-release-notes-*.md" \
+            || true
+          echo "=== 下载到的 notes 文件 ==="
+          ls -la release-assets/dimkey-release-notes-*.md 2>/dev/null || echo "（无）"
+
       - name: 生成 latest-zh.json 和 latest-en.json
         run: |
           set -euo pipefail
@@ -296,10 +315,20 @@ jobs:
               continue
             fi
 
+            # 按 lang 选 notes 文件
+            NOTES_FILE="release-assets/dimkey-release-notes-${TAG_NAME}.${LANG}.md"
+            if [ -s "$NOTES_FILE" ]; then
+              NOTES=$(cat "$NOTES_FILE")
+            elif [ "$LANG" = "en" ]; then
+              NOTES="See https://dimkey.com/releases/${TAG_NAME} for changelog."
+            else
+              NOTES="请查看 https://dimkey.com 了解详细变更。"
+            fi
+
             jq -n \
               --arg version "$VERSION" \
               --arg pub_date "$PUB_DATE" \
-              --arg notes "请查看更新日志了解详细变更。" \
+              --arg notes "$NOTES" \
               --argjson platforms "$PLATFORMS" \
               '{version: $version, notes: $notes, pub_date: $pub_date, platforms: $platforms}' \
               > "latest-${LANG}.json"

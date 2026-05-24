@@ -73,6 +73,14 @@ command -v gh &>/dev/null || { echo "错误: 未安装 gh CLI"; exit 1; }
 command -v jq &>/dev/null || { echo "错误: 未安装 jq"; exit 1; }
 gh auth status &>/dev/null || { echo "错误: gh CLI 未登录"; exit 1; }
 
+# ── License preflight 校验（lang=zh 阶段调用，避免 lang=en 重复跑）──
+# 在临时改写 tauri.conf.json 和 Cargo.toml 之前跑，确保"工作区干净"判定准确。
+if [ "$LANG_CODE" = "zh" ]; then
+  echo ""
+  echo "运行 License preflight 校验..."
+  ./scripts/preflight-license.sh
+fi
+
 # ── 顺序检查：lang=en 时必须先有 zh 产物 ──
 if [ "$LANG_CODE" = "en" ]; then
   echo ""
@@ -247,19 +255,51 @@ upload_to_release "--repo cube1/dimkey-site"
 # ── 从 CHANGELOG.md 提取当前版本日志，更新 Release 描述（lang=zh 时执行，避免重复）──
 if [ "$LANG_CODE" = "zh" ]; then
   echo ""
-  echo "更新 Release 描述..."
-  RELEASE_NOTES=$(awk "
-    /^## \\[${TAG}\\]/ { found=1 }
-    /^## \\[v/ && found && !/\\[${TAG}\\]/ { exit }
-    found { print }
-  " CHANGELOG.md)
+  echo "生成双语 release notes（zh + en LLM 翻译）..."
+  ./scripts/translate-changelog.sh "$TAG"
 
-  if [ -n "$RELEASE_NOTES" ]; then
-    gh release edit "$TAG" --notes "$RELEASE_NOTES"
-    gh release edit "$TAG" --notes "$RELEASE_NOTES" --repo cube1/dimkey-site
-    echo "  已从 CHANGELOG.md 更新两个仓库的 Release 描述"
+  ZH_NOTES_FILE="/tmp/dimkey-release-notes-${TAG}.zh.md"
+  EN_NOTES_FILE="/tmp/dimkey-release-notes-${TAG}.en.md"
+
+  if [ -s "$ZH_NOTES_FILE" ]; then
+    echo "更新 Release 描述（中文）..."
+    gh release edit "$TAG" --notes-file "$ZH_NOTES_FILE"
+    gh release edit "$TAG" --notes-file "$ZH_NOTES_FILE" --repo cube1/dimkey-site
+    echo "  已从 CHANGELOG.md 更新两个仓库的 Release 描述（中文）"
+
+    # 上传双语 notes 为 release asset，供 workflow_dispatch 阶段复用
+    for f in "$ZH_NOTES_FILE" "$EN_NOTES_FILE"; do
+      [ -s "$f" ] || continue
+      echo "  上传 $(basename "$f") 作为 release asset..."
+      gh release upload "$TAG" "$f" --clobber
+      gh release upload "$TAG" "$f" --clobber --repo cube1/dimkey-site
+    done
   else
-    echo "  警告: 未在 CHANGELOG.md 中找到 ${TAG} 的条目"
+    echo "  警告: 未在 CHANGELOG.md 中找到 ${TAG} 的条目，跳过 Release 描述更新"
+  fi
+fi
+
+# lang=en 完成时，把英文 notes 追加到 Release 描述
+if [ "$LANG_CODE" = "en" ]; then
+  EN_NOTES_FILE="/tmp/dimkey-release-notes-${TAG}.en.md"
+  ZH_NOTES_FILE="/tmp/dimkey-release-notes-${TAG}.zh.md"
+  if [ -s "$EN_NOTES_FILE" ] && [ -s "$ZH_NOTES_FILE" ]; then
+    echo ""
+    echo "把英文 notes 追加到 Release 描述..."
+    COMBINED=$(mktemp)
+    {
+      cat "$ZH_NOTES_FILE"
+      echo ""
+      echo "---"
+      echo ""
+      echo "## English"
+      echo ""
+      cat "$EN_NOTES_FILE"
+    } > "$COMBINED"
+    gh release edit "$TAG" --notes-file "$COMBINED"
+    gh release edit "$TAG" --notes-file "$COMBINED" --repo cube1/dimkey-site
+    rm -f "$COMBINED"
+    echo "  Release 描述已更新为中英双语"
   fi
 fi
 

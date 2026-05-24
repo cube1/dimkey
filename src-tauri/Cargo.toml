@@ -1,6 +1,6 @@
 [package]
 name = "dimkey"
-version = "0.7.0"
+version = "0.8.0"
 description = "Dimkey — 本地文档脱敏工具"
 authors = ["you"]
 edition = "2021"
@@ -63,3 +63,4 @@ dirs = "5"
 
 [dev-dependencies]
 tempfile = "3"
+mockito = "1"
