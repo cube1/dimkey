@@ -6,7 +6,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
-  ChevronRight,
   Clock,
   HelpCircle,
   Info,
@@ -28,6 +27,7 @@ import { RecoverDialog } from "../license/RecoverDialog";
 import { AboutModal } from "../AboutModal";
 
 const FEEDBACK_EMAIL = "support@dimkey.com";
+const MENU_ID = "license-status-card-menu";
 
 /** 从 Tauri invoke reject 的 payload 里提取人类可读消息。
  *  LicenseError 序列化为 {code, data?}；其它后端可能 reject 字符串；fallback 走 String(). */
@@ -108,6 +108,19 @@ export function LicenseStatusCard() {
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
+  }, [menuOpen]);
+
+  // Escape 关菜单（键盘可达性）
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
   }, [menuOpen]);
 
   // Activated 态下的指纹漂移 — 单独标记，仅用于在 Activated 视觉上叠加 warn 副标
@@ -294,44 +307,64 @@ export function LicenseStatusCard() {
   return (
     <>
       <div className="px-3 pt-2 pb-1 shrink-0 relative">
+        {/* 卡片 = 两个并排真实 button，避免 role=button 嵌套真 button 的 ARIA 违规。
+            外层 div 只做布局，hover 视觉用 group/group-hover 同步两个 button。 */}
         <div
           ref={cardRef}
-          className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg border transition-colors cursor-pointer ${tone.wrap}`}
-          onClick={handlePrimaryAction}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              handlePrimaryAction();
-            }
-          }}
+          className={`group flex items-center gap-1 rounded-lg border transition-colors ${tone.wrap}`}
         >
-          <Icon className={`w-4 h-4 shrink-0 ${tone.icon}`} />
-          <div className="flex-1 min-w-0">
-            <div className={`text-xs leading-tight truncate ${tone.title}`}>{visual.title}</div>
-            {visual.cta && (
-              <div className={`text-[11px] leading-tight truncate ${tone.cta}`}>
-                {visual.cta}
-              </div>
-            )}
-          </div>
           <button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setMenuOpen((v) => !v);
-            }}
-            className="p-1 -mr-1 rounded hover:bg-black/5 text-slate-400 hover:text-slate-600"
-            title={t("license.statusCard.menu.title")}
+            onClick={handlePrimaryAction}
+            disabled={!initialized}
+            className={`flex-1 min-w-0 flex items-center gap-2 px-2.5 py-1.5 rounded-l-lg text-left disabled:cursor-default ${
+              initialized ? "cursor-pointer" : ""
+            }`}
           >
-            <MoreVertical className="w-3.5 h-3.5" />
+            <Icon aria-hidden="true" className={`w-4 h-4 shrink-0 ${tone.icon}`} />
+            <div className="flex-1 min-w-0">
+              <div className={`text-xs leading-tight truncate ${tone.title}`}>{visual.title}</div>
+              {visual.cta && (
+                <div className={`text-[11px] leading-tight truncate ${tone.cta}`}>
+                  {visual.cta}
+                </div>
+              )}
+            </div>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+            aria-controls={MENU_ID}
+            aria-label={t("license.statusCard.menu.title")}
+            title={t("license.statusCard.menu.title")}
+            className="p-1.5 mr-1 rounded hover:bg-black/5 text-slate-400 hover:text-slate-600"
+          >
+            <MoreVertical aria-hidden="true" className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {menuOpen && (
+        {menuOpen && (() => {
+          // 首项焦点 key — 保证多条件渲染时只有一个 MenuItem 拿到焦点
+          // 优先级：reverify (Activated+fpDrift) > activate (未激活/孤儿等) > devices (Activated/Grace)
+          const firstKey: "reverify" | "activate" | "devices" | null = activatedFpDrift
+            ? "reverify"
+            : state.kind === "Trial" ||
+                state.kind === "TrialExpired" ||
+                state.kind === "Revoked" ||
+                orphanFpDrift ||
+                (state.kind === "Unknown" && initialized)
+              ? "activate"
+              : state.kind === "Activated" || state.kind === "GraceMode"
+                ? "devices"
+                : null;
+          return (
           <div
             ref={menuRef}
+            id={MENU_ID}
+            role="menu"
+            aria-label={t("license.statusCard.menu.title")}
             className="absolute left-3 right-3 bottom-full mb-1 bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-30"
           >
             {/* 未激活 / 试用 / 过期 / 已撤销 / Unknown+孤儿lic：激活入口 */}
@@ -341,7 +374,12 @@ export function LicenseStatusCard() {
               state.kind === "Revoked" ||
               orphanFpDrift ||
               (state.kind === "Unknown" && initialized)) && (
-              <MenuItem icon={KeyRound} label={t("license.statusCard.menu.activate")} onClick={handleActivate} />
+              <MenuItem
+                icon={KeyRound}
+                label={t("license.statusCard.menu.activate")}
+                onClick={handleActivate}
+                autoFocus={firstKey === "activate"}
+              />
             )}
 
             {/* Activated + 指纹漂移：重新验证此设备（联网） */}
@@ -350,12 +388,18 @@ export function LicenseStatusCard() {
                 icon={Wifi}
                 label={t("license.statusCard.menu.reverify")}
                 onClick={handleReconnect}
+                autoFocus={firstKey === "reverify"}
               />
             )}
 
             {/* 已激活（含 GraceMode 缓存的设备列表）：设备管理 */}
             {(state.kind === "Activated" || state.kind === "GraceMode") && (
-              <MenuItem icon={Smartphone} label={t("license.statusCard.menu.devices")} onClick={handleDevices} />
+              <MenuItem
+                icon={Smartphone}
+                label={t("license.statusCard.menu.devices")}
+                onClick={handleDevices}
+                autoFocus={firstKey === "devices"}
+              />
             )}
 
             {/* 宽限期：联网恢复 */}
@@ -372,7 +416,7 @@ export function LicenseStatusCard() {
 
             {state.kind === "Activated" && (
               <>
-                <div className="my-1 border-t border-slate-100" />
+                <div className="my-1 border-t border-slate-100" role="separator" />
                 <MenuItem
                   icon={AlertTriangle}
                   label={t("license.statusCard.menu.deactivate")}
@@ -382,7 +426,8 @@ export function LicenseStatusCard() {
               </>
             )}
           </div>
-        )}
+          );
+        })()}
       </div>
 
       <ActivationDialog
@@ -416,22 +461,29 @@ interface MenuItemProps {
   label: string;
   onClick: () => void;
   danger?: boolean;
+  /** 菜单打开时第一项自动获得焦点（键盘可达性） */
+  autoFocus?: boolean;
 }
 
-function MenuItem({ icon: Icon, label, onClick, danger }: MenuItemProps) {
+function MenuItem({ icon: Icon, label, onClick, danger, autoFocus }: MenuItemProps) {
+  const ref = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (autoFocus) ref.current?.focus();
+  }, [autoFocus]);
   return (
     <button
+      ref={ref}
       type="button"
+      role="menuitem"
       onClick={onClick}
-      className={`w-full flex items-center gap-2 px-3 py-1.5 text-xs text-left transition-colors ${
+      className={`w-full flex items-center gap-2 px-3 py-1.5 text-xs text-left transition-colors focus:outline-none focus:bg-slate-100 ${
         danger
-          ? "text-red-600 hover:bg-red-50"
+          ? "text-red-600 hover:bg-red-50 focus:bg-red-50"
           : "text-slate-700 hover:bg-slate-50"
       }`}
     >
-      <Icon className="w-3.5 h-3.5 shrink-0" />
+      <Icon aria-hidden="true" className="w-3.5 h-3.5 shrink-0" />
       <span className="flex-1 truncate">{label}</span>
-      <ChevronRight className="w-3 h-3 text-slate-300 shrink-0" />
     </button>
   );
 }
