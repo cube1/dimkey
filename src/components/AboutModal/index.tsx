@@ -9,7 +9,7 @@ import { ActivationDialog } from "../license/ActivationDialog";
 import { DeviceListDialog } from "../license/DeviceListDialog";
 import { RecoverDialog } from "../license/RecoverDialog";
 
-const FEEDBACK_EMAIL = "cube1@live.cn";
+const FEEDBACK_EMAIL = "support@dimkey.com";
 
 interface AboutModalProps {
   visible: boolean;
