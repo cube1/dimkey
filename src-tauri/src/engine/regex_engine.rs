@@ -244,7 +244,7 @@ impl RegexEngine {
                     row,
                     col,
                     sheet_index: 0,
-                    pdf_bbox: None,
+                    pdf_bboxes: None,
                 });
             }
         }

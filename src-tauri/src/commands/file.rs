@@ -539,16 +539,18 @@ pub async fn compute_pdf_redact_preview(
         }
     }
 
-    // 额外收集 pdf_bbox 项（已经是归一化屏幕坐标）
+    // 额外收集 pdf_bboxes 项（已经是归一化屏幕坐标）
     for item in &sensitive_items {
-        if let Some(ref bbox) = item.pdf_bbox {
-            result.push(RedactOverlayRect {
-                page_index: bbox.page_index,
-                left: bbox.left,
-                top: bbox.top,
-                right: bbox.right,
-                bottom: bbox.bottom,
-            });
+        if let Some(ref bboxes) = item.pdf_bboxes {
+            for bbox in bboxes {
+                result.push(RedactOverlayRect {
+                    page_index: bbox.page_index,
+                    left: bbox.left,
+                    top: bbox.top,
+                    right: bbox.right,
+                    bottom: bbox.bottom,
+                });
+            }
         }
     }
 

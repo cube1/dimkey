@@ -76,7 +76,7 @@ impl DictEngine {
                             row,
                             col,
                             sheet_index,
-                            pdf_bbox: None,
+                            pdf_bboxes: None,
                         });
 
                         search_start = abs_byte_pos + pattern.len();
@@ -105,7 +105,7 @@ impl DictEngine {
                             row,
                             col,
                             sheet_index,
-                            pdf_bbox: None,
+                            pdf_bboxes: None,
                         });
 
                         search_start = abs_byte_pos + pattern_lower.len();

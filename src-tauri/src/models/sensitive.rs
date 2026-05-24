@@ -229,10 +229,12 @@ pub struct SensitiveItem {
     /// 所在 Sheet 索引（Excel 多 Sheet，Word/CSV 为 0）
     #[serde(default)]
     pub sheet_index: usize,
-    /// PDF 手动框选涂黑区域（归一化屏幕坐标）
+    /// PDF 手动涂黑区域（归一化屏幕坐标）。
+    /// Vec 是因为多行文字选中需要每行一个 bbox（getClientRects 拆分），
+    /// 单一矩形框选时长度为 1。
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
-    pub pdf_bbox: Option<PdfBbox>,
+    pub pdf_bboxes: Option<Vec<PdfBbox>>,
 }
 
 /// 文件类型

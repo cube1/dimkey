@@ -29,9 +29,9 @@ pub fn compute_redact_targets(
     let mut redact_by_page: HashMap<usize, Vec<RedactTarget>> = HashMap::new();
 
     for item in sensitive_items {
-        // 已带 pdf_bbox 的 item（手动框选 / 手动文字选中）由调用方按 bbox 路径单独处理；
+        // 已带 pdf_bboxes 的 item（手动框选 / 手动文字选中）由调用方按 bbox 路径单独处理；
         // 这里跳过避免基于 paragraphs.get(row) 的错位匹配在错段落画鬼影黑块
-        if item.pdf_bbox.is_some() {
+        if item.pdf_bboxes.is_some() {
             continue;
         }
         let para_index = item.row;
@@ -112,22 +112,33 @@ pub fn export_pdf_redacted(
         .load_pdf_from_file(original_path, None)
         .map_err(|e| format!("打开 PDF 文件失败：{}", e))?;
 
-    // 额外收集 pdf_bbox 类型的涂黑区域（用户手动框选）
+    // 额外收集 pdf_bboxes 类型的涂黑区域（用户手动框选 / 文字选中按行拆出的多 bbox）
     for item in sensitive_items {
-        if let Some(ref bbox) = item.pdf_bbox {
-            let page = doc.pages().get(bbox.page_index as u16)
-                .map_err(|e| format!("读取第 {} 页失败：{}", bbox.page_index + 1, e))?;
-            let pw = page.width().value;
-            let ph = page.height().value;
+        if let Some(ref bboxes) = item.pdf_bboxes {
+            for bbox in bboxes {
+                let page = match doc.pages().get(bbox.page_index as u16) {
+                    Ok(p) => p,
+                    Err(e) => {
+                        eprintln!(
+                            "警告：跳过 bbox（页 {} 超出范围）：{}",
+                            bbox.page_index + 1,
+                            e
+                        );
+                        continue;
+                    }
+                };
+                let pw = page.width().value;
+                let ph = page.height().value;
 
-            let targets = redact_by_page.entry(bbox.page_index).or_default();
-            targets.push(RedactTarget {
-                text: String::new(),  // empty text marks this as a rect-select target
-                left: bbox.left * pw,
-                top: (1.0 - bbox.top) * ph,      // screen coords → PDF coords (Y flip)
-                right: bbox.right * pw,
-                bottom: (1.0 - bbox.bottom) * ph,
-            });
+                let targets = redact_by_page.entry(bbox.page_index).or_default();
+                targets.push(RedactTarget {
+                    text: String::new(),  // empty text marks this as a rect-select target
+                    left: bbox.left * pw,
+                    top: (1.0 - bbox.top) * ph,      // screen coords → PDF coords (Y flip)
+                    right: bbox.right * pw,
+                    bottom: (1.0 - bbox.bottom) * ph,
+                });
+            }
         }
     }
 
@@ -284,22 +295,33 @@ pub fn export_pdf_as_images(
         .load_pdf_from_file(original_path, None)
         .map_err(|e| format!("打开 PDF 文件失败：{}", e))?;
 
-    // 额外收集 pdf_bbox 类型的涂黑区域
+    // 额外收集 pdf_bboxes 类型的涂黑区域（手动框选 / 文字选中按行拆出）
     for item in sensitive_items {
-        if let Some(ref bbox) = item.pdf_bbox {
-            let page = doc.pages().get(bbox.page_index as u16)
-                .map_err(|e| format!("读取第 {} 页失败：{}", bbox.page_index + 1, e))?;
-            let pw = page.width().value;
-            let ph = page.height().value;
+        if let Some(ref bboxes) = item.pdf_bboxes {
+            for bbox in bboxes {
+                let page = match doc.pages().get(bbox.page_index as u16) {
+                    Ok(p) => p,
+                    Err(e) => {
+                        eprintln!(
+                            "警告：跳过 bbox（页 {} 超出范围）：{}",
+                            bbox.page_index + 1,
+                            e
+                        );
+                        continue;
+                    }
+                };
+                let pw = page.width().value;
+                let ph = page.height().value;
 
-            let targets = redact_by_page.entry(bbox.page_index).or_default();
-            targets.push(RedactTarget {
-                text: String::new(),
-                left: bbox.left * pw,
-                top: (1.0 - bbox.top) * ph,
-                right: bbox.right * pw,
-                bottom: (1.0 - bbox.bottom) * ph,
-            });
+                let targets = redact_by_page.entry(bbox.page_index).or_default();
+                targets.push(RedactTarget {
+                    text: String::new(),
+                    left: bbox.left * pw,
+                    top: (1.0 - bbox.top) * ph,
+                    right: bbox.right * pw,
+                    bottom: (1.0 - bbox.bottom) * ph,
+                });
+            }
         }
     }
 

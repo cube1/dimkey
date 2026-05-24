@@ -91,7 +91,7 @@ export function RectSelectionLayer({
       row: pageIndex,
       col: 0,
       sheet_index: 0,
-      pdf_bbox: pdf_bbox,
+      pdf_bboxes: [pdf_bbox],
     };
     onAddItem(item);
     setPendingRect(null);

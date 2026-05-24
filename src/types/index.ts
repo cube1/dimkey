@@ -61,7 +61,8 @@ export interface SensitiveItem {
   row: number;
   col: number;
   sheet_index: number;
-  pdf_bbox?: PdfBbox;
+  /** PDF 手动涂黑区域。多行文字选中拆 N 个 bbox，矩形框选长度为 1 */
+  pdf_bboxes?: PdfBbox[];
 }
 
 // ============================================================

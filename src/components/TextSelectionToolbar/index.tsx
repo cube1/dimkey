@@ -11,7 +11,8 @@ interface SelectionInfo {
   start: number;
   end: number;
   rect: DOMRect;
-  pdf_bbox?: PdfBbox;
+  /** 多行选中按行拆 N 个 bbox；矩形框选长度为 1；跨页时仅保留 startSpan 所在页 */
+  pdf_bboxes?: PdfBbox[];
 }
 
 /** 从 DOM 选区中提取坐标信息 */
@@ -32,9 +33,11 @@ function getSelectionInfo(): SelectionInfo | null {
   const col = parseInt(container.getAttribute("data-col") || "0", 10);
   if (row < 0) return null;
 
-  // PDF 文本层模式：使用 data-char-offset 计算偏移，并额外计算 pdf_bbox
-  // （pdf_bbox 是关键路径——后端按 bbox 涂黑，绕开 row/start-end 与
-  // paragraph 索引/段内偏移不匹配的问题）
+  // PDF 文本层模式：使用 data-char-offset 计算偏移，并按行拆 pdf_bboxes
+  // （pdf_bboxes 是关键路径——后端按 bbox 涂黑，绕开 row/start-end 与
+  // paragraph 索引/段内偏移不匹配的问题。多行选中用 getClientRects 拆每行
+  // 一个 bbox，避免 getBoundingClientRect 的并集矩形横盖行间无关文字。
+  // 跨页时仅保留 startSpan 所在页的 client rect。）
   const startSpan = findCharOffsetSpan(range.startContainer);
   if (startSpan) {
     const baseOffset = parseInt(startSpan.getAttribute("data-char-offset") || "0", 10);
@@ -42,23 +45,36 @@ function getSelectionInfo(): SelectionInfo | null {
     const end = start + text.length;
     const rect = range.getBoundingClientRect();
     const pdfPageEl = startSpan.closest("[data-pdf-page]") as HTMLElement | null;
-    let pdf_bbox: PdfBbox | undefined;
+    let pdf_bboxes: PdfBbox[] | undefined;
     if (pdfPageEl) {
       const pageRect = pdfPageEl.getBoundingClientRect();
-      // 防御：容器尚未布局或被 display:none 时 width/height=0，避免计算出 Infinity
+      // 防御：容器尚未布局或被 display:none 时 width/height=0，避免算出 Infinity
       // 让 bbox 失败后端走文字匹配路径，至少不会破坏 IPC 序列化
       if (pageRect.width > 0 && pageRect.height > 0) {
         const pageIdx = parseInt(pdfPageEl.getAttribute("data-pdf-page") || "0", 10);
-        pdf_bbox = {
-          page_index: pageIdx,
-          left: (rect.left - pageRect.left) / pageRect.width,
-          top: (rect.top - pageRect.top) / pageRect.height,
-          right: (rect.right - pageRect.left) / pageRect.width,
-          bottom: (rect.bottom - pageRect.top) / pageRect.height,
-        };
+        const clientRects = Array.from(range.getClientRects());
+        // 跨页过滤：只保留中心点落在 startPage 矩形内的 rect
+        const inPage = clientRects.filter((r) => {
+          if (r.width <= 0 || r.height <= 0) return false;
+          const cx = r.left + r.width / 2;
+          const cy = r.top + r.height / 2;
+          return (
+            cx >= pageRect.left && cx <= pageRect.right &&
+            cy >= pageRect.top && cy <= pageRect.bottom
+          );
+        });
+        if (inPage.length > 0) {
+          pdf_bboxes = inPage.map((r) => ({
+            page_index: pageIdx,
+            left: (r.left - pageRect.left) / pageRect.width,
+            top: (r.top - pageRect.top) / pageRect.height,
+            right: (r.right - pageRect.left) / pageRect.width,
+            bottom: (r.bottom - pageRect.top) / pageRect.height,
+          }));
+        }
       }
     }
-    return { text, row, col, start, end, rect, pdf_bbox };
+    return { text, row, col, start, end, rect, pdf_bboxes };
   }
 
   // 计算文本偏移：遍历容器内的文本节点
@@ -225,7 +241,7 @@ export function TextSelectionToolbar({
         row: selectionInfo.row,
         col: selectionInfo.col,
         sheet_index: sheetIndex,
-        pdf_bbox: selectionInfo.pdf_bbox,
+        pdf_bboxes: selectionInfo.pdf_bboxes,
       };
 
       if (onAddItem) {
@@ -267,7 +283,7 @@ export function TextSelectionToolbar({
       row: selectionInfo.row,
       col: selectionInfo.col,
       sheet_index: sheetIndex,
-      pdf_bbox: selectionInfo.pdf_bbox,
+      pdf_bboxes: selectionInfo.pdf_bboxes,
     };
     onAddItem?.(item);
 

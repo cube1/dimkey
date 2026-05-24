@@ -121,7 +121,7 @@ impl NerEngine {
                         row: *row,
                         col: *col,
                         sheet_index: *sheet_index,
-                        pdf_bbox: None,
+                        pdf_bboxes: None,
                     });
                 }
             }
