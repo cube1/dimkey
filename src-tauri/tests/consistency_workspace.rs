@@ -65,7 +65,7 @@ fn test_k01_same_phone_consistency_5rows() {
             text: dup_phone.into(),
             sensitive_type: SensitiveType::Phone,
             source: DetectSource::Regex,
-            pdf_bbox: None,
+            pdf_bboxes: None,
             confidence: 0.95,
             start: 0,
             end: dup_phone.chars().count(),

@@ -34,7 +34,7 @@ fn make_item(text: &str, st: SensitiveType, row: usize, col: usize) -> Sensitive
         text: text.into(),
         sensitive_type: st,
         source: DetectSource::Regex,
-        pdf_bbox: None,
+        pdf_bboxes: None,
         confidence: 0.95,
         start: 0,
         end: text.chars().count(),
