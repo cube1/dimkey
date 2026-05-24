@@ -16,7 +16,8 @@ use tauri::Emitter;
 const POLL_INTERVAL_SECS: u64 = 24 * 60 * 60; // 24h
 
 pub fn spawn(app: tauri::AppHandle, manager: Arc<LicenseManager>) {
-    tokio::spawn(async move {
+    // 用 Tauri 自带的 async_runtime，避免 setup 钩子非 Tokio 上下文导致 panic
+    tauri::async_runtime::spawn(async move {
         // 启动后立即检查一次
         check_once(&app, &manager).await;
         loop {
