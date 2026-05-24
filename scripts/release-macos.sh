@@ -91,6 +91,11 @@ if ! git ls-remote --tags origin | grep -q "refs/tags/${TAG}$"; then
   echo "警告: Tag $TAG 尚未推送到远端，Windows CI 不会自动触发"
 fi
 
+# ── 确保 PDFium dylib 就位（缺失则从 bblanchon 下载 + 重签 timestamp）──
+echo ""
+echo "检查 PDFium dylib ..."
+./scripts/fetch_pdfium.sh
+
 # ── 切换 NER 模型 ──
 echo ""
 echo "切换 NER 模型 → $MODEL_NAME ..."
