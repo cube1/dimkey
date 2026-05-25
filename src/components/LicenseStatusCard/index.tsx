@@ -127,15 +127,16 @@ export function LicenseStatusCard() {
   // （但不抢占 Revoked / TrialExpired 等更严重的状态判定）
   const activatedFpDrift =
     state.kind === "Activated" && state.fingerprint_mismatch;
-  // 未激活态的本地 .lic 指纹冲突：只在 state 不是 Activated/Revoked/TrialExpired 等严重态时优先
+  // 未激活态的本地 .lic 指纹冲突：boot 会回退到 Trial/TrialExpired，
+  // 但左下角主卡片仍应优先提示用户重新激活本机。
   const orphanFpDrift = !!fpMismatchHint && state.kind !== "Activated";
 
   const visual: CardVisual = (() => {
     if (!initialized) {
       return { Icon: HelpCircle, tone: "neutral", title: t("license.statusCard.checking") };
     }
-    // 优先级：Revoked > TrialExpired > orphanFpDrift > 其它正常态
-    // —— 严重状态不可被指纹漂移这种 warn 级提示掩盖
+    // 优先级：Revoked > orphanFpDrift > TrialExpired > 其它正常态
+    // —— revoked 不可被指纹漂移这种 warn 级提示掩盖；试用态则应让位给本地证书冲突。
     switch (state.kind) {
       case "Revoked":
         return {
@@ -144,22 +145,37 @@ export function LicenseStatusCard() {
           title: t("license.statusCard.revoked"),
           cta: t("license.statusCard.contactSupport"),
         };
+      case "Trial":
       case "TrialExpired":
-        return {
-          Icon: AlertTriangle,
-          tone: "danger",
-          title: t("license.statusCard.trialExpired"),
-          cta: t("license.statusCard.activateNow"),
-        };
-      case "Trial": {
-        const days = Math.max(0, state.days_remaining);
-        return {
-          Icon: Clock,
-          tone: days <= 3 ? "warn" : "neutral",
-          title: t("license.statusCard.trial"),
-          cta: t("license.statusCard.trialDaysLeftCta", { days }),
-        };
-      }
+      case "Unknown":
+        if (orphanFpDrift) {
+          return {
+            Icon: ShieldAlert,
+            tone: "warn",
+            title: t("license.statusCard.fpDrift"),
+            cta: fpMismatchHint
+              ? t("license.statusCard.fpDriftDetail", { fp: fpMismatchHint })
+              : t("license.statusCard.viewDetail"),
+          };
+        }
+        if (state.kind === "Trial") {
+          const days = Math.max(0, state.days_remaining);
+          return {
+            Icon: Clock,
+            tone: days <= 3 ? "warn" : "neutral",
+            title: t("license.statusCard.trial"),
+            cta: t("license.statusCard.trialDaysLeftCta", { days }),
+          };
+        }
+        if (state.kind === "TrialExpired") {
+          return {
+            Icon: AlertTriangle,
+            tone: "danger",
+            title: t("license.statusCard.trialExpired"),
+            cta: t("license.statusCard.activateNow"),
+          };
+        }
+        return { Icon: HelpCircle, tone: "neutral", title: t("license.statusCard.checking") };
       case "Activated":
         // Activated + 指纹漂移：变 warn + cta 显示 fp 短码，但不变 danger
         if (activatedFpDrift) {
@@ -185,19 +201,6 @@ export function LicenseStatusCard() {
           title: t("license.statusCard.graceMode"),
           cta: t("license.statusCard.graceDaysLeft", { days: state.days_until_block }),
         };
-      case "Unknown":
-        // Unknown + 有 .lic 指纹冲突 → 提示
-        if (orphanFpDrift) {
-          return {
-            Icon: ShieldAlert,
-            tone: "warn",
-            title: t("license.statusCard.fpDrift"),
-            cta: fpMismatchHint
-              ? t("license.statusCard.fpDriftDetail", { fp: fpMismatchHint })
-              : t("license.statusCard.viewDetail"),
-          };
-        }
-        return { Icon: HelpCircle, tone: "neutral", title: t("license.statusCard.checking") };
       default:
         return { Icon: HelpCircle, tone: "neutral", title: t("license.statusCard.checking") };
     }
@@ -347,8 +350,9 @@ export function LicenseStatusCard() {
 
         {menuOpen && (() => {
           // 首项焦点 key — 保证多条件渲染时只有一个 MenuItem 拿到焦点
-          // 优先级：reverify (Activated+fpDrift) > activate (未激活/孤儿等) > devices (Activated/Grace)
-          const firstKey: "reverify" | "activate" | "devices" | null = activatedFpDrift
+          // 优先级：reverify (Activated+fpDrift/Grace) > activate (未激活/孤儿等) > devices (Activated)
+          const firstKey: "reverify" | "activate" | "devices" | null =
+            activatedFpDrift || state.kind === "GraceMode"
             ? "reverify"
             : state.kind === "Trial" ||
                 state.kind === "TrialExpired" ||
@@ -356,7 +360,7 @@ export function LicenseStatusCard() {
                 orphanFpDrift ||
                 (state.kind === "Unknown" && initialized)
               ? "activate"
-              : state.kind === "Activated" || state.kind === "GraceMode"
+              : state.kind === "Activated"
                 ? "devices"
                 : null;
           return (
@@ -392,8 +396,8 @@ export function LicenseStatusCard() {
               />
             )}
 
-            {/* 已激活（含 GraceMode 缓存的设备列表）：设备管理 */}
-            {(state.kind === "Activated" || state.kind === "GraceMode") && (
+            {/* 已激活：设备管理。GraceMode 下设备列表需要联网，避免离线时显示误导性空列表。 */}
+            {state.kind === "Activated" && (
               <MenuItem
                 icon={Smartphone}
                 label={t("license.statusCard.menu.devices")}
@@ -408,6 +412,7 @@ export function LicenseStatusCard() {
                 icon={Wifi}
                 label={t("license.statusCard.menu.recoverOnline")}
                 onClick={handleReconnect}
+                autoFocus={firstKey === "reverify"}
               />
             )}
 
